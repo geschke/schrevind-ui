@@ -1,0 +1,302 @@
+﻿{
+  "comments": {
+    "title": "Comments",
+    "bulkAction": "Bulk action",
+    "selectedCount": "{count} selected",
+    "actions": {
+      "apply": "Apply",
+      "approve": "Approve",
+      "reject": "Reject",
+      "spam": "Mark as spam",
+      "delete": "Delete"
+    },
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "spam": "Spam",
+      "deleted": "Trash"
+    },
+    "table": {
+      "empty": "No data available.",
+      "columns": {
+        "site": "Site",
+        "postPath": "PostPath",
+        "author": "Author",
+        "email": "Email",
+        "name": "Name",
+        "url": "URL",
+        "comment": "Comment",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "fullTextBy": "Full text by {author} ({email})"
+    },
+    "siteFilter": {
+      "label": "Site:",
+      "allSites": "All sites"
+    },
+    "search": {
+      "placeholder": "Search comments...",
+      "submit": "Search",
+      "clear": "Clear search"
+    },
+    "toast": {
+      "errorTitle": "Error",
+      "loadFailed": "Could not load comments.",
+      "partialTitle": "Partially completed",
+      "partialContent": "{changed} changed, {unchanged} unchanged, {failed} failed{errorSuffix}.",
+      "noChangeTitle": "No changes",
+      "noChangeContent": "{count} comment(s) were already in the requested status.",
+      "successTitle": "OK",
+      "successContent": "{changed} comment(s) {action}, {unchanged} unchanged.",
+      "actionFailed": "Action could not be executed."
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "spam": "Spam",
+      "deleted": "Deleted"
+    }
+  },
+  "common": {
+    "loading": "Loading..."
+  },
+  "sites": {
+    "title": "Sites",
+    "table": {
+      "empty": "No data available.",
+      "columns": {
+        "id": "ID",
+        "siteKey": "SiteKey",
+        "title": "Title",
+        "status": "Status",
+        "createdAt": "Created",
+        "updatedAt": "Updated"
+      }
+    },
+    "toast": {
+      "errorTitle": "Error",
+      "loadFailed": "Could not load sites.",
+      "unknown": "An unknown error occurred."
+    }
+  },
+  "adminOverview": {
+    "title": "Admin",
+    "links": {
+      "users": "Users"
+    }
+  },
+  "adminUsers": {
+    "common": {
+      "email": "Email",
+      "password": "Password",
+      "passwordConfirm": "Repeat password",
+      "firstname": "First name",
+      "lastname": "Last name",
+      "cancel": "Cancel",
+      "save": "Save",
+      "okTitle": "OK",
+      "errorTitle": "Error",
+      "backToList": "Back to user list"
+    },
+    "errors": {
+      "loadFailed": "Failed to load data.",
+      "userDataLoadFailed": "Failed to load user data.",
+      "emailExists": "The email address already exists.",
+      "usernameExists": "The username already exists.",
+      "unknown": "An unknown error occurred.",
+      "userNotFound": "User was not found.",
+      "userNotFoundDelete": "User was not found (possibly already deleted).",
+      "cannotDeleteOwnAccount": "The currently signed-in user cannot delete their own account."
+    },
+    "validation": {
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "This is not a valid email address.",
+      "passwordRequired": "A password is required.",
+      "passwordMin": "The password must be at least 6 characters long.",
+      "passwordConfirmMismatch": "Passwords do not match.",
+      "firstnameRequired": "Please enter your first name.",
+      "firstnameMin": "Minimum length is two characters.",
+      "lastnameRequired": "Please enter your last name.",
+      "lastnameMin": "Minimum length is two characters."
+    },
+    "list": {
+      "title": "Users",
+      "addButton": "Add user",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "email": "Email",
+          "name": "Name",
+          "actions": "Actions"
+        }
+      },
+      "modal": {
+        "title": "Delete user?",
+        "body": "Do you really want to delete this user?",
+        "confirm": "Delete",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "idLabel": "ID",
+        "warning": "The user will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "User deleted",
+        "deletedContent": "The user was removed from the database.",
+        "deleteFailed": "The user could not be deleted."
+      },
+      "actions": {
+        "edit": "Edit user",
+        "changePassword": "Change password",
+        "delete": "Delete user"
+      },
+      "createdBanner": "User was created successfully.",
+      "createdBannerWithEmail": "User {email} was created successfully."
+    },
+    "add": {
+      "title": "Create user",
+      "submit": "Create user",
+      "errors": {
+        "invalidPassword": "Invalid password.",
+        "invalidJson": "Invalid request while creating the user.",
+        "dbError": "Database error while creating the user.",
+        "passwordHashFailed": "Password could not be processed.",
+        "unauthorized": "Not authorized for this action.",
+        "network": "Network error. No response from server."
+      },
+      "toasts": {
+        "createdContent": "The user was added."
+      }
+    },
+    "edit": {
+      "title": "Edit user",
+      "submit": "Save",
+      "toasts": {
+        "updatedContent": "User data was updated."
+      },
+      "changePassword": "Change password",
+      "alerts": {
+        "saved": "Changes were saved."
+      }
+    },
+    "password": {
+      "title": "Change password",
+      "submit": "Save password",
+      "toasts": {
+        "updatedContent": "Password was updated."
+      },
+      "errors": {
+        "invalidUserId": "Invalid user ID."
+      },
+      "alerts": {
+        "saved": "Password was saved."
+      }
+    }
+  },
+  "layout": {
+    "topbar": {
+      "searchPlaceholder": "Search for...",
+      "searchAria": "Search for...",
+      "editUser": "Edit user",
+      "changeOwnPassword": "Change password",
+      "logout": "Logout"
+    },
+    "locale": {
+      "de": "German",
+      "en": "English"
+    },
+    "loggedInAs": "Logged in as:",
+    "contentFallback": "Main content",
+    "footer": {
+      "about": "About",
+      "github": "GitHub"
+    }
+  },
+  "nav": {
+    "sections": {
+      "core": "Core"
+    },
+    "items": {
+      "comments": "Comments",
+      "sites": "Sites",
+      "users": "Users"
+    }
+  },
+  "landing": {
+    "mainContent": "Main content"
+  },
+  "twoColumns": {
+    "left": "Left column",
+    "right": "Right column"
+  },
+  "search": {
+    "title": "Search",
+    "queryLabel": "Search for",
+    "queryPlaceholder": "Search for...",
+    "searchButton": "Search",
+    "resultsPlaceholder": "Placeholder",
+    "validation": {
+      "queryRequired": "Please enter a search term.",
+      "queryMin": "Minimum length is two characters."
+    },
+    "toast": {
+      "errorTitle": "Error"
+    }
+  },
+  "notFound": {
+    "title": "Not found",
+    "productTitle": "Product title",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus hic sapiente quo veritatis assumenda in doloribus doloremque molestiae minus cum corrupti dolorem minima, sed iste repellendus unde voluptatem, nihil facilis."
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in now",
+      "emailLabel": "Email address",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "validation": {
+        "emailRequired": "Email address is required.",
+        "emailInvalid": "This is not a valid email address.",
+        "passwordRequired": "A password is required.",
+        "passwordMin": "Password must be at least 6 characters long."
+      },
+      "errors": {
+        "invalidCredentials": "Invalid credentials.",
+        "missingCredentials": "Email address and password are required.",
+        "invalidRequest": "Invalid login request.",
+        "authNotConfigured": "Authentication is not configured correctly.",
+        "dbNotInitialized": "Database is not initialized.",
+        "dbError": "Database error during login.",
+        "sessionSaveFailed": "Session could not be saved.",
+        "network": "Network error. No response from server.",
+        "unknown": "An unknown error occurred."
+      }
+    }
+  },
+  "pagination": {
+    "ariaLabel": "Pagination navigation",
+    "first": "First",
+    "last": "Last",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "about": {
+    "title": "This is an about page"
+  },
+  "aboutModal": {
+    "title": "Schrevind UI",
+    "descriptionLine1": "Lightweight admin UI for Schrevind.",
+    "descriptionLine2": "Manage comments, sites and users.",
+    "copyright": "Â© 2026 Ralf Geschke",
+    "license": "License: MIT",
+    "github": "GitHub Repository (schrevind-ui)",
+    "website": "https://www.geschke.net",
+    "blog": "https://www.kuerbis.org",
+    "close": "Close"
+  }
+}

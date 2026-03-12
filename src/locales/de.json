@@ -1,0 +1,297 @@
+﻿{
+  "comments": {
+    "title": "Kommentare",
+    "bulkAction": "Mehrfachaktion",
+    "selectedCount": "{count} ausgewählt",
+    "actions": {
+      "apply": "Anwenden",
+      "approve": "Freigeben",
+      "reject": "Ablehnen",
+      "spam": "Als Spam markieren",
+      "delete": "Löschen"
+    },
+    "tabs": {
+      "all": "Alle",
+      "pending": "Ausstehend",
+      "approved": "Freigegeben",
+      "rejected": "Abgelehnt",
+      "spam": "Spam",
+      "deleted": "Papierkorb"
+    },
+    "table": {
+      "empty": "Keine Daten verfügbar.",
+      "columns": {
+        "site": "Site",
+        "postPath": "PostPath",
+        "author": "Autor",
+        "email": "Email",
+        "name": "Name",
+        "url": "URL",
+        "comment": "Kommentar",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Aktionen"
+      },
+      "fullTextBy": "Volltext von {author} ({email})"
+    },
+    "siteFilter": {
+      "label": "Site:",
+      "allSites": "Alle Sites"
+    },
+    "search": {
+      "placeholder": "Kommentare durchsuchen...",
+      "submit": "Suchen",
+      "clear": "Suche löschen"
+    },
+    "toast": {
+      "errorTitle": "Fehler",
+      "loadFailed": "Kommentare konnten nicht geladen werden.",
+      "partialTitle": "Teilweise ausgeführt",
+      "partialContent": "{changed} geändert, {unchanged} unverändert, {failed} fehlgeschlagen{errorSuffix}.",
+      "noChangeTitle": "Keine Änderung",
+      "noChangeContent": "{count} Kommentar(e) waren bereits im gewünschten Status.",
+      "successTitle": "OK",
+      "successContent": "{changed} Kommentar(e) {action}, {unchanged} unverändert.",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden."
+    },
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Freigegeben",
+      "rejected": "Abgelehnt",
+      "spam": "Spam",
+      "deleted": "Gelöscht"
+    }
+  },
+  "common": {
+    "loading": "Laden..."
+  },
+  "sites": {
+    "title": "Sites",
+    "table": {
+      "empty": "Keine Daten verfügbar.",
+      "columns": {
+        "id": "ID",
+        "siteKey": "SiteKey",
+        "title": "Titel",
+        "status": "Status",
+        "createdAt": "Erstellt",
+        "updatedAt": "Aktualisiert"
+      }
+    },
+    "toast": {
+      "errorTitle": "Fehler",
+      "loadFailed": "Sites konnten nicht geladen werden.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    }
+  },
+  "adminOverview": {
+    "title": "Admin",
+    "links": {
+      "users": "Benutzer"
+    }
+  },
+  "adminUsers": {
+    "common": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "passwordConfirm": "Passwort wiederholen",
+      "firstname": "Vorname",
+      "lastname": "Nachname",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "okTitle": "OK",
+      "errorTitle": "Fehler",
+      "backToList": "Zur Benutzerliste"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Daten.",
+      "userDataLoadFailed": "Fehler beim Laden der Benutzerdaten.",
+      "emailExists": "Die E-Mail-Adresse existiert bereits.",
+      "usernameExists": "Der Username ist bereits vorhanden.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten.",
+      "userNotFound": "Benutzer konnte nicht gefunden werden.",
+      "userNotFoundDelete": "Benutzer wurde nicht gefunden (evtl. bereits gelöscht).",
+      "cannotDeleteOwnAccount": "Der aktuell angemeldete Benutzer kann nicht gelöscht werden."
+    },
+    "validation": {
+      "emailRequired": "E-Mail-Adresse wird benötigt.",
+      "emailInvalid": "Das ist keine gültige E-Mail-Adresse.",
+      "passwordRequired": "Ein Passwort wird benötigt.",
+      "passwordMin": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+      "passwordConfirmMismatch": "Passwörter stimmen nicht überein.",
+      "firstnameRequired": "Bitte geben Sie Ihren Vornamen ein.",
+      "firstnameMin": "Mindestlänge zwei Zeichen.",
+      "lastnameRequired": "Bitte geben Sie Ihren Nachnamen ein.",
+      "lastnameMin": "Mindestlänge zwei Zeichen."
+    },
+    "list": {
+      "title": "Benutzer",
+      "addButton": "Benutzer hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "email": "E-Mail",
+          "name": "Name",
+          "actions": "Aktionen"
+        }
+      },
+      "modal": {
+        "title": "Benutzer löschen?",
+        "body": "Soll der Benutzer wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "nameLabel": "Name",
+        "emailLabel": "E-Mail",
+        "idLabel": "ID",
+        "warning": "Der Benutzer wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Benutzer gelöscht",
+        "deletedContent": "Der Benutzer wurde aus der Datenbank gelöscht.",
+        "deleteFailed": "Der Benutzer konnte nicht gelöscht werden."
+      },
+      "actions": {
+        "edit": "Benutzer bearbeiten",
+        "changePassword": "Passwort ändern",
+        "delete": "Benutzer löschen"
+      },
+      "createdBanner": "Benutzer wurde erfolgreich angelegt.",
+      "createdBannerWithEmail": "Benutzer {email} wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Benutzer anlegen",
+      "submit": "Benutzer anlegen",
+      "errors": {
+        "invalidPassword": "Ungültiges Passwort.",
+        "invalidJson": "Ungültige Anfrage beim Anlegen des Benutzers.",
+        "dbError": "Datenbankfehler beim Anlegen des Benutzers.",
+        "passwordHashFailed": "Passwort konnte nicht verarbeitet werden.",
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      },
+      "toasts": {
+        "createdContent": "Der Benutzer wurde hinzugefügt."
+      }
+    },
+    "edit": {
+      "title": "Benutzer ändern",
+      "submit": "Speichern",
+      "toasts": {
+        "updatedContent": "Die Benutzerdaten wurden geändert."
+      },
+      "changePassword": "Passwort ändern",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      }
+    },
+    "password": {
+      "title": "Passwort ändern",
+      "submit": "Passwort speichern",
+      "toasts": {
+        "updatedContent": "Das Passwort wurde geändert."
+      },
+      "errors": {
+        "invalidUserId": "Ungültige Benutzer-ID."
+      },
+      "alerts": {
+        "saved": "Passwort wurde gespeichert."
+      }
+    }
+  },
+  "layout": {
+    "topbar": {
+      "searchPlaceholder": "Suche nach...",
+      "searchAria": "Suche nach...",
+      "editUser": "Benutzer bearbeiten",
+      "changeOwnPassword": "Passwort ändern",
+      "logout": "Abmelden"
+    },
+    "locale": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "loggedInAs": "Angemeldet als:",
+    "contentFallback": "Hauptbereich",
+    "footer": {
+      "about": "About",
+      "github": "GitHub"
+    }
+  },
+  "nav": {
+    "sections": {
+      "core": "Core"
+    },
+    "items": {
+      "comments": "Kommentare",
+      "sites": "Sites",
+      "users": "Benutzer"
+    }
+  },
+  "landing": {
+    "mainContent": "Hauptinhalt"
+  },
+  "twoColumns": {
+    "left": "Linke Spalte",
+    "right": "Rechte Spalte"
+  },
+  "search": {
+    "title": "Suche",
+    "queryLabel": "Suche nach",
+    "queryPlaceholder": "Suche nach...",
+    "searchButton": "Suche",
+    "resultsPlaceholder": "Platzhalter",
+    "validation": {
+      "queryRequired": "Bitte geben Sie den zu suchenden Begriff ein.",
+      "queryMin": "Mindestlänge zwei Zeichen."
+    },
+    "toast": {
+      "errorTitle": "Fehler"
+    }
+  },
+    "auth": {
+    "login": {
+      "title": "Jetzt einloggen",
+      "emailLabel": "E-Mail-Adresse",
+      "passwordLabel": "Passwort",
+      "submit": "Einloggen",
+      "validation": {
+        "emailRequired": "E-Mail-Adresse wird benötigt.",
+        "emailInvalid": "Das ist keine gültige E-Mail-Adresse.",
+        "passwordRequired": "Ein Passwort wird benötigt.",
+        "passwordMin": "Das Passwort muss mindestens 6 Zeichen lang sein."
+      },
+      "errors": {
+        "invalidCredentials": "Ungültige Anmeldedaten.",
+        "missingCredentials": "E-Mail-Adresse und Passwort werden benötigt.",
+        "invalidRequest": "Ungültige Anfrage beim Login.",
+        "authNotConfigured": "Authentifizierung ist nicht korrekt konfiguriert.",
+        "dbNotInitialized": "Datenbank ist nicht initialisiert.",
+        "dbError": "Datenbankfehler beim Login.",
+        "sessionSaveFailed": "Sitzung konnte nicht gespeichert werden.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server.",
+        "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+      }
+    }
+  },
+  "pagination": {
+    "ariaLabel": "Seitennavigation",
+    "first": "Erste",
+    "last": "Letzte",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "about": {
+    "title": "Dies ist eine Info-Seite"
+  },
+  "aboutModal": {
+    "title": "Schrevind UI",
+    "descriptionLine1": "Lightweight admin UI for Schrevind.",
+    "descriptionLine2": "Manage comments, sites and users.",
+    "copyright": " © 2026 Ralf Geschke",
+    "license": "License: MIT",
+    "github": "GitHub Repository (schrevind-ui)",
+    "website": "https://www.geschke.net",
+    "blog": "https://www.kuerbis.org",
+    "close": "Schließen"
+  }
+}
