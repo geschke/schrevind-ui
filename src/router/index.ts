@@ -115,6 +115,41 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/currencies",
+    name: "currencies",
+    component: () => import("@/pages/currencies/CurrencyListPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/currencies/new",
+    name: "currencynew",
+    component: () => import("@/pages/currencies/CurrencyAddPage.vue"),
+    meta: {
+      menuPath: "/currencies",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/currencies/edit/:id",
+    name: "currencyedit",
+    props: true,
+    component: () => import("@/pages/currencies/CurrencyEditPage.vue"),
+    meta: {
+      menuPath: "/currencies",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/dividend-entries/new",
+    name: "dividendentrynew",
+    component: () => import("@/pages/dividendEntries/DividendEntryAddPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/admin",
     component: () => import("@/pages/admin/OverviewPage.vue"),
     meta: {

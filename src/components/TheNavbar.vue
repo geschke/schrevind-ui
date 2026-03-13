@@ -75,6 +75,12 @@ const sidebarMenu = ref<SidebarItem[]>([
         url: "/overview",
       },
       {
+        title: "nav.items.dividendEntries",
+        type: "item",
+        icon: "bi bi-cash-coin",
+        url: "/dividend-entries/new",
+      },
+      {
         title: "nav.items.depots",
         type: "item",
         icon: "bi bi-bank",
@@ -91,6 +97,12 @@ const sidebarMenu = ref<SidebarItem[]>([
         type: "item",
         icon: "bi bi-percent",
         url: "/withholding-tax-defaults",
+      },
+      {
+        title: "nav.items.currencies",
+        type: "item",
+        icon: "bi bi-currency-exchange",
+        url: "/currencies",
       },
       {
         title: "nav.items.users",

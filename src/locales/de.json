@@ -2,6 +2,162 @@
   "common": {
     "loading": "Laden..."
   },
+  "dividendEntries": {
+    "common": {
+      "depotId": "Depot",
+      "securityId": "Wertpapier",
+      "payDate": "Zahltag",
+      "exDate": "Ex-Tag",
+      "quantity": "Stückzahl",
+      "dividendPerUnitAmount": "Dividende je Einheit",
+      "dividendPerUnitCurrency": "Währung je Einheit",
+      "grossAmount": "Bruttobetrag",
+      "grossCurrency": "Brutto-Währung",
+      "payoutAmount": "Auszahlungsbetrag",
+      "payoutCurrency": "Auszahlungs-Währung",
+      "fxRateLabel": "FX-Bezeichnung",
+      "fxRate": "FX-Kurs",
+      "withholdingTaxCountryCode": "Quellensteuer-Ländercode",
+      "withholdingTaxPercent": "Quellensteuer %",
+      "withholdingTaxAmount": "Quellensteuer-Betrag",
+      "withholdingTaxCurrency": "Quellensteuer-Währung",
+      "withholdingTaxAmountCredit": "Anrechenbare Quellensteuer",
+      "withholdingTaxAmountCreditCurrency": "Währung anrechenbar",
+      "withholdingTaxAmountRefundable": "Erstattbare Quellensteuer",
+      "withholdingTaxAmountRefundableCurrency": "Währung erstattbar",
+      "foreignFeesAmount": "Fremdspesen",
+      "foreignFeesCurrency": "Fremdspesen-Währung",
+      "note": "Notiz",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
+      "warningTitle": "Hinweis",
+      "errorTitle": "Fehler"
+    },
+    "sections": {
+      "general": "Allgemein",
+      "dividendData": "Dividendendaten",
+      "fx": "FX",
+      "withholdingTax": "Quellensteuer",
+      "other": "Sonstiges"
+    },
+    "form": {
+      "chooseDepot": "Depot wählen",
+      "chooseSecurity": "Wertpapier wählen",
+      "noSecurityResults": "Keine passenden Wertpapiere gefunden."
+    },
+    "actions": {
+      "copyWithholdingToCredit": "Als anrechenbar übernehmen",
+      "suggestRefundableWithholdingTax": "Erstattbar vorbelegen",
+      "missingWithholdingAmount": "Für diese Aktion wird zunächst ein Quellensteuer-Betrag benötigt.",
+      "missingRefundableSource": "Für diese Aktion werden Quellensteuer und anrechenbare Quellensteuer benötigt.",
+      "invalidRefundableSource": "Für diese Aktion ist die vorhandene Wertebasis nicht geeignet."
+    },
+    "validation": {
+      "depotIdRequired": "Bitte wählen Sie ein Depot.",
+      "securityIdRequired": "Bitte wählen Sie ein Wertpapier.",
+      "payDateRequired": "Bitte geben Sie den Zahltag ein.",
+      "exDateRequired": "Bitte geben Sie den Ex-Tag ein.",
+      "quantityRequired": "Bitte geben Sie die Stückzahl ein.",
+      "dividendPerUnitAmountRequired": "Bitte geben Sie die Dividende je Einheit ein.",
+      "dividendPerUnitCurrencyRequired": "Bitte geben Sie die Währung je Einheit ein.",
+      "grossAmountRequired": "Bitte geben Sie den Bruttobetrag ein.",
+      "grossCurrencyRequired": "Bitte geben Sie die Brutto-Währung ein.",
+      "payoutAmountRequired": "Bitte geben Sie den Auszahlungsbetrag ein.",
+      "payoutCurrencyRequired": "Bitte geben Sie die Auszahlungs-Währung ein."
+    },
+    "errors": {
+      "referenceDataLoadFailed": "Depots und Wertpapiere konnten nicht geladen werden.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "add": {
+      "title": "Dividendeneintrag anlegen",
+      "submit": "Dividendeneintrag speichern",
+      "alerts": {
+        "saved": "Der Dividendeneintrag wurde gespeichert."
+      },
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen des Dividendeneintrags.",
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "dbError": "Datenbankfehler beim Anlegen des Dividendeneintrags.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      }
+    }
+  },
+  "currencies": {
+    "common": {
+      "currency": "Währung",
+      "name": "Name",
+      "status": "Status",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
+      "errorTitle": "Fehler",
+      "backToList": "Zur Währungsliste"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Währungen.",
+      "currencyNotFound": "Währung konnte nicht gefunden werden.",
+      "currencyNotFoundDelete": "Währung wurde nicht gefunden (evtl. bereits gelöscht).",
+      "currencyAlreadyInUse": "Diese Währung existiert bereits oder ist bereits in Verwendung.",
+      "unauthorized": "Keine Berechtigung für diese Aktion.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "validation": {
+      "currencyInvalid": "Bitte geben Sie genau drei Buchstaben für die Währung an.",
+      "nameRequired": "Bitte geben Sie einen Namen für die Währung ein."
+    },
+    "list": {
+      "title": "Währungen",
+      "addButton": "Währung hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "currency": "Währung",
+          "name": "Name",
+          "status": "Status",
+          "createdAt": "Erstellt",
+          "updatedAt": "Aktualisiert",
+          "actions": "Aktionen"
+        }
+      },
+      "actions": {
+        "edit": "Währung bearbeiten",
+        "delete": "Währung löschen"
+      },
+      "modal": {
+        "title": "Währung löschen?",
+        "body": "Soll diese Währung wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Die Währung wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Währung gelöscht",
+        "deletedContent": "Die Währung wurde aus der Datenbank gelöscht."
+      },
+      "createdBannerWithCurrency": "Währung {currency} wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Währung anlegen",
+      "submit": "Währung anlegen",
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen der Währung.",
+        "dbError": "Datenbankfehler beim Anlegen der Währung.",
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      }
+    },
+    "edit": {
+      "title": "Währung bearbeiten",
+      "submit": "Speichern",
+      "statusHint": "Weitere Statuswerte werden später ergänzt.",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      },
+      "toasts": {
+        "updatedContent": "Die Währungsdaten wurden geändert."
+      }
+    }
+  },
   "depots": {
     "common": {
       "name": "Name",
@@ -248,6 +404,11 @@
     "title": "Übersicht",
     "description": "Dieser Bereich dient als Dashboard und Einstiegspunkt für die Datenpflege.",
     "cards": {
+      "dividendEntries": {
+        "title": "Dividendeneinträge",
+        "description": "Dividendenzahlungen und Ausschüttungen erfassen.",
+        "action": "Eingabe öffnen"
+      },
       "depots": {
         "title": "Depots",
         "description": "Depots anlegen, bearbeiten und verwalten.",
@@ -262,6 +423,11 @@
         "title": "Quellensteuern",
         "description": "Globale und depotbezogene Quellensteuer-Vorgaben verwalten.",
         "action": "Quellensteuern öffnen"
+      },
+      "currencies": {
+        "title": "Währungen",
+        "description": "Währungs-Stammdaten anlegen, bearbeiten und verwalten.",
+        "action": "Währungen öffnen"
       },
       "users": {
         "title": "Benutzer",
@@ -409,9 +575,11 @@
     },
     "items": {
       "overview": "Übersicht",
+      "dividendEntries": "Dividendeneingabe",
       "depots": "Depots",
       "securities": "Wertpapiere",
       "withholdingTaxDefaults": "Quellensteuern",
+      "currencies": "Währungen",
       "users": "Benutzer"
     }
   },

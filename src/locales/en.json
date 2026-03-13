@@ -2,6 +2,162 @@
   "common": {
     "loading": "Loading..."
   },
+  "dividendEntries": {
+    "common": {
+      "depotId": "Depot",
+      "securityId": "Security",
+      "payDate": "Pay date",
+      "exDate": "Ex date",
+      "quantity": "Quantity",
+      "dividendPerUnitAmount": "Dividend per unit",
+      "dividendPerUnitCurrency": "Per-unit currency",
+      "grossAmount": "Gross amount",
+      "grossCurrency": "Gross currency",
+      "payoutAmount": "Payout amount",
+      "payoutCurrency": "Payout currency",
+      "fxRateLabel": "FX label",
+      "fxRate": "FX rate",
+      "withholdingTaxCountryCode": "Withholding tax country code",
+      "withholdingTaxPercent": "Withholding tax %",
+      "withholdingTaxAmount": "Withholding tax amount",
+      "withholdingTaxCurrency": "Withholding tax currency",
+      "withholdingTaxAmountCredit": "Creditable withholding tax",
+      "withholdingTaxAmountCreditCurrency": "Creditable currency",
+      "withholdingTaxAmountRefundable": "Refundable withholding tax",
+      "withholdingTaxAmountRefundableCurrency": "Refundable currency",
+      "foreignFeesAmount": "Foreign fees",
+      "foreignFeesCurrency": "Foreign fees currency",
+      "note": "Note",
+      "cancel": "Cancel",
+      "okTitle": "OK",
+      "warningTitle": "Notice",
+      "errorTitle": "Error"
+    },
+    "sections": {
+      "general": "General",
+      "dividendData": "Dividend data",
+      "fx": "FX",
+      "withholdingTax": "Withholding tax",
+      "other": "Other"
+    },
+    "form": {
+      "chooseDepot": "Choose depot",
+      "chooseSecurity": "Choose security",
+      "noSecurityResults": "No matching securities found."
+    },
+    "actions": {
+      "copyWithholdingToCredit": "Copy to creditable",
+      "suggestRefundableWithholdingTax": "Suggest refundable",
+      "missingWithholdingAmount": "This action requires a withholding tax amount first.",
+      "missingRefundableSource": "This action requires both withholding tax and creditable withholding tax.",
+      "invalidRefundableSource": "The current values are not suitable for this action."
+    },
+    "validation": {
+      "depotIdRequired": "Please choose a depot.",
+      "securityIdRequired": "Please choose a security.",
+      "payDateRequired": "Please enter the pay date.",
+      "exDateRequired": "Please enter the ex date.",
+      "quantityRequired": "Please enter the quantity.",
+      "dividendPerUnitAmountRequired": "Please enter the dividend per unit.",
+      "dividendPerUnitCurrencyRequired": "Please enter the per-unit currency.",
+      "grossAmountRequired": "Please enter the gross amount.",
+      "grossCurrencyRequired": "Please enter the gross currency.",
+      "payoutAmountRequired": "Please enter the payout amount.",
+      "payoutCurrencyRequired": "Please enter the payout currency."
+    },
+    "errors": {
+      "referenceDataLoadFailed": "Depots and securities could not be loaded.",
+      "unknown": "An unknown error occurred."
+    },
+    "add": {
+      "title": "Create dividend entry",
+      "submit": "Save dividend entry",
+      "alerts": {
+        "saved": "The dividend entry was saved."
+      },
+      "errors": {
+        "invalidJson": "Invalid request while creating the dividend entry.",
+        "unauthorized": "Not authorized for this action.",
+        "dbError": "Database error while creating the dividend entry.",
+        "network": "Network error. No response from server."
+      }
+    }
+  },
+  "currencies": {
+    "common": {
+      "currency": "Currency",
+      "name": "Name",
+      "status": "Status",
+      "cancel": "Cancel",
+      "okTitle": "OK",
+      "errorTitle": "Error",
+      "backToList": "Back to currency list"
+    },
+    "errors": {
+      "loadFailed": "Failed to load currencies.",
+      "currencyNotFound": "Currency was not found.",
+      "currencyNotFoundDelete": "Currency was not found (possibly already deleted).",
+      "currencyAlreadyInUse": "This currency already exists or is already in use.",
+      "unauthorized": "Not authorized for this action.",
+      "unknown": "An unknown error occurred."
+    },
+    "validation": {
+      "currencyInvalid": "Please enter exactly three letters for the currency.",
+      "nameRequired": "Please enter a name for the currency."
+    },
+    "list": {
+      "title": "Currencies",
+      "addButton": "Add currency",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "currency": "Currency",
+          "name": "Name",
+          "status": "Status",
+          "createdAt": "Created",
+          "updatedAt": "Updated",
+          "actions": "Actions"
+        }
+      },
+      "actions": {
+        "edit": "Edit currency",
+        "delete": "Delete currency"
+      },
+      "modal": {
+        "title": "Delete currency?",
+        "body": "Do you really want to delete this currency?",
+        "confirm": "Delete",
+        "warning": "The currency will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Currency deleted",
+        "deletedContent": "The currency was removed from the database."
+      },
+      "createdBannerWithCurrency": "Currency {currency} was created successfully."
+    },
+    "add": {
+      "title": "Create currency",
+      "submit": "Create currency",
+      "errors": {
+        "invalidJson": "Invalid request while creating the currency.",
+        "dbError": "Database error while creating the currency.",
+        "unauthorized": "Not authorized for this action.",
+        "network": "Network error. No response from server."
+      }
+    },
+    "edit": {
+      "title": "Edit currency",
+      "submit": "Save",
+      "statusHint": "Additional status values will be added later.",
+      "alerts": {
+        "saved": "Changes were saved."
+      },
+      "toasts": {
+        "updatedContent": "Currency data was updated."
+      }
+    }
+  },
   "depots": {
     "common": {
       "name": "Name",
@@ -248,6 +404,11 @@
     "title": "Overview",
     "description": "This area serves as dashboard and entry point for data management.",
     "cards": {
+      "dividendEntries": {
+        "title": "Dividend entries",
+        "description": "Record dividend payments and distributions.",
+        "action": "Open entry form"
+      },
       "depots": {
         "title": "Depots",
         "description": "Create, edit and manage depots.",
@@ -262,6 +423,11 @@
         "title": "Withholding taxes",
         "description": "Manage global and depot-specific withholding tax defaults.",
         "action": "Open withholding taxes"
+      },
+      "currencies": {
+        "title": "Currencies",
+        "description": "Create, edit and manage currency master data.",
+        "action": "Open currencies"
       },
       "users": {
         "title": "Users",
@@ -409,9 +575,11 @@
     },
     "items": {
       "overview": "Overview",
+      "dividendEntries": "Dividend entry",
       "depots": "Depots",
       "securities": "Securities",
       "withholdingTaxDefaults": "Withholding taxes",
+      "currencies": "Currencies",
       "users": "Users"
     }
   },

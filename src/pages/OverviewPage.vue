@@ -10,6 +10,26 @@
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="overview-icon bg-info-subtle text-info">
+                <i class="bi bi-cash-coin"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("overview.cards.dividendEntries.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("overview.cards.dividendEntries.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-info" :to="{ name: 'dividendentrynew' }">
+              {{ t("overview.cards.dividendEntries.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bank"></i>
               </div>
@@ -61,6 +81,26 @@
 
             <router-link class="btn btn-warning" :to="{ name: 'withholdingtaxdefaults' }">
               {{ t("overview.cards.withholdingTaxDefaults.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="overview-icon bg-dark-subtle text-dark">
+                <i class="bi bi-currency-exchange"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("overview.cards.currencies.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("overview.cards.currencies.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-dark" :to="{ name: 'currencies' }">
+              {{ t("overview.cards.currencies.action") }}
             </router-link>
           </div>
         </div>
