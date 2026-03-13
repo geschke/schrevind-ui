@@ -162,7 +162,7 @@ const onSubmit = handleSubmit((values) => {
     .then(() => {
       isLoading.value = false;
      
-      router.push({ name: "comments" });
+      router.push({ name: "overview" });
     })
     .catch((requestError: unknown) => {
       errorCode.value = getErrorCode(requestError);

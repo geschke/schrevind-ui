@@ -69,16 +69,28 @@ const sidebarMenu = ref<SidebarItem[]>([
     //url: "", // optional, default none
     sub: [
       {
-        title: "nav.items.comments",
+        title: "nav.items.overview",
         type: "item",
-        icon: "bi bi-chat-text",
-        url: "/comments",
+        icon: "bi bi-grid-1x2",
+        url: "/overview",
       },
       {
-        title: "nav.items.sites",
+        title: "nav.items.depots",
         type: "item",
-        icon: "bi bi-globe",
-        url: "/sites",
+        icon: "bi bi-bank",
+        url: "/depots",
+      },
+      {
+        title: "nav.items.securities",
+        type: "item",
+        icon: "bi bi-graph-up-arrow",
+        url: "/securities",
+      },
+      {
+        title: "nav.items.withholdingTaxDefaults",
+        type: "item",
+        icon: "bi bi-percent",
+        url: "/withholding-tax-defaults",
       },
       {
         title: "nav.items.users",

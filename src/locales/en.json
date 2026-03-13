@@ -1,87 +1,273 @@
 ﻿{
-  "comments": {
-    "title": "Comments",
-    "bulkAction": "Bulk action",
-    "selectedCount": "{count} selected",
-    "actions": {
-      "apply": "Apply",
-      "approve": "Approve",
-      "reject": "Reject",
-      "spam": "Mark as spam",
-      "delete": "Delete"
-    },
-    "tabs": {
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "spam": "Spam",
-      "deleted": "Trash"
-    },
-    "table": {
-      "empty": "No data available.",
-      "columns": {
-        "site": "Site",
-        "postPath": "PostPath",
-        "author": "Author",
-        "email": "Email",
-        "name": "Name",
-        "url": "URL",
-        "comment": "Comment",
-        "status": "Status",
-        "date": "Date",
-        "actions": "Actions"
-      },
-      "fullTextBy": "Full text by {author} ({email})"
-    },
-    "siteFilter": {
-      "label": "Site:",
-      "allSites": "All sites"
-    },
-    "search": {
-      "placeholder": "Search comments...",
-      "submit": "Search",
-      "clear": "Clear search"
-    },
-    "toast": {
-      "errorTitle": "Error",
-      "loadFailed": "Could not load comments.",
-      "partialTitle": "Partially completed",
-      "partialContent": "{changed} changed, {unchanged} unchanged, {failed} failed{errorSuffix}.",
-      "noChangeTitle": "No changes",
-      "noChangeContent": "{count} comment(s) were already in the requested status.",
-      "successTitle": "OK",
-      "successContent": "{changed} comment(s) {action}, {unchanged} unchanged.",
-      "actionFailed": "Action could not be executed."
-    },
-    "status": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "spam": "Spam",
-      "deleted": "Deleted"
-    }
-  },
   "common": {
     "loading": "Loading..."
   },
-  "sites": {
-    "title": "Sites",
-    "table": {
-      "empty": "No data available.",
-      "columns": {
-        "id": "ID",
-        "siteKey": "SiteKey",
-        "title": "Title",
-        "status": "Status",
-        "createdAt": "Created",
-        "updatedAt": "Updated"
+  "depots": {
+    "common": {
+      "name": "Name",
+      "brokerName": "Broker",
+      "accountNumber": "Account number",
+      "baseCurrency": "Base currency",
+      "description": "Description",
+      "status": "Status",
+      "cancel": "Cancel",
+      "okTitle": "OK",
+      "errorTitle": "Error",
+      "backToList": "Back to depot list"
+    },
+    "errors": {
+      "loadFailed": "Failed to load depots.",
+      "depotNotFound": "Depot was not found.",
+      "depotNotFoundDelete": "Depot was not found (possibly already deleted).",
+      "unauthorized": "Not authorized for this action.",
+      "unknown": "An unknown error occurred."
+    },
+    "validation": {
+      "nameRequired": "Please enter a depot name.",
+      "baseCurrencyRequired": "Please enter a base currency."
+    },
+    "list": {
+      "title": "Depots",
+      "addButton": "Add depot",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "brokerName": "Broker",
+          "accountNumber": "Account number",
+          "baseCurrency": "Base currency",
+          "status": "Status",
+          "createdAt": "Created",
+          "updatedAt": "Updated",
+          "actions": "Actions"
+        }
+      },
+      "actions": {
+        "edit": "Edit depot",
+        "delete": "Delete depot"
+      },
+      "modal": {
+        "title": "Delete depot?",
+        "body": "Do you really want to delete this depot?",
+        "confirm": "Delete",
+        "warning": "The depot will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Depot deleted",
+        "deletedContent": "The depot was removed from the database."
+      },
+      "createdBannerWithName": "Depot {name} was created successfully."
+    },
+    "add": {
+      "title": "Create depot",
+      "submit": "Create depot",
+      "errors": {
+        "invalidJson": "Invalid request while creating the depot.",
+        "dbError": "Database error while creating the depot.",
+        "unauthorized": "Not authorized for this action.",
+        "network": "Network error. No response from server."
       }
     },
-    "toast": {
+    "edit": {
+      "title": "Edit depot",
+      "submit": "Save",
+      "statusHint": "Additional status values will be added later.",
+      "alerts": {
+        "saved": "Changes were saved."
+      },
+      "toasts": {
+        "updatedContent": "Depot data was updated."
+      }
+    }
+  },
+  "securities": {
+    "common": {
+      "name": "Name",
+      "isin": "ISIN",
+      "wkn": "WKN",
+      "symbol": "Symbol",
+      "status": "Status",
+      "cancel": "Cancel",
+      "okTitle": "OK",
       "errorTitle": "Error",
-      "loadFailed": "Could not load sites.",
+      "backToList": "Back to security list"
+    },
+    "errors": {
+      "loadFailed": "Failed to load securities.",
+      "securityNotFound": "Security was not found.",
+      "securityNotFoundDelete": "Security was not found (possibly already deleted).",
       "unknown": "An unknown error occurred."
+    },
+    "validation": {
+      "nameRequired": "Please enter a security name.",
+      "isinRequired": "Please enter an ISIN for the security."
+    },
+    "list": {
+      "title": "Securities",
+      "addButton": "Add security",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "isin": "ISIN",
+          "wkn": "WKN",
+          "symbol": "Symbol",
+          "status": "Status",
+          "createdAt": "Created",
+          "updatedAt": "Updated",
+          "actions": "Actions"
+        }
+      },
+      "actions": {
+        "edit": "Edit security",
+        "delete": "Delete security"
+      },
+      "modal": {
+        "title": "Delete security?",
+        "body": "Do you really want to delete this security?",
+        "confirm": "Delete",
+        "warning": "The security will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Security deleted",
+        "deletedContent": "The security was removed from the database."
+      },
+      "createdBannerWithName": "Security {name} was created successfully."
+    },
+    "add": {
+      "title": "Create security",
+      "submit": "Create security",
+      "errors": {
+        "invalidJson": "Invalid request while creating the security.",
+        "dbError": "Database error while creating the security.",
+        "network": "Network error. No response from server."
+      }
+    },
+    "edit": {
+      "title": "Edit security",
+      "submit": "Save",
+      "statusHint": "Additional status values will be added later.",
+      "alerts": {
+        "saved": "Changes were saved."
+      },
+      "toasts": {
+        "updatedContent": "Security data was updated."
+      }
+    }
+  },
+  "withholdingTaxDefaults": {
+    "common": {
+      "scope": "Scope",
+      "depot": "Depot",
+      "countryCode": "Country code",
+      "countryName": "Country",
+      "percentDefault": "Withholding tax %",
+      "percentCreditDefault": "Creditable %",
+      "cancel": "Cancel",
+      "okTitle": "OK",
+      "errorTitle": "Error",
+      "backToList": "Back to withholding tax list"
+    },
+    "scope": {
+      "global": "Global",
+      "depot": "Depot"
+    },
+    "form": {
+      "chooseDepot": "Choose depot"
+    },
+    "errors": {
+      "loadFailed": "Failed to load withholding tax defaults.",
+      "itemNotFound": "Withholding tax default was not found.",
+      "itemNotFoundDelete": "Withholding tax default was not found (possibly already deleted).",
+      "unknown": "An unknown error occurred."
+    },
+    "validation": {
+      "scopeRequired": "Please choose a scope.",
+      "depotRequired": "Please choose a depot.",
+      "countryCodeRequired": "Please enter a country code.",
+      "countryNameRequired": "Please enter a country name.",
+      "percentDefaultRequired": "Please enter the withholding tax percentage."
+    },
+    "list": {
+      "title": "Withholding taxes",
+      "addButton": "Add withholding tax default",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "scope": "Scope",
+          "depot": "Depot",
+          "countryCode": "Country code",
+          "countryName": "Country",
+          "percentDefault": "Withholding tax %",
+          "percentCreditDefault": "Creditable %",
+          "createdAt": "Created",
+          "updatedAt": "Updated",
+          "actions": "Actions"
+        }
+      },
+      "actions": {
+        "edit": "Edit withholding tax default",
+        "delete": "Delete withholding tax default"
+      },
+      "modal": {
+        "title": "Delete withholding tax default?",
+        "body": "Do you really want to delete this withholding tax default?",
+        "confirm": "Delete",
+        "warning": "The withholding tax default will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Withholding tax default deleted",
+        "deletedContent": "The withholding tax default was removed from the database."
+      },
+      "createdBannerWithCountry": "Withholding tax default for {country} was created successfully."
+    },
+    "add": {
+      "title": "Create withholding tax default",
+      "submit": "Create withholding tax default",
+      "errors": {
+        "invalidJson": "Invalid request while creating the withholding tax default.",
+        "dbError": "Database error while creating the withholding tax default.",
+        "network": "Network error. No response from server."
+      }
+    },
+    "edit": {
+      "title": "Edit withholding tax default",
+      "submit": "Save",
+      "alerts": {
+        "saved": "Changes were saved."
+      },
+      "toasts": {
+        "updatedContent": "The withholding tax default was updated."
+      }
+    }
+  },
+  "overview": {
+    "title": "Overview",
+    "description": "This area serves as dashboard and entry point for data management.",
+    "cards": {
+      "depots": {
+        "title": "Depots",
+        "description": "Create, edit and manage depots.",
+        "action": "Open depots"
+      },
+      "securities": {
+        "title": "Securities",
+        "description": "Create, edit and manage security master data.",
+        "action": "Open securities"
+      },
+      "withholdingTaxDefaults": {
+        "title": "Withholding taxes",
+        "description": "Manage global and depot-specific withholding tax defaults.",
+        "action": "Open withholding taxes"
+      },
+      "users": {
+        "title": "Users",
+        "description": "Manage user accounts and credentials.",
+        "action": "Open users"
+      }
     }
   },
   "adminOverview": {
@@ -222,8 +408,10 @@
       "core": "Core"
     },
     "items": {
-      "comments": "Comments",
-      "sites": "Sites",
+      "overview": "Overview",
+      "depots": "Depots",
+      "securities": "Securities",
+      "withholdingTaxDefaults": "Withholding taxes",
       "users": "Users"
     }
   },
@@ -291,7 +479,7 @@
   "aboutModal": {
     "title": "Schrevind UI",
     "descriptionLine1": "Lightweight admin UI for Schrevind.",
-    "descriptionLine2": "Manage comments, sites and users.",
+    "descriptionLine2": "Manage depots, securities, withholding taxes, users and application data.",
     "copyright": "Â© 2026 Ralf Geschke",
     "license": "License: MIT",
     "github": "GitHub Repository (schrevind-ui)",

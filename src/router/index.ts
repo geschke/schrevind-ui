@@ -26,22 +26,94 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/pages/HomePage.vue"),
   },
   {
-    path: "/comments",
-    name: "comments",
-    component: () => import("@/pages/CommentsPage.vue"),
+    path: "/overview",
+    name: "overview",
+    component: () => import("@/pages/OverviewPage.vue"),
     meta: {
       requiresAuth: true,
     },
   },
   {
-    path: "/sites",
-    name: "sites",
-    component: () => import("@/pages/SitesPage.vue"),
+    path: "/depots",
+    name: "depots",
+    component: () => import("@/pages/depots/DepotListPage.vue"),
     meta: {
       requiresAuth: true,
     },
   },
-  
+  {
+    path: "/depots/new",
+    name: "depotnew",
+    component: () => import("@/pages/depots/DepotAddPage.vue"),
+    meta: {
+      menuPath: "/depots",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/depots/edit/:id",
+    name: "depotedit",
+    props: true,
+    component: () => import("@/pages/depots/DepotEditPage.vue"),
+    meta: {
+      menuPath: "/depots",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/securities",
+    name: "securities",
+    component: () => import("@/pages/securities/SecurityListPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/securities/new",
+    name: "securitynew",
+    component: () => import("@/pages/securities/SecurityAddPage.vue"),
+    meta: {
+      menuPath: "/securities",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/securities/edit/:id",
+    name: "securityedit",
+    props: true,
+    component: () => import("@/pages/securities/SecurityEditPage.vue"),
+    meta: {
+      menuPath: "/securities",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/withholding-tax-defaults",
+    name: "withholdingtaxdefaults",
+    component: () => import("@/pages/withholdingTaxDefaults/WithholdingTaxDefaultListPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/withholding-tax-defaults/new",
+    name: "withholdingtaxdefaultnew",
+    component: () => import("@/pages/withholdingTaxDefaults/WithholdingTaxDefaultAddPage.vue"),
+    meta: {
+      menuPath: "/withholding-tax-defaults",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/withholding-tax-defaults/edit/:id",
+    name: "withholdingtaxdefaultedit",
+    props: true,
+    component: () => import("@/pages/withholdingTaxDefaults/WithholdingTaxDefaultEditPage.vue"),
+    meta: {
+      menuPath: "/withholding-tax-defaults",
+      requiresAuth: true,
+    },
+  },
   {
     path: "/admin",
     component: () => import("@/pages/admin/OverviewPage.vue"),
@@ -118,7 +190,7 @@ router.beforeEach(async (to, from, next) => {
   //console.log(storeUser.isAuthenticated);
   // maybe don't use next() in current version, see https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
   if (to.name === "home" && storeUserAuth.isAuthenticated) {
-    next({ name: "comments" });
+    next({ name: "overview" });
     return;
   }
 

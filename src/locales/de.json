@@ -1,87 +1,273 @@
 ﻿{
-  "comments": {
-    "title": "Kommentare",
-    "bulkAction": "Mehrfachaktion",
-    "selectedCount": "{count} ausgewählt",
-    "actions": {
-      "apply": "Anwenden",
-      "approve": "Freigeben",
-      "reject": "Ablehnen",
-      "spam": "Als Spam markieren",
-      "delete": "Löschen"
-    },
-    "tabs": {
-      "all": "Alle",
-      "pending": "Ausstehend",
-      "approved": "Freigegeben",
-      "rejected": "Abgelehnt",
-      "spam": "Spam",
-      "deleted": "Papierkorb"
-    },
-    "table": {
-      "empty": "Keine Daten verfügbar.",
-      "columns": {
-        "site": "Site",
-        "postPath": "PostPath",
-        "author": "Autor",
-        "email": "Email",
-        "name": "Name",
-        "url": "URL",
-        "comment": "Kommentar",
-        "status": "Status",
-        "date": "Datum",
-        "actions": "Aktionen"
-      },
-      "fullTextBy": "Volltext von {author} ({email})"
-    },
-    "siteFilter": {
-      "label": "Site:",
-      "allSites": "Alle Sites"
-    },
-    "search": {
-      "placeholder": "Kommentare durchsuchen...",
-      "submit": "Suchen",
-      "clear": "Suche löschen"
-    },
-    "toast": {
-      "errorTitle": "Fehler",
-      "loadFailed": "Kommentare konnten nicht geladen werden.",
-      "partialTitle": "Teilweise ausgeführt",
-      "partialContent": "{changed} geändert, {unchanged} unverändert, {failed} fehlgeschlagen{errorSuffix}.",
-      "noChangeTitle": "Keine Änderung",
-      "noChangeContent": "{count} Kommentar(e) waren bereits im gewünschten Status.",
-      "successTitle": "OK",
-      "successContent": "{changed} Kommentar(e) {action}, {unchanged} unverändert.",
-      "actionFailed": "Aktion konnte nicht ausgeführt werden."
-    },
-    "status": {
-      "pending": "Ausstehend",
-      "approved": "Freigegeben",
-      "rejected": "Abgelehnt",
-      "spam": "Spam",
-      "deleted": "Gelöscht"
-    }
-  },
   "common": {
     "loading": "Laden..."
   },
-  "sites": {
-    "title": "Sites",
-    "table": {
-      "empty": "Keine Daten verfügbar.",
-      "columns": {
-        "id": "ID",
-        "siteKey": "SiteKey",
-        "title": "Titel",
-        "status": "Status",
-        "createdAt": "Erstellt",
-        "updatedAt": "Aktualisiert"
+  "depots": {
+    "common": {
+      "name": "Name",
+      "brokerName": "Broker",
+      "accountNumber": "Kontonummer",
+      "baseCurrency": "Basiswährung",
+      "description": "Beschreibung",
+      "status": "Status",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
+      "errorTitle": "Fehler",
+      "backToList": "Zur Depotliste"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Depots.",
+      "depotNotFound": "Depot konnte nicht gefunden werden.",
+      "depotNotFoundDelete": "Depot wurde nicht gefunden (evtl. bereits gelöscht).",
+      "unauthorized": "Keine Berechtigung für diese Aktion.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "validation": {
+      "nameRequired": "Bitte geben Sie einen Namen für das Depot ein.",
+      "baseCurrencyRequired": "Bitte geben Sie eine Basiswährung an."
+    },
+    "list": {
+      "title": "Depots",
+      "addButton": "Depot hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "brokerName": "Broker",
+          "accountNumber": "Kontonummer",
+          "baseCurrency": "Basiswährung",
+          "status": "Status",
+          "createdAt": "Erstellt",
+          "updatedAt": "Aktualisiert",
+          "actions": "Aktionen"
+        }
+      },
+      "actions": {
+        "edit": "Depot bearbeiten",
+        "delete": "Depot löschen"
+      },
+      "modal": {
+        "title": "Depot löschen?",
+        "body": "Soll dieses Depot wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Das Depot wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Depot gelöscht",
+        "deletedContent": "Das Depot wurde aus der Datenbank gelöscht."
+      },
+      "createdBannerWithName": "Depot {name} wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Depot anlegen",
+      "submit": "Depot anlegen",
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen des Depots.",
+        "dbError": "Datenbankfehler beim Anlegen des Depots.",
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
       }
     },
-    "toast": {
+    "edit": {
+      "title": "Depot bearbeiten",
+      "submit": "Speichern",
+      "statusHint": "Weitere Statuswerte werden später ergänzt.",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      },
+      "toasts": {
+        "updatedContent": "Die Depotdaten wurden geändert."
+      }
+    }
+  },
+  "securities": {
+    "common": {
+      "name": "Name",
+      "isin": "ISIN",
+      "wkn": "WKN",
+      "symbol": "Symbol",
+      "status": "Status",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
       "errorTitle": "Fehler",
-      "loadFailed": "Sites konnten nicht geladen werden.",
+      "backToList": "Zur Wertpapierliste"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Wertpapiere.",
+      "securityNotFound": "Wertpapier konnte nicht gefunden werden.",
+      "securityNotFoundDelete": "Wertpapier wurde nicht gefunden (evtl. bereits gelöscht).",
       "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "validation": {
+      "nameRequired": "Bitte geben Sie einen Namen für das Wertpapier ein.",
+      "isinRequired": "Bitte geben Sie eine ISIN für das Wertpapier ein."
+    },
+    "list": {
+      "title": "Wertpapiere",
+      "addButton": "Wertpapier hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "isin": "ISIN",
+          "wkn": "WKN",
+          "symbol": "Symbol",
+          "status": "Status",
+          "createdAt": "Erstellt",
+          "updatedAt": "Aktualisiert",
+          "actions": "Aktionen"
+        }
+      },
+      "actions": {
+        "edit": "Wertpapier bearbeiten",
+        "delete": "Wertpapier löschen"
+      },
+      "modal": {
+        "title": "Wertpapier löschen?",
+        "body": "Soll dieses Wertpapier wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Das Wertpapier wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Wertpapier gelöscht",
+        "deletedContent": "Das Wertpapier wurde aus der Datenbank gelöscht."
+      },
+      "createdBannerWithName": "Wertpapier {name} wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Wertpapier anlegen",
+      "submit": "Wertpapier anlegen",
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen des Wertpapiers.",
+        "dbError": "Datenbankfehler beim Anlegen des Wertpapiers.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      }
+    },
+    "edit": {
+      "title": "Wertpapier bearbeiten",
+      "submit": "Speichern",
+      "statusHint": "Weitere Statuswerte werden später ergänzt.",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      },
+      "toasts": {
+        "updatedContent": "Die Wertpapierdaten wurden geändert."
+      }
+    }
+  },
+  "withholdingTaxDefaults": {
+    "common": {
+      "scope": "Scope",
+      "depot": "Depot",
+      "countryCode": "Ländercode",
+      "countryName": "Land",
+      "percentDefault": "Quellensteuer %",
+      "percentCreditDefault": "Anrechenbar %",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
+      "errorTitle": "Fehler",
+      "backToList": "Zur Quellensteuerliste"
+    },
+    "scope": {
+      "global": "Global",
+      "depot": "Depot"
+    },
+    "form": {
+      "chooseDepot": "Depot wählen"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Quellensteuer-Vorgaben.",
+      "itemNotFound": "Quellensteuer-Vorgabe konnte nicht gefunden werden.",
+      "itemNotFoundDelete": "Quellensteuer-Vorgabe wurde nicht gefunden (evtl. bereits gelöscht).",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "validation": {
+      "scopeRequired": "Bitte wählen Sie einen Scope.",
+      "depotRequired": "Bitte wählen Sie ein Depot.",
+      "countryCodeRequired": "Bitte geben Sie einen Ländercode ein.",
+      "countryNameRequired": "Bitte geben Sie einen Ländernamen ein.",
+      "percentDefaultRequired": "Bitte geben Sie den Quellensteuersatz ein."
+    },
+    "list": {
+      "title": "Quellensteuern",
+      "addButton": "Quellensteuer-Vorgabe hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "scope": "Scope",
+          "depot": "Depot",
+          "countryCode": "Ländercode",
+          "countryName": "Land",
+          "percentDefault": "Quellensteuer %",
+          "percentCreditDefault": "Anrechenbar %",
+          "createdAt": "Erstellt",
+          "updatedAt": "Aktualisiert",
+          "actions": "Aktionen"
+        }
+      },
+      "actions": {
+        "edit": "Quellensteuer-Vorgabe bearbeiten",
+        "delete": "Quellensteuer-Vorgabe löschen"
+      },
+      "modal": {
+        "title": "Quellensteuer-Vorgabe löschen?",
+        "body": "Soll diese Quellensteuer-Vorgabe wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Die Quellensteuer-Vorgabe wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Quellensteuer-Vorgabe gelöscht",
+        "deletedContent": "Die Quellensteuer-Vorgabe wurde aus der Datenbank gelöscht."
+      },
+      "createdBannerWithCountry": "Quellensteuer-Vorgabe für {country} wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Quellensteuer-Vorgabe anlegen",
+      "submit": "Quellensteuer-Vorgabe anlegen",
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen der Quellensteuer-Vorgabe.",
+        "dbError": "Datenbankfehler beim Anlegen der Quellensteuer-Vorgabe.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      }
+    },
+    "edit": {
+      "title": "Quellensteuer-Vorgabe bearbeiten",
+      "submit": "Speichern",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      },
+      "toasts": {
+        "updatedContent": "Die Quellensteuer-Vorgabe wurde geändert."
+      }
+    }
+  },
+  "overview": {
+    "title": "Übersicht",
+    "description": "Dieser Bereich dient als Dashboard und Einstiegspunkt für die Datenpflege.",
+    "cards": {
+      "depots": {
+        "title": "Depots",
+        "description": "Depots anlegen, bearbeiten und verwalten.",
+        "action": "Depots öffnen"
+      },
+      "securities": {
+        "title": "Wertpapiere",
+        "description": "Wertpapier-Stammdaten anlegen, bearbeiten und verwalten.",
+        "action": "Wertpapiere öffnen"
+      },
+      "withholdingTaxDefaults": {
+        "title": "Quellensteuern",
+        "description": "Globale und depotbezogene Quellensteuer-Vorgaben verwalten.",
+        "action": "Quellensteuern öffnen"
+      },
+      "users": {
+        "title": "Benutzer",
+        "description": "Benutzerkonten und Zugangsdaten verwalten.",
+        "action": "Benutzer öffnen"
+      }
     }
   },
   "adminOverview": {
@@ -222,8 +408,10 @@
       "core": "Core"
     },
     "items": {
-      "comments": "Kommentare",
-      "sites": "Sites",
+      "overview": "Übersicht",
+      "depots": "Depots",
+      "securities": "Wertpapiere",
+      "withholdingTaxDefaults": "Quellensteuern",
       "users": "Benutzer"
     }
   },
@@ -286,7 +474,7 @@
   "aboutModal": {
     "title": "Schrevind UI",
     "descriptionLine1": "Lightweight admin UI for Schrevind.",
-    "descriptionLine2": "Manage comments, sites and users.",
+    "descriptionLine2": "Depots, Wertpapiere, Quellensteuern, Benutzer und Anwendungsdaten verwalten.",
     "copyright": " © 2026 Ralf Geschke",
     "license": "License: MIT",
     "github": "GitHub Repository (schrevind-ui)",
