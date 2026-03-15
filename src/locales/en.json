@@ -15,9 +15,10 @@
       "grossCurrency": "Gross currency",
       "payoutAmount": "Payout amount",
       "payoutCurrency": "Payout currency",
-      "fxRateLabel": "FX label",
-      "fxRate": "FX rate",
-      "withholdingTaxCountryCode": "Withholding tax country code",
+      "exchangeRate": "Conversion rate",
+      "fxRateLabel": "Currency pair",
+      "fxRate": "Rate",
+      "withholdingTaxCountryCode": "Withholding tax country",
       "withholdingTaxPercent": "Withholding tax %",
       "withholdingTaxAmount": "Withholding tax amount",
       "withholdingTaxCurrency": "Withholding tax currency",
@@ -45,6 +46,16 @@
       "chooseSecurity": "Choose security",
       "noSecurityResults": "No matching securities found."
     },
+    "currencyField": {
+      "placeholder": "Enter or choose currency",
+      "placeholderOptional": "Optional: enter or choose currency",
+      "noResults": "No matching currencies found.",
+      "createDialogTitle": "Create currency?",
+      "createDialogBody": "Currency {currency} does not exist yet. Do you want to create it?",
+      "createDialogConfirm": "Create",
+      "createdCurrency": "Currency {currency} was created.",
+      "currencyAlreadyExists": "Currency {currency} already exists now."
+    },
     "actions": {
       "copyWithholdingToCredit": "Copy to creditable",
       "suggestRefundableWithholdingTax": "Suggest refundable",
@@ -60,13 +71,14 @@
       "quantityRequired": "Please enter the quantity.",
       "dividendPerUnitAmountRequired": "Please enter the dividend per unit.",
       "dividendPerUnitCurrencyRequired": "Please enter the per-unit currency.",
+      "currencyCodeInvalid": "Please enter a currency code with exactly three letters.",
       "grossAmountRequired": "Please enter the gross amount.",
       "grossCurrencyRequired": "Please enter the gross currency.",
       "payoutAmountRequired": "Please enter the payout amount.",
       "payoutCurrencyRequired": "Please enter the payout currency."
     },
     "errors": {
-      "referenceDataLoadFailed": "Depots and securities could not be loaded.",
+      "referenceDataLoadFailed": "Depots, securities and currencies could not be loaded.",
       "unknown": "An unknown error occurred."
     },
     "add": {

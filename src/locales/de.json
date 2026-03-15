@@ -15,9 +15,10 @@
       "grossCurrency": "Brutto-Währung",
       "payoutAmount": "Auszahlungsbetrag",
       "payoutCurrency": "Auszahlungs-Währung",
-      "fxRateLabel": "FX-Bezeichnung",
-      "fxRate": "FX-Kurs",
-      "withholdingTaxCountryCode": "Quellensteuer-Ländercode",
+      "exchangeRate": "Umrechnungskurs",
+      "fxRateLabel": "Währungspaar",
+      "fxRate": "Kurs",
+      "withholdingTaxCountryCode": "Land Quellensteuer",
       "withholdingTaxPercent": "Quellensteuer %",
       "withholdingTaxAmount": "Quellensteuer-Betrag",
       "withholdingTaxCurrency": "Quellensteuer-Währung",
@@ -45,6 +46,16 @@
       "chooseSecurity": "Wertpapier wählen",
       "noSecurityResults": "Keine passenden Wertpapiere gefunden."
     },
+    "currencyField": {
+      "placeholder": "Währung eingeben oder wählen",
+      "placeholderOptional": "Optional: Währung eingeben oder wählen",
+      "noResults": "Keine passenden Währungen gefunden.",
+      "createDialogTitle": "Währung anlegen?",
+      "createDialogBody": "Die Währung {currency} existiert noch nicht. Soll sie angelegt werden?",
+      "createDialogConfirm": "Anlegen",
+      "createdCurrency": "Währung {currency} wurde angelegt.",
+      "currencyAlreadyExists": "Währung {currency} ist inzwischen bereits vorhanden."
+    },
     "actions": {
       "copyWithholdingToCredit": "Als anrechenbar übernehmen",
       "suggestRefundableWithholdingTax": "Erstattbar vorbelegen",
@@ -60,13 +71,14 @@
       "quantityRequired": "Bitte geben Sie die Stückzahl ein.",
       "dividendPerUnitAmountRequired": "Bitte geben Sie die Dividende je Einheit ein.",
       "dividendPerUnitCurrencyRequired": "Bitte geben Sie die Währung je Einheit ein.",
+      "currencyCodeInvalid": "Bitte geben Sie einen Währungscode mit genau drei Buchstaben ein.",
       "grossAmountRequired": "Bitte geben Sie den Bruttobetrag ein.",
       "grossCurrencyRequired": "Bitte geben Sie die Brutto-Währung ein.",
       "payoutAmountRequired": "Bitte geben Sie den Auszahlungsbetrag ein.",
       "payoutCurrencyRequired": "Bitte geben Sie die Auszahlungs-Währung ein."
     },
     "errors": {
-      "referenceDataLoadFailed": "Depots und Wertpapiere konnten nicht geladen werden.",
+      "referenceDataLoadFailed": "Depots, Wertpapiere und Währungen konnten nicht geladen werden.",
       "unknown": "Es ist ein unbekannter Fehler aufgetreten."
     },
     "add": {

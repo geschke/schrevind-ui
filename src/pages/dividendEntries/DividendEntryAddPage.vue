@@ -22,342 +22,386 @@
         <button type="button" class="btn-close" aria-label="Close" @click="dismissReferenceDataError"></button>
       </div>
 
-      <form @submit="onSubmit">
-        <div class="card mb-4">
-          <div class="card-header">{{ t("dividendEntries.sections.general") }}</div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="depotId" class="form-label">{{ t("dividendEntries.common.depotId") }}</label>
+
+
+          <div class="col-md-10 offset-md-1">
+
+      <form @submit="onSubmit" class="g-3">
+
+            <div class="row py-2 bg-body-secondary">
+            <label for="depotId" class="col-sm-3 col-form-label">{{ t("dividendEntries.common.depotId") }}</label>
+            <div class="col-sm-9">
                 <select id="depotId" v-model="depotId" v-bind="depotIdAttrs" class="form-select">
                   <option value="">{{ referenceDataLoading ? t("common.loading") : t("dividendEntries.form.chooseDepot") }}</option>
                   <option v-for="depot in depotOptions" :key="depot.ID" :value="String(depot.ID)">
                     {{ depot.Name }}
                   </option>
                 </select>
-                <small class="text-danger" v-if="errors.depotId">{{ errors.depotId }}</small>
-              </div>
+              <small class="text-danger" v-if="errors.depotId">{{ errors.depotId }}</small>
+            </div>
+          </div>
 
-              <div class="col-md-6">
-                <label for="securityId" class="form-label">{{ t("dividendEntries.common.securityId") }}</label>
-                <div ref="securityPickerRef" class="position-relative">
-                  <input
-                    id="securityId"
-                    v-model="securitySearchQuery"
-                    type="text"
-                    class="form-control"
-                    :placeholder="referenceDataLoading ? t('common.loading') : t('dividendEntries.form.chooseSecurity')"
-                    autocomplete="off"
-                    @focus="openSecurityPicker"
-                    @input="onSecurityInput"
-                  />
-                  <input type="hidden" v-model="securityId" v-bind="securityIdAttrs" />
-                  <div v-if="isSecurityPickerOpen" class="list-group position-absolute w-100 shadow-sm security-picker-list">
-                    <button
-                      v-for="security in filteredSecurityOptions"
-                      :key="security.ID"
-                      type="button"
-                      class="list-group-item list-group-item-action"
-                      @mousedown.prevent="selectSecurityOption(security)"
-                    >
-                      {{ formatSecurityLabel(security) }}
-                    </button>
-                    <div v-if="filteredSecurityOptions.length === 0" class="list-group-item text-muted">
-                      {{ t("dividendEntries.form.noSecurityResults") }}
-                    </div>
+          <div class="row py-2 mb-3" >
+            <label for="securityId" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.securityId") }}</label>
+            <div class="col-sm-9 col-lg-7">
+              <div ref="securityPickerRef" class="position-relative">
+                <input
+                  id="securityId"
+                  v-model="securitySearchQuery"
+                  type="text"
+                  class="form-control"
+                  :placeholder="referenceDataLoading ? t('common.loading') : t('dividendEntries.form.chooseSecurity')"
+                  autocomplete="off"
+                  @focus="openSecurityPicker"
+                  @input="onSecurityInput"
+                />
+                <input type="hidden" v-model="securityId" v-bind="securityIdAttrs" />
+                <div v-if="isSecurityPickerOpen" class="list-group position-absolute w-100 shadow-sm security-picker-list">
+                  <button
+                    v-for="security in filteredSecurityOptions"
+                    :key="security.ID"
+                    type="button"
+                    class="list-group-item list-group-item-action"
+                    @mousedown.prevent="selectSecurityOption(security)"
+                  >
+                    {{ formatSecurityLabel(security) }}
+                  </button>
+                  <div v-if="filteredSecurityOptions.length === 0" class="list-group-item text-muted">
+                    {{ t("dividendEntries.form.noSecurityResults") }}
                   </div>
                 </div>
-                <small class="text-danger" v-if="errors.securityId">{{ errors.securityId }}</small>
               </div>
+              <small class="text-danger" v-if="errors.securityId">{{ errors.securityId }}</small>
+            </div>
+          </div>
 
-              <div class="col-md-6">
-                <label for="payDate" class="form-label">{{ t("dividendEntries.common.payDate") }}</label>
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="payDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.payDate") }}</label>
+            <div class="col-sm-9 col-md-5 col-lg-4 col-xl-3">
                 <input id="payDate" type="date" v-model="payDate" v-bind="payDateAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.payDate">{{ errors.payDate }}</small>
-              </div>
+              <small class="text-danger" v-if="errors.payDate">{{ errors.payDate }}</small>
+            </div>
+          </div>
 
-              <div class="col-md-6">
-                <label for="exDate" class="form-label">{{ t("dividendEntries.common.exDate") }}</label>
+          <div class="row py-2 mb-2">
+            <label for="exDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.exDate") }}</label>
+            <div class="col-sm-9 col-md-5 col-lg-4 col-xl-3">
                 <input id="exDate" type="date" v-model="exDate" v-bind="exDateAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.exDate">{{ errors.exDate }}</small>
+              <small class="text-danger" v-if="errors.exDate">{{ errors.exDate }}</small>
+            </div>
+          </div>
+
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="quantity" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.quantity") }}</label>
+            <div class="col-sm-9 col-md-4 col-lg-3">
+                <input id="quantity" type="text" v-model="quantity" v-bind="quantityAttrs" class="form-control text-end" />
+              <small class="text-danger" v-if="errors.quantity">{{ errors.quantity }}</small>
+            </div>
+          </div>
+
+          <div class="row py-2 mb-2">
+            <label for="dividendPerUnitAmount" class="col-sm-3 col-form-label fw-semibold">
+              {{ t("dividendEntries.common.dividendPerUnitAmount") }}
+            </label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input
+                    id="dividendPerUnitAmount"
+                    type="text"
+                    v-model="dividendPerUnitAmount"
+                    v-bind="dividendPerUnitAmountAttrs"
+                    class="form-control text-end"
+                  />
+                  <small class="text-danger" v-if="errors.dividendPerUnitAmount">{{ errors.dividendPerUnitAmount }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <CurrencyComboboxField
+                    v-model="dividendPerUnitCurrency"
+                    :input-id="'dividendPerUnitCurrency'"
+                    :input-name="'dividendPerUnitCurrency'"
+                    :input-attrs="dividendPerUnitCurrencyAttrs"
+                    :currencies="currencyOptions"
+                    :placeholder="t('currencies.common.currency')"
+                    :error="errors.dividendPerUnitCurrency"
+                    @notify="showCurrencyToast($event.type, $event.content)"
+                  />
+                  <small class="text-danger" v-if="errors.dividendPerUnitCurrency">{{ errors.dividendPerUnitCurrency }}</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card mb-4">
-          <div class="card-header">{{ t("dividendEntries.sections.dividendData") }}</div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="quantity" class="form-label">{{ t("dividendEntries.common.quantity") }}</label>
-                <input id="quantity" type="text" v-model="quantity" v-bind="quantityAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.quantity">{{ errors.quantity }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="dividendPerUnitAmount" class="form-label">{{ t("dividendEntries.common.dividendPerUnitAmount") }}</label>
-                <input
-                  id="dividendPerUnitAmount"
-                  type="text"
-                  v-model="dividendPerUnitAmount"
-                  v-bind="dividendPerUnitAmountAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.dividendPerUnitAmount">{{ errors.dividendPerUnitAmount }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="dividendPerUnitCurrency" class="form-label">
-                  {{ t("dividendEntries.common.dividendPerUnitCurrency") }}
-                </label>
-                <input
-                  id="dividendPerUnitCurrency"
-                  type="text"
-                  v-model="dividendPerUnitCurrency"
-                  v-bind="dividendPerUnitCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.dividendPerUnitCurrency">{{ errors.dividendPerUnitCurrency }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="grossAmount" class="form-label">{{ t("dividendEntries.common.grossAmount") }}</label>
-                <input id="grossAmount" type="text" v-model="grossAmount" v-bind="grossAmountAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.grossAmount">{{ errors.grossAmount }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="grossCurrency" class="form-label">{{ t("dividendEntries.common.grossCurrency") }}</label>
-                <input id="grossCurrency" type="text" v-model="grossCurrency" v-bind="grossCurrencyAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.grossCurrency">{{ errors.grossCurrency }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="payoutAmount" class="form-label">{{ t("dividendEntries.common.payoutAmount") }}</label>
-                <input id="payoutAmount" type="text" v-model="payoutAmount" v-bind="payoutAmountAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.payoutAmount">{{ errors.payoutAmount }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="payoutCurrency" class="form-label">{{ t("dividendEntries.common.payoutCurrency") }}</label>
-                <input
-                  id="payoutCurrency"
-                  type="text"
-                  v-model="payoutCurrency"
-                  v-bind="payoutCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.payoutCurrency">{{ errors.payoutCurrency }}</small>
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="grossAmount" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.grossAmount") }}</label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input id="grossAmount" type="text" v-model="grossAmount" v-bind="grossAmountAttrs" class="form-control text-end" />
+                  <small class="text-danger" v-if="errors.grossAmount">{{ errors.grossAmount }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <CurrencyComboboxField
+                    v-model="grossCurrency"
+                    :input-id="'grossCurrency'"
+                    :input-name="'grossCurrency'"
+                    :input-attrs="grossCurrencyAttrs"
+                    :currencies="currencyOptions"
+                    :placeholder="t('currencies.common.currency')"
+                    :error="errors.grossCurrency"
+                    @notify="showCurrencyToast($event.type, $event.content)"
+                  />
+                  <small class="text-danger" v-if="errors.grossCurrency">{{ errors.grossCurrency }}</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card mb-4">
-          <div class="card-header">{{ t("dividendEntries.sections.fx") }}</div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="fxRateLabel" class="form-label">{{ t("dividendEntries.common.fxRateLabel") }}</label>
-                <input id="fxRateLabel" type="text" v-model="fxRateLabel" v-bind="fxRateLabelAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.fxRateLabel">{{ errors.fxRateLabel }}</small>
-              </div>
-
-              <div class="col-md-6">
-                <label for="fxRate" class="form-label">{{ t("dividendEntries.common.fxRate") }}</label>
-                <input id="fxRate" type="text" v-model="fxRate" v-bind="fxRateAttrs" class="form-control" />
-                <small class="text-danger" v-if="errors.fxRate">{{ errors.fxRate }}</small>
+          <div class="row py-2 mb-2">
+            <label for="payoutAmount" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.payoutAmount") }}</label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input id="payoutAmount" type="text" v-model="payoutAmount" v-bind="payoutAmountAttrs" class="form-control text-end" />
+                  <small class="text-danger" v-if="errors.payoutAmount">{{ errors.payoutAmount }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <CurrencyComboboxField
+                    v-model="payoutCurrency"
+                    :input-id="'payoutCurrency'"
+                    :input-name="'payoutCurrency'"
+                    :input-attrs="payoutCurrencyAttrs"
+                    :currencies="currencyOptions"
+                    :placeholder="t('currencies.common.currency')"
+                    :error="errors.payoutCurrency"
+                    @notify="showCurrencyToast($event.type, $event.content)"
+                  />
+                  <small class="text-danger" v-if="errors.payoutCurrency">{{ errors.payoutCurrency }}</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card mb-4">
-          <div class="card-header">{{ t("dividendEntries.sections.withholdingTax") }}</div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-12 d-flex justify-content-end">
-                <button type="button" class="btn btn-outline-secondary btn-sm" @click="copyWithholdingToCredit">
-                  {{ t("dividendEntries.actions.copyWithholdingToCredit") }}
-                </button>
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="fxRateLabel" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.exchangeRate") }}</label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input
+                    id="fxRateLabel"
+                    type="text"
+                    v-model="fxRateLabel"
+                    v-bind="fxRateLabelAttrs"
+                    class="form-control text-end"
+                    :placeholder="t('dividendEntries.common.fxRateLabel')"
+                  />
+                  <small class="text-danger" v-if="errors.fxRateLabel">{{ errors.fxRateLabel }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <input
+                    id="fxRate"
+                    type="text"
+                    v-model="fxRate"
+                    v-bind="fxRateAttrs"
+                    class="form-control"
+                    :placeholder="t('dividendEntries.common.fxRate')"
+                  />
+                  <small class="text-danger" v-if="errors.fxRate">{{ errors.fxRate }}</small>
+                </div>
               </div>
+            </div>
+          </div>
 
-              <div class="col-md-6">
-                <label for="withholdingTaxCountryCode" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxCountryCode") }}
-                </label>
-                <input
-                  id="withholdingTaxCountryCode"
-                  type="text"
-                  v-model="withholdingTaxCountryCode"
-                  v-bind="withholdingTaxCountryCodeAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxCountryCode">
-                  {{ errors.withholdingTaxCountryCode }}
-                </small>
-              </div>
-
-              <div class="col-md-6">
-                <label for="withholdingTaxPercent" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxPercent") }}
-                </label>
-                <input
-                  id="withholdingTaxPercent"
-                  type="text"
-                  v-model="withholdingTaxPercent"
-                  v-bind="withholdingTaxPercentAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxPercent">{{ errors.withholdingTaxPercent }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="withholdingTaxAmount" class="form-label">{{ t("dividendEntries.common.withholdingTaxAmount") }}</label>
-                <input
-                  id="withholdingTaxAmount"
-                  type="text"
-                  v-model="withholdingTaxAmount"
-                  v-bind="withholdingTaxAmountAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxAmount">{{ errors.withholdingTaxAmount }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="withholdingTaxCurrency" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxCurrency") }}
-                </label>
-                <input
-                  id="withholdingTaxCurrency"
-                  type="text"
-                  v-model="withholdingTaxCurrency"
-                  v-bind="withholdingTaxCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxCurrency">{{ errors.withholdingTaxCurrency }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="withholdingTaxAmountCredit" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxAmountCredit") }}
-                </label>
-                <input
-                  id="withholdingTaxAmountCredit"
-                  type="text"
-                  v-model="withholdingTaxAmountCredit"
-                  v-bind="withholdingTaxAmountCreditAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxAmountCredit">{{ errors.withholdingTaxAmountCredit }}</small>
-              </div>
-
-              <div class="col-md-3">
-                <label for="withholdingTaxAmountCreditCurrency" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxAmountCreditCurrency") }}
-                </label>
-                <input
-                  id="withholdingTaxAmountCreditCurrency"
-                  type="text"
-                  v-model="withholdingTaxAmountCreditCurrency"
-                  v-bind="withholdingTaxAmountCreditCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxAmountCreditCurrency">
-                  {{ errors.withholdingTaxAmountCreditCurrency }}
-                </small>
-              </div>
-
-              <div class="col-md-6">
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                  <label for="withholdingTaxAmountRefundable" class="form-label mb-0">
-                    {{ t("dividendEntries.common.withholdingTaxAmountRefundable") }}
+          <div class="row py-2 mb-2">
+            <label for="withholdingTaxCountryCode" class="col-sm-3 col-form-label fw-semibold">
+              {{ t("dividendEntries.common.withholdingTaxCountryCode") }}
+            </label>
+            <div class="col-sm-9">
+              <div class="row g-2 align-items-start">
+                <div class="col-sm-2">
+                  <input
+                    id="withholdingTaxCountryCode"
+                    type="text"
+                    v-model="withholdingTaxCountryCode"
+                    v-bind="withholdingTaxCountryCodeAttrs"
+                    class="form-control"
+                  />
+                  <small class="text-danger" v-if="errors.withholdingTaxCountryCode">{{ errors.withholdingTaxCountryCode }}</small>
+                </div>
+                <div class="col-auto">
+                  <label for="withholdingTaxPercent" class="col-form-label fw-semibold">
+                    {{ t("dividendEntries.common.withholdingTaxPercent") }}
                   </label>
+                </div>
+                <div class="col-sm-3">
+                  <input
+                    id="withholdingTaxPercent"
+                    type="text"
+                    v-model="withholdingTaxPercent"
+                    v-bind="withholdingTaxPercentAttrs"
+                    class="form-control"
+                  />
+                  <small class="text-danger" v-if="errors.withholdingTaxPercent">{{ errors.withholdingTaxPercent }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="withholdingTaxAmount" class="col-sm-3 col-form-label fw-semibold">
+              {{ t("dividendEntries.common.withholdingTaxAmount") }}
+            </label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input
+                    id="withholdingTaxAmount"
+                    type="text"
+                    v-model="withholdingTaxAmount"
+                    v-bind="withholdingTaxAmountAttrs"
+                    class="form-control text-end"
+                  />
+                  <small class="text-danger" v-if="errors.withholdingTaxAmount">{{ errors.withholdingTaxAmount }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <CurrencyComboboxField
+                    v-model="withholdingTaxCurrency"
+                    :input-id="'withholdingTaxCurrency'"
+                    :input-name="'withholdingTaxCurrency'"
+                    :input-attrs="withholdingTaxCurrencyAttrs"
+                    :currencies="currencyOptions"
+                    :placeholder="t('currencies.common.currency')"
+                    :error="errors.withholdingTaxCurrency"
+                    @notify="showCurrencyToast($event.type, $event.content)"
+                  />
+                  <small class="text-danger" v-if="errors.withholdingTaxCurrency">{{ errors.withholdingTaxCurrency }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row py-2 mb-2">
+            <label for="withholdingTaxAmountCredit" class="col-sm-3 col-form-label fw-semibold">
+              {{ t("dividendEntries.common.withholdingTaxAmountCredit") }}
+            </label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                    <input
+                      id="withholdingTaxAmountCredit"
+                      type="text"
+                      v-model="withholdingTaxAmountCredit"
+                      v-bind="withholdingTaxAmountCreditAttrs"
+                      class="form-control text-end"
+                    />
+                    <small class="text-danger" v-if="errors.withholdingTaxAmountCredit">{{ errors.withholdingTaxAmountCredit }}</small>
+                </div>
+                <div class="col-sm-3">
+                    <CurrencyComboboxField
+                      v-model="withholdingTaxAmountCreditCurrency"
+                      :input-id="'withholdingTaxAmountCreditCurrency'"
+                      :input-name="'withholdingTaxAmountCreditCurrency'"
+                      :input-attrs="withholdingTaxAmountCreditCurrencyAttrs"
+                      :currencies="currencyOptions"
+                      :placeholder="t('currencies.common.currency')"
+                      :error="errors.withholdingTaxAmountCreditCurrency"
+                      @notify="showCurrencyToast($event.type, $event.content)"
+                    />
+                    <small class="text-danger" v-if="errors.withholdingTaxAmountCreditCurrency">
+                      {{ errors.withholdingTaxAmountCreditCurrency }}
+                    </small>
+                </div>
+                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">todo!!
+                  <button type="button" class="btn btn-outline-secondary btn-sm" @click="copyWithholdingToCredit">
+                    {{ t("dividendEntries.actions.copyWithholdingToCredit") }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="withholdingTaxAmountRefundable" class="col-sm-3 col-form-label fw-semibold">
+              {{ t("dividendEntries.common.withholdingTaxAmountRefundable") }}
+            </label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                    <input
+                      id="withholdingTaxAmountRefundable"
+                      type="text"
+                      v-model="withholdingTaxAmountRefundable"
+                      v-bind="withholdingTaxAmountRefundableAttrs"
+                      class="form-control text-end"
+                    />
+                    <small class="text-danger" v-if="errors.withholdingTaxAmountRefundable">{{ errors.withholdingTaxAmountRefundable }}</small>
+                </div>
+                <div class="col-sm-3">
+                    <CurrencyComboboxField
+                      v-model="withholdingTaxAmountRefundableCurrency"
+                      :input-id="'withholdingTaxAmountRefundableCurrency'"
+                      :input-name="'withholdingTaxAmountRefundableCurrency'"
+                      :input-attrs="withholdingTaxAmountRefundableCurrencyAttrs"
+                      :currencies="currencyOptions"
+                      :placeholder="t('currencies.common.currency')"
+                      :error="errors.withholdingTaxAmountRefundableCurrency"
+                      @notify="showCurrencyToast($event.type, $event.content)"
+                    />
+                    <small class="text-danger" v-if="errors.withholdingTaxAmountRefundableCurrency">
+                      {{ errors.withholdingTaxAmountRefundableCurrency }}
+                    </small>
+                </div>
+                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">
                   <button type="button" class="btn btn-outline-secondary btn-sm" @click="suggestRefundableWithholdingTax">
                     {{ t("dividendEntries.actions.suggestRefundableWithholdingTax") }}
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div class="col-md-6"></div>
-
-              <div class="col-md-6">
-                <label for="withholdingTaxAmountRefundable" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxAmountRefundable") }}
-                </label>
-                <input
-                  id="withholdingTaxAmountRefundable"
-                  type="text"
-                  v-model="withholdingTaxAmountRefundable"
-                  v-bind="withholdingTaxAmountRefundableAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxAmountRefundable">
-                  {{ errors.withholdingTaxAmountRefundable }}
-                </small>
-              </div>
-
-              <div class="col-md-6">
-                <label for="withholdingTaxAmountRefundableCurrency" class="form-label">
-                  {{ t("dividendEntries.common.withholdingTaxAmountRefundableCurrency") }}
-                </label>
-                <input
-                  id="withholdingTaxAmountRefundableCurrency"
-                  type="text"
-                  v-model="withholdingTaxAmountRefundableCurrency"
-                  v-bind="withholdingTaxAmountRefundableCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.withholdingTaxAmountRefundableCurrency">
-                  {{ errors.withholdingTaxAmountRefundableCurrency }}
-                </small>
+          <div class="row py-2 mb-2">
+            <label for="foreignFeesAmount" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.foreignFeesAmount") }}</label>
+            <div class="col-sm-9">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <input
+                    id="foreignFeesAmount"
+                    type="text"
+                    v-model="foreignFeesAmount"
+                    v-bind="foreignFeesAmountAttrs"
+                    class="form-control text-end"
+                  />
+                  <small class="text-danger" v-if="errors.foreignFeesAmount">{{ errors.foreignFeesAmount }}</small>
+                </div>
+                <div class="col-sm-3">
+                  <CurrencyComboboxField
+                    v-model="foreignFeesCurrency"
+                    :input-id="'foreignFeesCurrency'"
+                    :input-name="'foreignFeesCurrency'"
+                    :input-attrs="foreignFeesCurrencyAttrs"
+                    :currencies="currencyOptions"
+                    :placeholder="t('currencies.common.currency')"
+                    :error="errors.foreignFeesCurrency"
+                    @notify="showCurrencyToast($event.type, $event.content)"
+                  />
+                  <small class="text-danger" v-if="errors.foreignFeesCurrency">{{ errors.foreignFeesCurrency }}</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card mb-4">
-          <div class="card-header">{{ t("dividendEntries.sections.other") }}</div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="foreignFeesAmount" class="form-label">{{ t("dividendEntries.common.foreignFeesAmount") }}</label>
-                <input
-                  id="foreignFeesAmount"
-                  type="text"
-                  v-model="foreignFeesAmount"
-                  v-bind="foreignFeesAmountAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.foreignFeesAmount">{{ errors.foreignFeesAmount }}</small>
-              </div>
-
-              <div class="col-md-6">
-                <label for="foreignFeesCurrency" class="form-label">
-                  {{ t("dividendEntries.common.foreignFeesCurrency") }}
-                </label>
-                <input
-                  id="foreignFeesCurrency"
-                  type="text"
-                  v-model="foreignFeesCurrency"
-                  v-bind="foreignFeesCurrencyAttrs"
-                  class="form-control"
-                />
-                <small class="text-danger" v-if="errors.foreignFeesCurrency">{{ errors.foreignFeesCurrency }}</small>
-              </div>
-
-              <div class="col-12">
-                <label for="note" class="form-label">{{ t("dividendEntries.common.note") }}</label>
-                <textarea id="note" v-model="note" v-bind="noteAttrs" rows="4" class="form-control"></textarea>
-                <small class="text-danger" v-if="errors.note">{{ errors.note }}</small>
-              </div>
+          <div class="row py-2 mb-2 bg-body-tertiary">
+            <label for="note" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.note") }}</label>
+            <div class="col-sm-9">
+              <textarea id="note" v-model="note" v-bind="noteAttrs" rows="4" class="form-control"></textarea>
+              <small class="text-danger" v-if="errors.note">{{ errors.note }}</small>
             </div>
           </div>
-        </div>
-
-        <div class="form-row mt-3">
-          <div class="form-group">
+        
+        
+        <div class="row py-2 mb-2">
+          <div class="offset-sm-3 col-sm-9">
             <button type="button" @click="$router.go(-1)" class="btn btn-secondary">
               {{ t("dividendEntries.common.cancel") }}
             </button>
@@ -369,6 +413,7 @@
           </div>
         </div>
       </form>
+      </div>
 
       <GToast ref="toast"></GToast>
     </template>
@@ -376,6 +421,7 @@
 </template>
 
 <script setup lang="ts">
+import CurrencyComboboxField from "@/components/helper/CurrencyComboboxField.vue";
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
@@ -384,6 +430,7 @@ import { useI18n } from "vue-i18n";
 import { GToast, GToastSuccess, GToastDanger, GToastWarning } from "goar-components";
 import type { GToastContent } from "goar-components";
 import { getErrorCode } from "@/helper/errorCode";
+import { useCurrenciesStore } from "@/stores/currencies";
 import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
@@ -392,6 +439,7 @@ import type { Security } from "@/types/securities";
 type SaveState = "idle" | "saving" | "success" | "error";
 
 const { t } = useI18n();
+const storeCurrencies = useCurrenciesStore();
 const storeDepots = useDepotsStore();
 const storeSecurities = useSecuritiesStore();
 const storeDividendEntries = useDividendEntriesStore();
@@ -437,6 +485,27 @@ const initialValues = {
   securitySymbol: "",
 };
 
+function normalizeCurrencyCode(value: unknown) {
+  return typeof value === "string" ? value.trim().toUpperCase().slice(0, 3) : "";
+}
+
+function optionalCurrencySchema() {
+  return yup
+    .string()
+    .transform((value) => normalizeCurrencyCode(value))
+    .test("currency-code", () => t("dividendEntries.validation.currencyCodeInvalid"), (value) => {
+      return value === "" || /^[A-Z]{3}$/.test(value ?? "");
+    });
+}
+
+function requiredCurrencySchema(messageKey: string) {
+  return yup
+    .string()
+    .transform((value) => normalizeCurrencyCode(value))
+    .required(() => t(messageKey))
+    .matches(/^[A-Z]{3}$/, () => t("dividendEntries.validation.currencyCodeInvalid"));
+}
+
 const validationSchema = yup.object().shape({
   depotId: yup.string().required(() => t("dividendEntries.validation.depotIdRequired")),
   securityId: yup.string().required(() => t("dividendEntries.validation.securityIdRequired")),
@@ -456,38 +525,29 @@ const validationSchema = yup.object().shape({
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.dividendPerUnitAmountRequired")),
-  dividendPerUnitCurrency: yup
-    .string()
-    .transform((value) => value?.trim() ?? "")
-    .required(() => t("dividendEntries.validation.dividendPerUnitCurrencyRequired")),
+  dividendPerUnitCurrency: requiredCurrencySchema("dividendEntries.validation.dividendPerUnitCurrencyRequired"),
   grossAmount: yup
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.grossAmountRequired")),
-  grossCurrency: yup
-    .string()
-    .transform((value) => value?.trim() ?? "")
-    .required(() => t("dividendEntries.validation.grossCurrencyRequired")),
+  grossCurrency: requiredCurrencySchema("dividendEntries.validation.grossCurrencyRequired"),
   payoutAmount: yup
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.payoutAmountRequired")),
-  payoutCurrency: yup
-    .string()
-    .transform((value) => value?.trim() ?? "")
-    .required(() => t("dividendEntries.validation.payoutCurrencyRequired")),
+  payoutCurrency: requiredCurrencySchema("dividendEntries.validation.payoutCurrencyRequired"),
   fxRateLabel: yup.string().transform((value) => value?.trim() ?? ""),
   fxRate: yup.string().transform((value) => value?.trim() ?? ""),
   withholdingTaxCountryCode: yup.string().transform((value) => value?.trim() ?? ""),
   withholdingTaxPercent: yup.string().transform((value) => value?.trim() ?? ""),
   withholdingTaxAmount: yup.string().transform((value) => value?.trim() ?? ""),
-  withholdingTaxCurrency: yup.string().transform((value) => value?.trim() ?? ""),
+  withholdingTaxCurrency: optionalCurrencySchema(),
   withholdingTaxAmountCredit: yup.string().transform((value) => value?.trim() ?? ""),
-  withholdingTaxAmountCreditCurrency: yup.string().transform((value) => value?.trim() ?? ""),
+  withholdingTaxAmountCreditCurrency: optionalCurrencySchema(),
   withholdingTaxAmountRefundable: yup.string().transform((value) => value?.trim() ?? ""),
-  withholdingTaxAmountRefundableCurrency: yup.string().transform((value) => value?.trim() ?? ""),
+  withholdingTaxAmountRefundableCurrency: optionalCurrencySchema(),
   foreignFeesAmount: yup.string().transform((value) => value?.trim() ?? ""),
-  foreignFeesCurrency: yup.string().transform((value) => value?.trim() ?? ""),
+  foreignFeesCurrency: optionalCurrencySchema(),
   note: yup.string().transform((value) => value?.trim() ?? ""),
   securityName: yup.string().transform((value) => value?.trim() ?? ""),
   securityISIN: yup.string().transform((value) => value?.trim() ?? ""),
@@ -532,6 +592,7 @@ const [foreignFeesCurrency, foreignFeesCurrencyAttrs] = defineField("foreignFees
 const [note, noteAttrs] = defineField("note");
 
 const depotOptions = computed(() => storeDepots.getDepots);
+const currencyOptions = computed(() => storeCurrencies.getCurrencies);
 const securityOptions = computed(() => storeSecurities.getSecurities);
 const filteredSecurityOptions = computed(() => {
   const query = securitySearchQuery.value.trim().toLowerCase();
@@ -583,6 +644,17 @@ function showWarningToast(content: string) {
   toast.value?.addToast(<GToastContent>{
     ...GToastWarning,
     title: t("dividendEntries.common.warningTitle"),
+    content,
+  });
+}
+
+function showCurrencyToast(type: "success" | "warning" | "danger", content: string) {
+  const baseToast = type === "success" ? GToastSuccess : type === "warning" ? GToastWarning : GToastDanger;
+  const titleKey = type === "danger" ? "dividendEntries.common.errorTitle" : type === "warning" ? "dividendEntries.common.warningTitle" : "dividendEntries.common.okTitle";
+
+  toast.value?.addToast(<GToastContent>{
+    ...baseToast,
+    title: t(titleKey),
     content,
   });
 }
@@ -659,7 +731,7 @@ function onSecurityInput() {
 
 function applyDepotCurrencyDefaults(depotKey: unknown) {
   const depot = storeDepots.getItem(depotKey ?? "");
-  const baseCurrency = depot?.BaseCurrency?.trim() ?? "";
+  const baseCurrency = normalizeCurrencyCode(depot?.BaseCurrency ?? "");
 
   if (baseCurrency === "") {
     autoCurrencySeed.value = "";
@@ -683,11 +755,11 @@ function applyDepotCurrencyDefaults(depotKey: unknown) {
 
 function getDefaultWithholdingCurrency() {
   if (payoutCurrency.value !== "") {
-    return payoutCurrency.value;
+    return normalizeCurrencyCode(payoutCurrency.value);
   }
 
   if (grossCurrency.value !== "") {
-    return grossCurrency.value;
+    return normalizeCurrencyCode(grossCurrency.value);
   }
 
   return "";
@@ -721,7 +793,7 @@ function copyWithholdingToCredit() {
   setFieldValue("withholdingTaxAmountCredit", withholdingTaxAmount.value);
 
   if (withholdingTaxAmountCreditCurrency.value === "" && withholdingTaxCurrency.value !== "") {
-    setFieldValue("withholdingTaxAmountCreditCurrency", withholdingTaxCurrency.value);
+    setFieldValue("withholdingTaxAmountCreditCurrency", normalizeCurrencyCode(withholdingTaxCurrency.value));
   }
 }
 
@@ -746,7 +818,7 @@ function suggestRefundableWithholdingTax() {
   );
 
   if (withholdingTaxAmountRefundableCurrency.value === "" && withholdingTaxCurrency.value !== "") {
-    setFieldValue("withholdingTaxAmountRefundableCurrency", withholdingTaxCurrency.value);
+    setFieldValue("withholdingTaxAmountRefundableCurrency", normalizeCurrencyCode(withholdingTaxCurrency.value));
   }
 }
 
@@ -824,7 +896,7 @@ onMounted(() => {
   document.addEventListener("click", handleDocumentClick);
   referenceDataLoading.value = true;
 
-  Promise.all([storeDepots.fetchDepots(), storeSecurities.fetchSecurities()])
+  Promise.all([storeDepots.fetchDepots(), storeSecurities.fetchSecurities(), storeCurrencies.fetchCurrencies()])
     .catch(() => {
       referenceDataError.value = t("dividendEntries.errors.referenceDataLoadFailed");
       toast.value?.addToast(<GToastContent>{
@@ -859,23 +931,23 @@ const onSubmit = handleSubmit((values) => {
       SecuritySymbol: normalizeOptionalString(selectedSecurity?.Symbol ?? values.securitySymbol),
       Quantity: values.quantity,
       DividendPerUnitAmount: values.dividendPerUnitAmount,
-      DividendPerUnitCurrency: values.dividendPerUnitCurrency,
+      DividendPerUnitCurrency: normalizeCurrencyCode(values.dividendPerUnitCurrency),
       FXRateLabel: normalizeOptionalString(values.fxRateLabel),
       FXRate: normalizeOptionalString(values.fxRate, "1"),
       GrossAmount: values.grossAmount,
-      GrossCurrency: values.grossCurrency,
+      GrossCurrency: normalizeCurrencyCode(values.grossCurrency),
       PayoutAmount: values.payoutAmount,
-      PayoutCurrency: values.payoutCurrency,
+      PayoutCurrency: normalizeCurrencyCode(values.payoutCurrency),
       WithholdingTaxCountryCode: normalizeOptionalString(values.withholdingTaxCountryCode),
       WithholdingTaxPercent: normalizeOptionalString(values.withholdingTaxPercent),
       WithholdingTaxAmount: normalizeOptionalString(values.withholdingTaxAmount),
-      WithholdingTaxCurrency: normalizeOptionalString(values.withholdingTaxCurrency),
+      WithholdingTaxCurrency: normalizeCurrencyCode(values.withholdingTaxCurrency),
       WithholdingTaxAmountCredit: normalizeOptionalString(values.withholdingTaxAmountCredit),
-      WithholdingTaxAmountCreditCurrency: normalizeOptionalString(values.withholdingTaxAmountCreditCurrency),
+      WithholdingTaxAmountCreditCurrency: normalizeCurrencyCode(values.withholdingTaxAmountCreditCurrency),
       WithholdingTaxAmountRefundable: normalizeOptionalString(values.withholdingTaxAmountRefundable),
-      WithholdingTaxAmountRefundableCurrency: normalizeOptionalString(values.withholdingTaxAmountRefundableCurrency),
+      WithholdingTaxAmountRefundableCurrency: normalizeCurrencyCode(values.withholdingTaxAmountRefundableCurrency),
       ForeignFeesAmount: normalizeOptionalString(values.foreignFeesAmount),
-      ForeignFeesCurrency: normalizeOptionalString(values.foreignFeesCurrency),
+      ForeignFeesCurrency: normalizeCurrencyCode(values.foreignFeesCurrency),
       Note: normalizeOptionalString(values.note),
     })
     .then(() => {
