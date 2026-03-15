@@ -31,7 +31,7 @@
             <div class="row py-2 bg-body-secondary">
             <label for="depotId" class="col-sm-3 col-form-label">{{ t("dividendEntries.common.depotId") }}</label>
             <div class="col-sm-9">
-                <select id="depotId" v-model="depotId" v-bind="depotIdAttrs" class="form-select">
+                <select id="depotId" v-model="depotId" v-bind="depotIdAttrs" class="form-select" @change="onDepotSelectionChange">
                   <option value="">{{ referenceDataLoading ? t("common.loading") : t("dividendEntries.form.chooseDepot") }}</option>
                   <option v-for="depot in depotOptions" :key="depot.ID" :value="String(depot.ID)">
                     {{ depot.Name }}
@@ -77,17 +77,27 @@
 
           <div class="row py-2 mb-2 bg-body-tertiary">
             <label for="payDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.payDate") }}</label>
-            <div class="col-sm-9 col-md-5 col-lg-4 col-xl-3">
+            <div class="col-sm-3">
                 <input id="payDate" type="date" v-model="payDate" v-bind="payDateAttrs" class="form-control" />
               <small class="text-danger" v-if="errors.payDate">{{ errors.payDate }}</small>
+            </div>
+            <div class="col-sm-1">
+              <button type="button" class="btn btn-outline-secondary" @click="setDateToToday('payDate')">
+                {{ t("common.today") }}
+              </button>
             </div>
           </div>
 
           <div class="row py-2 mb-2">
             <label for="exDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.exDate") }}</label>
-            <div class="col-sm-9 col-md-5 col-lg-4 col-xl-3">
+            <div class="col-sm-3">
                 <input id="exDate" type="date" v-model="exDate" v-bind="exDateAttrs" class="form-control" />
               <small class="text-danger" v-if="errors.exDate">{{ errors.exDate }}</small>
+            </div>
+            <div class="col-sm-1">
+              <button type="button" class="btn btn-outline-secondary" @click="setDateToToday('exDate')">
+                {{ t("common.today") }}
+              </button>
             </div>
           </div>
 
@@ -124,6 +134,7 @@
                     :currencies="currencyOptions"
                     :placeholder="t('currencies.common.currency')"
                     :error="errors.dividendPerUnitCurrency"
+                    @update:modelValue="onDividendPerUnitCurrencyChange"
                     @notify="showCurrencyToast($event.type, $event.content)"
                   />
                   <small class="text-danger" v-if="errors.dividendPerUnitCurrency">{{ errors.dividendPerUnitCurrency }}</small>
@@ -194,6 +205,7 @@
                     v-bind="fxRateLabelAttrs"
                     class="form-control text-end"
                     :placeholder="t('dividendEntries.common.fxRateLabel')"
+                    @input="onFxRateLabelInput"
                   />
                   <small class="text-danger" v-if="errors.fxRateLabel">{{ errors.fxRateLabel }}</small>
                 </div>
@@ -219,13 +231,36 @@
             <div class="col-sm-9">
               <div class="row g-2 align-items-start">
                 <div class="col-sm-2">
-                  <input
-                    id="withholdingTaxCountryCode"
-                    type="text"
-                    v-model="withholdingTaxCountryCode"
-                    v-bind="withholdingTaxCountryCodeAttrs"
-                    class="form-control"
-                  />
+                  <div ref="withholdingCountryPickerRef" class="position-relative">
+                    <input
+                      id="withholdingTaxCountryCode"
+                      type="text"
+                      v-model="withholdingTaxCountryCode"
+                      v-bind="withholdingTaxCountryCodeAttrs"
+                      class="form-control"
+                      autocomplete="off"
+                      @focus="openWithholdingCountryPicker"
+                      @input="onWithholdingCountryInput"
+                      @keydown="onWithholdingCountryKeydown"
+                      @blur="onWithholdingCountryBlur"
+                    />
+                    <div v-if="isWithholdingCountryPickerOpen" class="list-group position-absolute w-100 shadow-sm security-picker-list">
+                      <button
+                        v-for="(item, index) in withholdingCountrySuggestions"
+                        :key="`${item.DepotID}-${item.CountryCode}`"
+                        type="button"
+                        class="list-group-item list-group-item-action"
+                        :class="{ active: index === highlightedWithholdingCountryIndex }"
+                        @mousedown.prevent="selectWithholdingCountrySuggestion(item.CountryCode)"
+                        @mousemove="highlightedWithholdingCountryIndex = index"
+                      >
+                        {{ item.CountryCode }}<span v-if="item.CountryName"> - {{ item.CountryName }}</span>
+                      </button>
+                      <div v-if="withholdingCountrySuggestions.length === 0" class="list-group-item text-muted">
+                        {{ t("dividendEntries.withholdingTaxCountry.noResults") }}
+                      </div>
+                    </div>
+                  </div>
                   <small class="text-danger" v-if="errors.withholdingTaxCountryCode">{{ errors.withholdingTaxCountryCode }}</small>
                 </div>
                 <div class="col-auto">
@@ -415,6 +450,49 @@
       </form>
       </div>
 
+      <div v-if="showWithholdingTaxCreateDialog" class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">{{ t("dividendEntries.withholdingTaxCountry.dialogTitle") }}</h1>
+              <button type="button" class="btn-close" :aria-label="t('dividendEntries.common.cancel')" @click="closeWithholdingTaxCreateDialog"></button>
+            </div>
+            <div class="modal-body">
+              <p class="mb-3">{{ t("dividendEntries.withholdingTaxCountry.dialogBody") }}</p>
+
+              <div class="mb-3">
+                <label class="form-label">{{ t("withholdingTaxDefaults.common.countryCode") }}</label>
+                <input ref="withholdingTaxCreateCountryCodeRef" v-model="newWithholdingTaxCountryCode" type="text" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">{{ t("withholdingTaxDefaults.common.countryName") }}</label>
+                <input v-model="newWithholdingTaxCountryName" type="text" class="form-control" />
+              </div>
+
+              <div class="mb-0">
+                <label class="form-label">{{ t("withholdingTaxDefaults.common.percentDefault") }}</label>
+                <input v-model="newWithholdingTaxPercentDefault" type="text" class="form-control" />
+              </div>
+
+              <div v-if="withholdingTaxCreateError !== ''" class="text-danger small mt-2">
+                {{ withholdingTaxCreateError }}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="closeWithholdingTaxCreateDialog">
+                {{ t("dividendEntries.common.cancel") }}
+              </button>
+              <button type="button" class="btn btn-primary" :disabled="withholdingTaxCreateState === 'saving'" @click="confirmWithholdingTaxCreateDialog">
+                <span v-if="withholdingTaxCreateState !== 'saving'">{{ t("dividendEntries.withholdingTaxCountry.createConfirm") }}</span>
+                <span v-else class="spinner-border spinner-border-sm"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="showWithholdingTaxCreateDialog" class="modal-backdrop fade show"></div>
+
       <GToast ref="toast"></GToast>
     </template>
   </TheMainLayout>
@@ -425,7 +503,7 @@ import CurrencyComboboxField from "@/components/helper/CurrencyComboboxField.vue
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { GToast, GToastSuccess, GToastDanger, GToastWarning } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -434,6 +512,7 @@ import { useCurrenciesStore } from "@/stores/currencies";
 import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
+import { useWithholdingTaxDefaultsStore } from "@/stores/withholdingTaxDefaults";
 import type { Security } from "@/types/securities";
 
 type SaveState = "idle" | "saving" | "success" | "error";
@@ -443,16 +522,30 @@ const storeCurrencies = useCurrenciesStore();
 const storeDepots = useDepotsStore();
 const storeSecurities = useSecuritiesStore();
 const storeDividendEntries = useDividendEntriesStore();
+const storeWithholdingTaxDefaults = useWithholdingTaxDefaultsStore();
 const toast: any = ref(null);
 const saveState = ref<SaveState>("idle");
 const messageError = ref("");
 const referenceDataLoading = ref(false);
 const referenceDataError = ref("");
 const autoCurrencySeed = ref("");
+const autoFxRateLabel = ref("");
+const fxRateLabelManuallyChanged = ref(false);
 const securitySearchQuery = ref("");
 const isSecurityPickerOpen = ref(false);
 const isSecurityFilterActive = ref(false);
 const securityPickerRef = ref<HTMLElement | null>(null);
+const withholdingCountryPickerRef = ref<HTMLElement | null>(null);
+const withholdingCountrySearchQuery = ref("");
+const isWithholdingCountryPickerOpen = ref(false);
+const highlightedWithholdingCountryIndex = ref(-1);
+const showWithholdingTaxCreateDialog = ref(false);
+const withholdingTaxCreateState = ref<SaveState>("idle");
+const withholdingTaxCreateError = ref("");
+const newWithholdingTaxCountryCode = ref("");
+const newWithholdingTaxCountryName = ref("");
+const newWithholdingTaxPercentDefault = ref("");
+const withholdingTaxCreateCountryCodeRef = ref<HTMLInputElement | null>(null);
 
 const initialValues = {
   depotId: "",
@@ -489,6 +582,23 @@ function normalizeCurrencyCode(value: unknown) {
   return typeof value === "string" ? value.trim().toUpperCase().slice(0, 3) : "";
 }
 
+function normalizeCurrencyPair(value: unknown) {
+  return typeof value === "string" ? value.trim().toUpperCase() : "";
+}
+
+function normalizeCountryCode(value: unknown) {
+  return typeof value === "string" ? value.trim().toUpperCase().slice(0, 2) : "";
+}
+
+function optionalCountryCodeSchema() {
+  return yup
+    .string()
+    .transform((value) => normalizeCountryCode(value))
+    .test("country-code", () => t("dividendEntries.validation.countryCodeInvalid"), (value) => {
+      return value === "" || /^[A-Z]{2}$/.test(value ?? "");
+    });
+}
+
 function optionalCurrencySchema() {
   return yup
     .string()
@@ -504,6 +614,15 @@ function requiredCurrencySchema(messageKey: string) {
     .transform((value) => normalizeCurrencyCode(value))
     .required(() => t(messageKey))
     .matches(/^[A-Z]{3}$/, () => t("dividendEntries.validation.currencyCodeInvalid"));
+}
+
+function optionalCurrencyPairSchema() {
+  return yup
+    .string()
+    .transform((value) => normalizeCurrencyPair(value))
+    .test("currency-pair", () => t("dividendEntries.validation.currencyPairInvalid"), (value) => {
+      return value === "" || /^[A-Z]{3}\/[A-Z]{3}$/.test(value ?? "");
+    });
 }
 
 const validationSchema = yup.object().shape({
@@ -536,9 +655,9 @@ const validationSchema = yup.object().shape({
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.payoutAmountRequired")),
   payoutCurrency: requiredCurrencySchema("dividendEntries.validation.payoutCurrencyRequired"),
-  fxRateLabel: yup.string().transform((value) => value?.trim() ?? ""),
+  fxRateLabel: optionalCurrencyPairSchema(),
   fxRate: yup.string().transform((value) => value?.trim() ?? ""),
-  withholdingTaxCountryCode: yup.string().transform((value) => value?.trim() ?? ""),
+  withholdingTaxCountryCode: optionalCountryCodeSchema(),
   withholdingTaxPercent: yup.string().transform((value) => value?.trim() ?? ""),
   withholdingTaxAmount: yup.string().transform((value) => value?.trim() ?? ""),
   withholdingTaxCurrency: optionalCurrencySchema(),
@@ -571,9 +690,13 @@ const [grossAmount, grossAmountAttrs] = defineField("grossAmount");
 const [grossCurrency, grossCurrencyAttrs] = defineField("grossCurrency");
 const [payoutAmount, payoutAmountAttrs] = defineField("payoutAmount");
 const [payoutCurrency, payoutCurrencyAttrs] = defineField("payoutCurrency");
-const [fxRateLabel, fxRateLabelAttrs] = defineField("fxRateLabel");
+const [fxRateLabel, fxRateLabelAttrs] = defineField("fxRateLabel", {
+  validateOnModelUpdate: false,
+});
 const [fxRate, fxRateAttrs] = defineField("fxRate");
-const [withholdingTaxCountryCode, withholdingTaxCountryCodeAttrs] = defineField("withholdingTaxCountryCode");
+const [withholdingTaxCountryCode, withholdingTaxCountryCodeAttrs] = defineField("withholdingTaxCountryCode", {
+  validateOnModelUpdate: false,
+});
 const [withholdingTaxPercent, withholdingTaxPercentAttrs] = defineField("withholdingTaxPercent");
 const [withholdingTaxAmount, withholdingTaxAmountAttrs] = defineField("withholdingTaxAmount");
 const [withholdingTaxCurrency, withholdingTaxCurrencyAttrs] = defineField("withholdingTaxCurrency");
@@ -594,6 +717,30 @@ const [note, noteAttrs] = defineField("note");
 const depotOptions = computed(() => storeDepots.getDepots);
 const currencyOptions = computed(() => storeCurrencies.getCurrencies);
 const securityOptions = computed(() => storeSecurities.getSecurities);
+const withholdingTaxDefaultsOptions = computed(() => storeWithholdingTaxDefaults.getWithholdingTaxDefaults);
+const selectedDepotCurrency = computed(() => {
+  const depot = storeDepots.getItem(depotId.value ?? "");
+  return normalizeCurrencyCode(depot?.BaseCurrency ?? "");
+});
+const selectedDepotIdNumber = computed(() => normalizeIdentifier(depotId.value));
+const relevantWithholdingTaxDefaults = computed(() => {
+  const selectedDepotId = selectedDepotIdNumber.value;
+  return withholdingTaxDefaultsOptions.value.filter((item) => item.DepotID === 0 || (selectedDepotId > 0 && item.DepotID === selectedDepotId));
+});
+const withholdingCountrySuggestions = computed(() => {
+  const query = normalizeCountryCode(withholdingCountrySearchQuery.value);
+  const uniqueItems = relevantWithholdingTaxDefaults.value.filter((item, index, array) => {
+    return array.findIndex((entry) => entry.CountryCode === item.CountryCode) === index;
+  });
+
+  if (query === "") {
+    return uniqueItems;
+  }
+
+  return uniqueItems.filter((item) => {
+    return item.CountryCode.toUpperCase().includes(query) || item.CountryName.toUpperCase().includes(query);
+  });
+});
 const filteredSecurityOptions = computed(() => {
   const query = securitySearchQuery.value.trim().toLowerCase();
 
@@ -648,6 +795,18 @@ function showWarningToast(content: string) {
   });
 }
 
+function getTodayIsoDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function setDateToToday(field: "payDate" | "exDate") {
+  setFieldValue(field, getTodayIsoDate());
+}
+
 function showCurrencyToast(type: "success" | "warning" | "danger", content: string) {
   const baseToast = type === "success" ? GToastSuccess : type === "warning" ? GToastWarning : GToastDanger;
   const titleKey = type === "danger" ? "dividendEntries.common.errorTitle" : type === "warning" ? "dividendEntries.common.warningTitle" : "dividendEntries.common.okTitle";
@@ -661,6 +820,219 @@ function showCurrencyToast(type: "success" | "warning" | "danger", content: stri
 
 function normalizeOptionalString(value: unknown, fallback = "") {
   return typeof value === "string" ? value : fallback;
+}
+
+function buildFxRateLabelSuggestion(
+  depotCurrency = selectedDepotCurrency.value,
+  foreignCurrency = normalizeCurrencyCode(dividendPerUnitCurrency.value)
+) {
+  if (!/^[A-Z]{3}$/.test(depotCurrency) || !/^[A-Z]{3}$/.test(foreignCurrency) || depotCurrency === foreignCurrency) {
+    return "";
+  }
+
+  return `${depotCurrency}/${foreignCurrency}`;
+}
+
+function syncFxRateLabelSuggestion(
+  foreignCurrency = normalizeCurrencyCode(dividendPerUnitCurrency.value),
+  depotCurrency = selectedDepotCurrency.value
+) {
+  const currentValue = normalizeOptionalString(fxRateLabel.value).trim();
+  const suggestion = buildFxRateLabelSuggestion(depotCurrency, foreignCurrency);
+  const canAutoApply =
+    !fxRateLabelManuallyChanged.value || currentValue === "" || currentValue === autoFxRateLabel.value;
+
+  if (!canAutoApply) {
+    return;
+  }
+
+  setFieldValue("fxRateLabel", suggestion);
+  autoFxRateLabel.value = suggestion;
+  fxRateLabelManuallyChanged.value = false;
+}
+
+function onDepotSelectionChange() {
+  applyDepotCurrencyDefaults(depotId.value);
+  syncFxRateLabelSuggestion();
+}
+
+function onDividendPerUnitCurrencyChange(value: string) {
+  syncFxRateLabelSuggestion(normalizeCurrencyCode(value));
+}
+
+function onFxRateLabelInput() {
+  const normalized = normalizeCurrencyPair(fxRateLabel.value);
+  if (normalized !== fxRateLabel.value) {
+    setFieldValue("fxRateLabel", normalized);
+  }
+
+  const currentValue = normalized;
+  fxRateLabelManuallyChanged.value = currentValue !== "" && currentValue !== autoFxRateLabel.value;
+}
+
+function openWithholdingCountryPicker() {
+  withholdingCountrySearchQuery.value = normalizeCountryCode(withholdingTaxCountryCode.value);
+  isWithholdingCountryPickerOpen.value = true;
+  highlightedWithholdingCountryIndex.value = -1;
+}
+
+function onWithholdingCountryInput() {
+  const normalized = normalizeCountryCode(withholdingTaxCountryCode.value);
+  if (normalized !== withholdingTaxCountryCode.value) {
+    setFieldValue("withholdingTaxCountryCode", normalized);
+  }
+
+  withholdingCountrySearchQuery.value = normalized;
+  isWithholdingCountryPickerOpen.value = true;
+  highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+}
+
+function selectWithholdingCountrySuggestion(countryCode: string) {
+  setFieldValue("withholdingTaxCountryCode", countryCode);
+  withholdingCountrySearchQuery.value = countryCode;
+  isWithholdingCountryPickerOpen.value = false;
+  highlightedWithholdingCountryIndex.value = -1;
+}
+
+async function confirmWithholdingCountryValue() {
+  isWithholdingCountryPickerOpen.value = false;
+  highlightedWithholdingCountryIndex.value = -1;
+
+  const countryCode = normalizeCountryCode(withholdingTaxCountryCode.value);
+  setFieldValue("withholdingTaxCountryCode", countryCode);
+  withholdingCountrySearchQuery.value = countryCode;
+
+  if (countryCode === "" || !/^[A-Z]{2}$/.test(countryCode)) {
+    return;
+  }
+
+  await storeWithholdingTaxDefaults.fetchWithholdingTaxDefaults();
+
+  const exists = relevantWithholdingTaxDefaults.value.some((item) => item.CountryCode.toUpperCase() === countryCode);
+  if (exists) {
+    return;
+  }
+
+  newWithholdingTaxCountryCode.value = countryCode;
+  newWithholdingTaxCountryName.value = "";
+  newWithholdingTaxPercentDefault.value = "";
+  withholdingTaxCreateError.value = "";
+  withholdingTaxCreateState.value = "idle";
+    showWithholdingTaxCreateDialog.value = true;
+    await nextTick();
+    withholdingTaxCreateCountryCodeRef.value?.focus();
+}
+
+async function onWithholdingCountryBlur() {
+  window.setTimeout(() => {
+    void confirmWithholdingCountryValue();
+  }, 120);
+}
+
+function closeWithholdingCountryPicker() {
+  isWithholdingCountryPickerOpen.value = false;
+  highlightedWithholdingCountryIndex.value = -1;
+}
+
+function onWithholdingCountryKeydown(event: KeyboardEvent) {
+  if (event.key === "ArrowDown") {
+    if (!isWithholdingCountryPickerOpen.value) {
+      isWithholdingCountryPickerOpen.value = true;
+      highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+      return;
+    }
+
+    event.preventDefault();
+    if (withholdingCountrySuggestions.value.length === 0) {
+      return;
+    }
+
+    if (highlightedWithholdingCountryIndex.value < 0) {
+      highlightedWithholdingCountryIndex.value = 0;
+      return;
+    }
+
+    highlightedWithholdingCountryIndex.value =
+      (highlightedWithholdingCountryIndex.value + 1 + withholdingCountrySuggestions.value.length) %
+      withholdingCountrySuggestions.value.length;
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    if (!isWithholdingCountryPickerOpen.value) {
+      isWithholdingCountryPickerOpen.value = true;
+      highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+      return;
+    }
+
+    event.preventDefault();
+    if (withholdingCountrySuggestions.value.length === 0) {
+      return;
+    }
+
+    if (highlightedWithholdingCountryIndex.value < 0) {
+      highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length - 1;
+      return;
+    }
+
+    highlightedWithholdingCountryIndex.value =
+      (highlightedWithholdingCountryIndex.value - 1 + withholdingCountrySuggestions.value.length) %
+      withholdingCountrySuggestions.value.length;
+    return;
+  }
+
+  if (event.key === "Escape") {
+    closeWithholdingCountryPicker();
+    return;
+  }
+
+  if (event.key === "Enter") {
+    if (
+      isWithholdingCountryPickerOpen.value &&
+      highlightedWithholdingCountryIndex.value >= 0 &&
+      withholdingCountrySuggestions.value[highlightedWithholdingCountryIndex.value]
+    ) {
+      event.preventDefault();
+      selectWithholdingCountrySuggestion(withholdingCountrySuggestions.value[highlightedWithholdingCountryIndex.value].CountryCode);
+      return;
+    }
+
+    event.preventDefault();
+    void confirmWithholdingCountryValue();
+  }
+}
+
+function closeWithholdingTaxCreateDialog() {
+  showWithholdingTaxCreateDialog.value = false;
+  withholdingTaxCreateError.value = "";
+  withholdingTaxCreateState.value = "idle";
+}
+
+async function confirmWithholdingTaxCreateDialog() {
+  withholdingTaxCreateState.value = "saving";
+  withholdingTaxCreateError.value = "";
+
+  try {
+    await storeWithholdingTaxDefaults.addWithholdingTaxDefault({
+      DepotID: 0,
+      CountryCode: normalizeCountryCode(newWithholdingTaxCountryCode.value),
+      CountryName: normalizeOptionalString(newWithholdingTaxCountryName.value).trim(),
+      WithholdingTaxPercentDefault: normalizeOptionalString(newWithholdingTaxPercentDefault.value).trim(),
+      WithholdingTaxPercentCreditDefault: "",
+    });
+
+    setFieldValue("withholdingTaxCountryCode", normalizeCountryCode(newWithholdingTaxCountryCode.value));
+    showWithholdingTaxCreateDialog.value = false;
+
+    toast.value?.addToast(<GToastContent>{
+      ...GToastSuccess,
+      title: t("dividendEntries.common.okTitle"),
+      content: t("dividendEntries.withholdingTaxCountry.createdHint"),
+    });
+  } catch {
+    withholdingTaxCreateState.value = "error";
+    withholdingTaxCreateError.value = t("dividendEntries.withholdingTaxCountry.createError");
+  }
 }
 
 function normalizeIdentifier(value: unknown) {
@@ -781,6 +1153,10 @@ function handleDocumentClick(event: MouseEvent) {
   if (!target || !securityPickerRef.value?.contains(target)) {
     isSecurityPickerOpen.value = false;
   }
+
+  if (!target || !withholdingCountryPickerRef.value?.contains(target)) {
+    closeWithholdingCountryPicker();
+  }
 }
 
 function copyWithholdingToCredit() {
@@ -884,10 +1260,6 @@ watch(securityId, (nextSecurityId) => {
   }
 });
 
-watch(depotId, (nextDepotId) => {
-  applyDepotCurrencyDefaults(nextDepotId);
-});
-
 watch(withholdingTaxAmount, () => {
   applyWithholdingCurrencyDefault();
 });
@@ -896,7 +1268,12 @@ onMounted(() => {
   document.addEventListener("click", handleDocumentClick);
   referenceDataLoading.value = true;
 
-  Promise.all([storeDepots.fetchDepots(), storeSecurities.fetchSecurities(), storeCurrencies.fetchCurrencies()])
+  Promise.all([
+    storeDepots.fetchDepots(),
+    storeSecurities.fetchSecurities(),
+    storeCurrencies.fetchCurrencies(),
+    storeWithholdingTaxDefaults.fetchWithholdingTaxDefaults(),
+  ])
     .catch(() => {
       referenceDataError.value = t("dividendEntries.errors.referenceDataLoadFailed");
       toast.value?.addToast(<GToastContent>{
@@ -954,6 +1331,8 @@ const onSubmit = handleSubmit((values) => {
       saveState.value = "success";
       resetForm({ values: { ...initialValues } });
       autoCurrencySeed.value = "";
+      autoFxRateLabel.value = "";
+      fxRateLabelManuallyChanged.value = false;
       securitySearchQuery.value = "";
       isSecurityPickerOpen.value = false;
       isSecurityFilterActive.value = false;

@@ -1,6 +1,7 @@
 ﻿{
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "today": "Today"
   },
   "dividendEntries": {
     "common": {
@@ -56,6 +57,14 @@
       "createdCurrency": "Currency {currency} was created.",
       "currencyAlreadyExists": "Currency {currency} already exists now."
     },
+    "withholdingTaxCountry": {
+      "noResults": "No matching countries found.",
+      "dialogTitle": "Create withholding tax entry",
+      "dialogBody": "There is no withholding tax entry for this country code yet. Do you want to create it globally?",
+      "createConfirm": "Create",
+      "createError": "The withholding tax entry could not be created.",
+      "createdHint": "Withholding tax was created. You can adjust the data later under “Withholding taxes”, especially the creditable %."
+    },
     "actions": {
       "copyWithholdingToCredit": "Copy to creditable",
       "suggestRefundableWithholdingTax": "Suggest refundable",
@@ -72,13 +81,15 @@
       "dividendPerUnitAmountRequired": "Please enter the dividend per unit.",
       "dividendPerUnitCurrencyRequired": "Please enter the per-unit currency.",
       "currencyCodeInvalid": "Please enter a currency code with exactly three letters.",
+      "countryCodeInvalid": "Please enter a country code with exactly two letters.",
+      "currencyPairInvalid": "Please enter a currency pair in the format XXX/YYY.",
       "grossAmountRequired": "Please enter the gross amount.",
       "grossCurrencyRequired": "Please enter the gross currency.",
       "payoutAmountRequired": "Please enter the payout amount.",
       "payoutCurrencyRequired": "Please enter the payout currency."
     },
     "errors": {
-      "referenceDataLoadFailed": "Depots, securities and currencies could not be loaded.",
+      "referenceDataLoadFailed": "Depots, securities, currencies and withholding tax data could not be loaded.",
       "unknown": "An unknown error occurred."
     },
     "add": {

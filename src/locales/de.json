@@ -1,6 +1,7 @@
 ﻿{
   "common": {
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "today": "Heute"
   },
   "dividendEntries": {
     "common": {
@@ -56,6 +57,14 @@
       "createdCurrency": "Währung {currency} wurde angelegt.",
       "currencyAlreadyExists": "Währung {currency} ist inzwischen bereits vorhanden."
     },
+    "withholdingTaxCountry": {
+      "noResults": "Keine passenden Länder gefunden.",
+      "dialogTitle": "Quellensteuer anlegen",
+      "dialogBody": "Für diesen Ländercode existiert noch kein Quellensteuer-Eintrag. Möchten Sie ihn global anlegen?",
+      "createConfirm": "Anlegen",
+      "createError": "Der Quellensteuer-Eintrag konnte nicht angelegt werden.",
+      "createdHint": "Quellensteuer wurde angelegt. Sie können die Daten später unter „Quellensteuern“ weiter pflegen, insbesondere die anrechenbaren %."
+    },
     "actions": {
       "copyWithholdingToCredit": "Als anrechenbar übernehmen",
       "suggestRefundableWithholdingTax": "Erstattbar vorbelegen",
@@ -72,13 +81,15 @@
       "dividendPerUnitAmountRequired": "Bitte geben Sie die Dividende je Einheit ein.",
       "dividendPerUnitCurrencyRequired": "Bitte geben Sie die Währung je Einheit ein.",
       "currencyCodeInvalid": "Bitte geben Sie einen Währungscode mit genau drei Buchstaben ein.",
+      "countryCodeInvalid": "Bitte geben Sie einen Ländercode mit genau zwei Buchstaben ein.",
+      "currencyPairInvalid": "Bitte geben Sie ein Währungspaar im Format XXX/YYY ein.",
       "grossAmountRequired": "Bitte geben Sie den Bruttobetrag ein.",
       "grossCurrencyRequired": "Bitte geben Sie die Brutto-Währung ein.",
       "payoutAmountRequired": "Bitte geben Sie den Auszahlungsbetrag ein.",
       "payoutCurrencyRequired": "Bitte geben Sie die Auszahlungs-Währung ein."
     },
     "errors": {
-      "referenceDataLoadFailed": "Depots, Wertpapiere und Währungen konnten nicht geladen werden.",
+      "referenceDataLoadFailed": "Depots, Wertpapiere, Währungen und Quellensteuerdaten konnten nicht geladen werden.",
       "unknown": "Es ist ein unbekannter Fehler aufgetreten."
     },
     "add": {
