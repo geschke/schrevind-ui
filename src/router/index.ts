@@ -217,23 +217,20 @@ const router = createRouter({
 
 // todo: Autologin or something like this based on session cookies
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   //console.log(to);
-  //console.log(from);
   const storeUserAuth = useUserAuthStore();
   await storeUserAuth.initAuth();
   //console.log(storeUser.isAuthenticated);
-  // maybe don't use next() in current version, see https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
   if (to.name === "home" && storeUserAuth.isAuthenticated) {
-    next({ name: "overview" });
-    return;
+    return { name: "overview" };
   }
 
   if (to.meta.requiresAuth && !storeUserAuth.isAuthenticated) {
-    next({ name: "home" });
-  } else {
-    next();
+    return { name: "home" };
   }
+
+  return true;
 });
 
 export default router;

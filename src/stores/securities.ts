@@ -21,8 +21,10 @@ function normalizeSecurity(item: unknown): Security {
 
 export const useSecuritiesStore = defineStore("securities", () => {
   const securities = ref<Security[]>([]);
+  const securitiesCount = ref(0);
   const securitiesLoaded = ref(false);
   const getSecurities = computed(() => securities.value);
+  const getSecuritiesCount = computed(() => securitiesCount.value);
 
   function getItem(id: number | string): Security | undefined {
     return securities.value.find((item) => String(item.ID) === String(id));
@@ -39,15 +41,23 @@ export const useSecuritiesStore = defineStore("securities", () => {
     return items.map((item) => normalizeSecurity(item));
   }
 
-  async function fetchSecurities() {
+  async function fetchSecurities(params?: { offset?: number; limit?: number }) {
     return axios
-      .get("/securities/list", { withCredentials: true })
+      .get("/securities/list", {
+        withCredentials: true,
+        params: {
+          offset: params?.offset ?? 0,
+          limit: params?.limit ?? 10,
+        },
+      })
       .then((response) => {
         securities.value = normalizeSecurityItems(response.data);
+        securitiesCount.value = Number(response.data?.count ?? securities.value.length);
         securitiesLoaded.value = true;
       })
       .catch((error: unknown) => {
         securities.value = [];
+        securitiesCount.value = 0;
         securitiesLoaded.value = false;
         throw error;
       });
@@ -120,6 +130,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
   return {
     securitiesLoaded,
     getSecurities,
+    getSecuritiesCount,
     getItem,
     fetchSecurities,
     fetchSecurityById,

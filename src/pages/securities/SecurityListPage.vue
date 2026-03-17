@@ -11,12 +11,17 @@
       <GTable
         :headers="headers"
         :items="securities"
+        :count="securitiesCount"
+        :items-per-page="itemsPerPage"
         classes="table-striped table-hover"
         _bodyClasses="table-group-divider"
         headClasses="table-secondary"
         :_showEmpty="false"
         :showLoading="true"
         :loading="loading"
+        :showPageFirstLast="true"
+        :showPageIcons="true"
+        @pageChange="onPageChange"
       >
         <template #tmplLoading>
           <div class="col text-center">
@@ -141,6 +146,8 @@ const loading = ref(false);
 const toBeDeleted = ref<Security | null>(null);
 const createdBannerVisible = ref(false);
 const createdBannerMessage = ref("");
+const itemsPerPage = 10;
+const currentOffset = ref(0);
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("securities.list.table.columns.id"), field: "ID" },
@@ -155,23 +162,11 @@ const headers = computed<GTableHeader[]>(() => [
 ]);
 
 const securities = computed(() => storeSecurities.getSecurities);
+const securitiesCount = computed(() => storeSecurities.getSecuritiesCount);
 
 onMounted(() => {
   showCreateSuccessBannerFromFlash();
-
-  loading.value = true;
-  storeSecurities
-    .fetchSecurities()
-    .catch((requestError: unknown) => {
-      toast.value?.addToast(<GToastContent>{
-        ...GToastDanger,
-        title: t("securities.common.errorTitle"),
-        content: errorContent(getErrorCode(requestError)),
-      });
-    })
-    .finally(() => {
-      loading.value = false;
-    });
+  void loadPage(0, itemsPerPage);
 });
 
 function showCreateSuccessBannerFromFlash() {
@@ -199,6 +194,27 @@ function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
   return new Date(milliseconds).toLocaleString(locale.value || "de-DE");
+}
+
+async function loadPage(offset: number, limit: number) {
+  loading.value = true;
+  currentOffset.value = offset;
+
+  try {
+    await storeSecurities.fetchSecurities({ offset, limit });
+  } catch (requestError: unknown) {
+    toast.value?.addToast(<GToastContent>{
+      ...GToastDanger,
+      title: t("securities.common.errorTitle"),
+      content: errorContent(getErrorCode(requestError)),
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
+function onPageChange({ offset, limit }: { page: number; offset: number; limit: number }) {
+  void loadPage(offset, limit);
 }
 
 function errorContent(errorCode: string) {
@@ -239,6 +255,7 @@ function deleteSecurity(item: Security) {
   storeSecurities
     .deleteSecurity(item)
     .then(() => {
+      void loadPage(currentOffset.value, itemsPerPage);
       toast.value?.addToast(<GToastContent>{
         ...GToastSuccess,
         title: t("securities.list.toasts.deletedTitle"),
