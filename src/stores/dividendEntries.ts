@@ -4,6 +4,18 @@ import { useUserAuthStore } from "@/stores/userauth";
 import { computed, ref } from "vue";
 import type { CreateDividendEntryPayload, DividendEntry } from "@/types/dividendEntries";
 
+type DividendEntriesSortField = "PayDate" | "ExDate" | "SecurityName";
+type DividendEntriesSortDirection = "asc" | "desc" | "none";
+
+type DividendEntriesQueryParams = {
+  offset?: number;
+  limit?: number;
+  sort?: DividendEntriesSortField;
+  direction?: DividendEntriesSortDirection;
+  from?: string;
+  to?: string;
+};
+
 function getCurrentUserIdOrThrow(): number {
   const storeUserAuth = useUserAuthStore();
   const rawUserId = storeUserAuth.getUserId;
@@ -82,16 +94,24 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     return dividendEntries.value.find((item) => String(item.ID) === String(id));
   }
 
-  async function fetchDividendEntriesByUser(params?: { offset?: number; limit?: number }) {
+  function buildQueryParams(params?: DividendEntriesQueryParams) {
+    return {
+      offset: params?.offset ?? 0,
+      limit: params?.limit ?? 20,
+      ...(params?.sort ? { sort: params.sort } : {}),
+      ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
+      ...(params?.from ? { from: params.from } : {}),
+      ...(params?.to ? { to: params.to } : {}),
+    };
+  }
+
+  async function fetchDividendEntriesByUser(params?: DividendEntriesQueryParams) {
     const currentUserId = getCurrentUserIdOrThrow();
 
     return axios
       .get(`/dividend-entries/by-user/${currentUserId}`, {
         withCredentials: true,
-        params: {
-          offset: params?.offset ?? 0,
-          limit: params?.limit ?? 20,
-        },
+        params: buildQueryParams(params),
       })
       .then((response) => {
         dividendEntries.value = normalizeDividendEntryItems(response.data);
@@ -110,15 +130,12 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   async function fetchDividendEntriesByDepot(
     depotId: number | string,
-    params?: { offset?: number; limit?: number }
+    params?: DividendEntriesQueryParams
   ) {
     return axios
       .get(`/dividend-entries/by-depot/${depotId}`, {
         withCredentials: true,
-        params: {
-          offset: params?.offset ?? 0,
-          limit: params?.limit ?? 20,
-        },
+        params: buildQueryParams(params),
       })
       .then((response) => {
         dividendEntries.value = normalizeDividendEntryItems(response.data);
@@ -137,15 +154,12 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   async function fetchDividendEntriesBySecurity(
     securityId: number | string,
-    params?: { offset?: number; limit?: number }
+    params?: DividendEntriesQueryParams
   ) {
     return axios
       .get(`/dividend-entries/by-security/${securityId}`, {
         withCredentials: true,
-        params: {
-          offset: params?.offset ?? 0,
-          limit: params?.limit ?? 20,
-        },
+        params: buildQueryParams(params),
       })
       .then((response) => {
         dividendEntries.value = normalizeDividendEntryItems(response.data);

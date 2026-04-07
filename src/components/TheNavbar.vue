@@ -77,8 +77,8 @@ const sidebarMenu = computed<SidebarItem[]>(() => {
       type: "main",
       sub: [
         { title: "nav.items.overview", type: "item", icon: "bi bi-grid-1x2", url: "/overview" },
-        { title: "nav.items.dividendEntries", type: "item", icon: "bi bi-cash-coin", url: "/dividend-entries" },
         { title: "nav.items.dividendEntryAdd", type: "item", icon: "bi bi-plus-circle", url: "/dividend-entries/new" },
+        { title: "nav.items.dividendEntries", type: "item", icon: "bi bi-cash-coin", url: "/dividend-entries" },
         { title: "nav.items.depots", type: "item", icon: "bi bi-bank", url: "/depots" },
         { title: "nav.items.securities", type: "item", icon: "bi bi-graph-up-arrow", url: "/securities" },
         { title: "nav.items.withholdingTaxDefaults", type: "item", icon: "bi bi-percent", url: "/withholding-tax-defaults" },

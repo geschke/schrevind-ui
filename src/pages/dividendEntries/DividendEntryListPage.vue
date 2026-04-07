@@ -17,6 +17,7 @@
         :showPageFirstLast="true"
         :showPageIcons="true"
         @pageChange="onPageChange"
+        @sortChange="onSortChange"
       >
         <template #tmplLoading>
           <div class="col text-center">
@@ -32,11 +33,11 @@
           </div>
         </template>
 
-        <template #tmplPayDate="data">
+        <template #PayDate="data">
           {{ formatDateValue(data.value.PayDate) }}
         </template>
 
-        <template #tmplExDate="data">
+        <template #ExDate="data">
           {{ formatDateValue(data.value.ExDate) }}
         </template>
 
@@ -50,7 +51,7 @@
           <span v-else>{{ getDepotName(data.value.DepotID) }}</span>
         </template>
 
-        <template #tmplSecurityName="data">
+        <template #SecurityName="data">
           {{ formatSecurityLabel(data.value) }}
         </template>
 
@@ -90,18 +91,22 @@ import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
 const itemsPerPage = 20;
+type SortField = "PayDate" | "ExDate" | "SecurityName";
+type SortDirection = "asc" | "desc" | "none";
 
 const storeDividendEntries = useDividendEntriesStore();
 const storeDepots = useDepotsStore();
 const toast: any = ref(null);
 const loading = ref(false);
+const currentSortField = ref<SortField>("PayDate");
+const currentSortDirection = ref<SortDirection>("none");
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("dividendEntries.list.table.columns.id"), field: "ID" },
-  { title: t("dividendEntries.list.table.columns.payDate"), field: "tmplPayDate" },
-  { title: t("dividendEntries.list.table.columns.exDate"), field: "tmplExDate" },
+  { title: t("dividendEntries.list.table.columns.payDate"), field: "PayDate", sortable: true },
+  { title: t("dividendEntries.list.table.columns.exDate"), field: "ExDate", sortable: true },
   { title: t("dividendEntries.list.table.columns.depot"), field: "tmplDepotName" },
-  { title: t("dividendEntries.list.table.columns.security"), field: "tmplSecurityName" },
+  { title: t("dividendEntries.list.table.columns.security"), field: "SecurityName", sortable: true },
   { title: t("dividendEntries.list.table.columns.quantity"), field: "Quantity" },
   { title: t("dividendEntries.list.table.columns.grossAmount"), field: "tmplGrossAmount" },
   { title: t("dividendEntries.list.table.columns.payoutAmount"), field: "tmplPayoutAmount" },
@@ -131,7 +136,16 @@ async function loadPage(offset: number, limit: number) {
   loading.value = true;
 
   try {
-    await storeDividendEntries.fetchDividendEntriesByUser({ offset, limit });
+    await storeDividendEntries.fetchDividendEntriesByUser({
+      offset,
+      limit,
+      ...(currentSortDirection.value !== "none"
+        ? {
+            sort: currentSortField.value,
+            direction: currentSortDirection.value,
+          }
+        : {}),
+    });
   } catch (requestError: unknown) {
     toast.value?.addToast(<GToastContent>{
       ...GToastDanger,
@@ -145,6 +159,14 @@ async function loadPage(offset: number, limit: number) {
 
 function onPageChange({ offset, limit }: { page: number; offset: number; limit: number }) {
   void loadPage(offset, limit);
+}
+
+function onSortChange({ field, direction }: { field: string; direction: SortDirection }) {
+  if (!isSupportedSortField(field)) return;
+
+  currentSortField.value = field;
+  currentSortDirection.value = direction;
+  void loadPage(0, itemsPerPage);
 }
 
 function errorContent(errorCode: string) {
@@ -176,6 +198,10 @@ function formatAmount(amount: string, currency: string): string {
   if (normalizedCurrency === "") return normalizedAmount || "-";
   if (normalizedAmount === "") return normalizedCurrency;
   return `${normalizedAmount} ${normalizedCurrency}`;
+}
+
+function isSupportedSortField(field: string): field is SortField {
+  return field === "PayDate" || field === "ExDate" || field === "SecurityName";
 }
 
 function formatDateValue(value: string): string {

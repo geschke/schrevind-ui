@@ -14,8 +14,8 @@
                 <i class="bi bi-cash-coin"></i>
               </div>
               <div>
-                <h3 class="h5 mb-1">{{ t("overview.cards.dividendEntries.title") }}</h3>
-                <p class="text-muted mb-0">{{ t("overview.cards.dividendEntries.description") }}</p>
+                <h3 class="h5 mb-1">{{ t("overview.cards.dividendEntryAdd.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("overview.cards.dividendEntryAdd.description") }}</p>
               </div>
             </div>
 
