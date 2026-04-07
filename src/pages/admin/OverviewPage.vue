@@ -5,8 +5,8 @@
       <div class="row">
       <div class="col-12 m-3">
       <ul>
-      <li><router-link to="/admin/user" class="nav-link">{{ t("adminOverview.links.users") }}</router-link>
-      </li>
+      <li><router-link to="/admin/user" class="nav-link">{{ t("adminOverview.links.users") }}</router-link></li>
+      <li><router-link to="/admin/group" class="nav-link">{{ t("adminOverview.links.groups") }}</router-link></li>
       </ul>
 
       </div>

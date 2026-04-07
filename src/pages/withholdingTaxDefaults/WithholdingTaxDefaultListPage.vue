@@ -227,7 +227,7 @@ function showCreateSuccessBannerFromFlash() {
 function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(milliseconds).toLocaleString(locale.value || "de-DE");
+  return new Date(milliseconds).toLocaleString(locale.value || "de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 function getScopeLabel(depotId: number): string {

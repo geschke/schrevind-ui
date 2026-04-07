@@ -1,6 +1,18 @@
+export type DepotRole = "owner" | "editor" | "viewer";
+
+export type DepotAccess = {
+  EntityType: string;
+  EntityID: number;
+  UserID: number;
+  Role: DepotRole;
+};
+
+export type AddDepotAccessPayload = { UserID: number; Role: DepotRole };
+export type ChangeDepotAccessPayload = { UserID: number; Role: DepotRole };
+export type RemoveDepotAccessPayload = { UserID: number };
+
 export type Depot = {
   ID: number;
-  UserID: number;
   Name: string;
   BrokerName: string;
   AccountNumber: string;
@@ -13,6 +25,7 @@ export type Depot = {
 };
 
 export type CreateDepotPayload = {
+  GroupID: number;
   Name: string;
   BrokerName: string;
   AccountNumber: string;

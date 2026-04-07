@@ -66,6 +66,7 @@ import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useUsersStore } from "@/stores/users";
+import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import { GToast, GToastSuccess, GToastDanger } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -93,6 +94,7 @@ const messageSuccess = ref("");
 const messageError = ref("");
 const toast: any = ref(null);
 const storeUsers = useUsersStore();
+const storeUserAuth = useUserAuthStore();
 
 const { defineField, errors, handleSubmit, resetForm } = useForm({
   validationSchema,
@@ -142,6 +144,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeUsers
     .updateUserPassword({
+      GroupID: storeUserAuth.activeGroupID ?? 1,
       ID: userId,
       Password: values.password,
       PasswordDuplicate: values.passwordDuplicate,

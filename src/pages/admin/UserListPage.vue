@@ -32,6 +32,18 @@
           </div>
         </template>
 
+        <template #tmplUserName="data">
+          {{ [data.value.FirstName, data.value.LastName].filter(Boolean).join(" ") || "-" }}
+          <span
+            v-if="isNakedUser(data.value)"
+            class="badge bg-warning text-dark ms-1"
+            :title="t('adminUsers.list.nakedUserBadge')"
+          >
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ t("adminUsers.list.nakedUserBadge") }}
+          </span>
+        </template>
+
         <template #tmplUserActions="data">
           <div class="btn-group btn-group-sm" role="group" aria-label="User actions">
             <router-link
@@ -129,6 +141,7 @@
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useUsersStore } from "@/stores/users";
+import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import type { User } from "@/types/users";
 import { GTable } from "goar-components";
@@ -144,14 +157,12 @@ const CREATED_USER_FLASH_KEY = "schrevind.adminUsers.createdEmail";
 const headers = computed<GTableHeader[]>(() => [
   { title: t("adminUsers.list.table.columns.id"), field: "ID" },
   { title: t("adminUsers.list.table.columns.email"), field: "Email" },
-  {
-    title: t("adminUsers.list.table.columns.name"),
-    render: (item: User) => `${item.FirstName} ${item.LastName}`,
-  },
+  { title: t("adminUsers.list.table.columns.name"), field: "tmplUserName" },
   { title: t("adminUsers.list.table.columns.actions"), field: "tmplUserActions" },
 ]);
 
 const storeUsers = useUsersStore();
+const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
 const loading = ref(false);
 const toBeDeleted = ref<User | null>(null);
@@ -178,6 +189,12 @@ onMounted(() => {
 
 const users = computed(() => storeUsers.getUsers);
 
+// A user is "naked" if GroupCount is explicitly 0 (backend-provided).
+// When GroupCount is undefined the backend doesn't expose this info yet — don't flag.
+function isNakedUser(user: User): boolean {
+  return typeof user.GroupCount === "number" && user.GroupCount === 0;
+}
+
 function showCreateSuccessBannerFromFlash() {
   let createdEmail = "";
   try {
@@ -202,22 +219,13 @@ function showCreateSuccessBannerFromFlash() {
 }
 
 function errorContent(errorCode: string) {
-  if (errorCode) {
-    if (errorCode === "NETWORK_ERROR") {
-      return t("adminUsers.errors.loadFailed");
-    }
-    return t("adminUsers.errors.unknown");
-  }
-  return "";
+  if (errorCode === "NETWORK_ERROR") return t("adminUsers.errors.loadFailed");
+  return t("adminUsers.errors.unknown");
 }
 
 function deleteErrorContent(errorCode: string) {
-  if (errorCode === "CANNOT_DELETE_OWN_ACCOUNT") {
-    return t("adminUsers.errors.cannotDeleteOwnAccount");
-  }
-  if (errorCode === "USER_NOT_FOUND") {
-    return t("adminUsers.errors.userNotFoundDelete");
-  }
+  if (errorCode === "CANNOT_DELETE_OWN_ACCOUNT") return t("adminUsers.errors.cannotDeleteOwnAccount");
+  if (errorCode === "USER_NOT_FOUND") return t("adminUsers.errors.userNotFoundDelete");
   return errorContent(errorCode);
 }
 
@@ -239,7 +247,7 @@ function deleteItemConfirm() {
 
 function deleteUser(item: User) {
   storeUsers
-    .deleteUser(item)
+    .deleteUser({ GroupID: storeUserAuth.activeGroupID ?? 1, ID: item.ID })
     .then(() => {
       toast.value?.addToast(<GToastContent>{
         ...GToastSuccess,

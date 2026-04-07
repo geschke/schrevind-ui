@@ -1,23 +1,30 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type {
   User,
   CreateUserPayload,
   UpdateUserPayload,
   UpdateUserPasswordPayload,
+  DeleteUserPayload,
 } from "@/types/users";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 export const useUsersStore = defineStore("users", () => {
   const users = ref<User[]>([]);
   const usersLoaded = ref(false);
   const getUsers = computed(() => users.value);
 
-
   function getItem(id: number | string): User | undefined {
     return users.value.find((item) => String(item.ID) === String(id));
   }
-
 
   async function fetchUsers() {
     return await axios
@@ -36,21 +43,9 @@ export const useUsersStore = defineStore("users", () => {
       });
   }
 
-
-
-  async function deleteUser(payload: Pick<User, "ID">) {
-    return await axios
-      .post(`/users/delete/${payload.ID}`, undefined, { withCredentials: true })
-      .then(() => {
-        return fetchUsers();
-      })
-      .catch((error: any) => {
-        throw error;
-      });
-  }
-
   async function addUser(payload: CreateUserPayload) {
-    const userDO = {
+    const body = {
+      GroupID: payload.GroupID,
       FirstName: payload.FirstName,
       LastName: payload.LastName,
       Email: payload.Email,
@@ -58,24 +53,22 @@ export const useUsersStore = defineStore("users", () => {
       PasswordConfirm: payload.PasswordConfirm,
     };
     return await axios
-      .post("/users/add", userDO, { withCredentials: true })
-      .then(() => {
-        return fetchUsers();
-      })
+      .post("/users/add", body, { withCredentials: true })
+      .then(() => fetchUsers())
       .catch((error: any) => {
         throw error;
       });
   }
 
   async function updateUser(payload: UpdateUserPayload) {
-    const userDO = {
-      ID: payload.ID,
+    const body = {
+      GroupID: payload.GroupID,
+      Email: payload.Email,
       FirstName: payload.FirstName,
       LastName: payload.LastName,
-      Email: payload.Email,
     };
     return await axios
-      .post(`/users/update/${userDO.ID}`, userDO, { withCredentials: true })
+      .post(`/users/update/${payload.ID}`, body, { withCredentials: true })
       .then(() => {
         return;
       })
@@ -85,12 +78,13 @@ export const useUsersStore = defineStore("users", () => {
   }
 
   async function updateUserPassword(payload: UpdateUserPasswordPayload) {
-    const userDO = {
+    const body = {
+      GroupID: payload.GroupID,
       Password: payload.Password,
       PasswordDuplicate: payload.PasswordDuplicate,
     };
     return await axios
-      .post(`/users/update-password/${payload.ID}`, userDO, { withCredentials: true })
+      .post(`/users/update-password/${payload.ID}`, body, { withCredentials: true })
       .then(() => {
         return;
       })
@@ -99,5 +93,35 @@ export const useUsersStore = defineStore("users", () => {
       });
   }
 
-  return { usersLoaded, getUsers, getItem, addUser, updateUser, updateUserPassword, deleteUser, fetchUsers }
+  async function deleteUser(payload: DeleteUserPayload) {
+    const body = { GroupID: payload.GroupID };
+    return await axios
+      .post(`/users/delete/${payload.ID}`, body, { withCredentials: true })
+      .then(() => fetchUsers())
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  // Assigns a user to a group via the groups members/add endpoint.
+  async function assignUserToGroup(userId: number, groupId: number) {
+    return await axios
+      .post(`/groups/${groupId}/members/add`, { UserIDs: [userId] }, { withCredentials: true })
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  return {
+    usersLoaded,
+    getUsers,
+    getItem,
+    fetchUsers,
+    addUser,
+    updateUser,
+    updateUserPassword,
+    deleteUser,
+    assignUserToGroup,
+    getActiveGroupIDOrThrow,
+  };
 });

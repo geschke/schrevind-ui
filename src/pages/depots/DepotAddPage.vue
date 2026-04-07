@@ -97,6 +97,7 @@ import { useForm } from "vee-validate";
 import { useRouter } from "vue-router";
 import * as yup from "yup";
 import { useDepotsStore } from "@/stores/depots";
+import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import { GToast, GToastDanger } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -125,6 +126,7 @@ const validationSchema = yup.object().shape({
 const saveState = ref<SaveState>("idle");
 const messageError = ref("");
 const storeDepots = useDepotsStore();
+const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
 const router = useRouter();
 
@@ -170,6 +172,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeDepots
     .addDepot({
+      GroupID: storeUserAuth.activeGroupID ?? 1,
       Name: values.name,
       BrokerName: values.brokerName ?? "",
       AccountNumber: values.accountNumber ?? "",

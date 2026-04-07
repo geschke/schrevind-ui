@@ -30,7 +30,8 @@ import TheNavbarItem from "@/components/TheNavbarItem.vue";
 import type { SidebarItem } from "@/types/navigation";
 
 import { useUserAuthStore } from "../stores/userauth";
-import { ref, onUpdated, onMounted } from "vue";
+import { usePermissions } from "@/composables/usePermissions";
+import { onUpdated, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 
@@ -45,6 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 
 const storeUserAuth = useUserAuthStore();
+const { canManageUsers } = usePermissions();
 const route = useRoute();
 const { t } = useI18n();
 
@@ -61,59 +63,31 @@ onUpdated(() => {
   // todo: get breadcrumb data and use them to create senseful breadcrumb, title and more
 });
 
-const sidebarMenu = ref<SidebarItem[]>([
-  {
-    title: "", // nav.sections.core",
-    type: "main",
-    //icon: "", // optional, default none
-    //url: "", // optional, default none
-    sub: [
-      {
-        title: "nav.items.overview",
-        type: "item",
-        icon: "bi bi-grid-1x2",
-        url: "/overview",
-      },
-      {
-        title: "nav.items.dividendEntries",
-        type: "item",
-        icon: "bi bi-cash-coin",
-        url: "/dividend-entries/new",
-      },
-      {
-        title: "nav.items.depots",
-        type: "item",
-        icon: "bi bi-bank",
-        url: "/depots",
-      },
-      {
-        title: "nav.items.securities",
-        type: "item",
-        icon: "bi bi-graph-up-arrow",
-        url: "/securities",
-      },
-      {
-        title: "nav.items.withholdingTaxDefaults",
-        type: "item",
-        icon: "bi bi-percent",
-        url: "/withholding-tax-defaults",
-      },
-      {
-        title: "nav.items.currencies",
-        type: "item",
-        icon: "bi bi-currency-exchange",
-        url: "/currencies",
-      },
-      {
-        title: "nav.items.users",
-        type: "item",
-        icon: "bi bi-people",
-        url: "/admin/user",
-      },
-    ],
-  },
- 
-]);
+const sidebarMenu = computed<SidebarItem[]>(() => {
+  const adminItems: SidebarItem[] = canManageUsers.value
+    ? [
+        { title: "nav.items.users", type: "item", icon: "bi bi-people", url: "/admin/user" },
+        { title: "nav.items.groups", type: "item", icon: "bi bi-people-fill", url: "/admin/group" },
+      ]
+    : [];
+
+  return [
+    {
+      title: "",
+      type: "main",
+      sub: [
+        { title: "nav.items.overview", type: "item", icon: "bi bi-grid-1x2", url: "/overview" },
+        { title: "nav.items.dividendEntries", type: "item", icon: "bi bi-cash-coin", url: "/dividend-entries" },
+        { title: "nav.items.dividendEntryAdd", type: "item", icon: "bi bi-plus-circle", url: "/dividend-entries/new" },
+        { title: "nav.items.depots", type: "item", icon: "bi bi-bank", url: "/depots" },
+        { title: "nav.items.securities", type: "item", icon: "bi bi-graph-up-arrow", url: "/securities" },
+        { title: "nav.items.withholdingTaxDefaults", type: "item", icon: "bi bi-percent", url: "/withholding-tax-defaults" },
+        { title: "nav.items.currencies", type: "item", icon: "bi bi-currency-exchange", url: "/currencies" },
+        ...adminItems,
+      ],
+    },
+  ];
+});
 
 
 function markCollapse(menu: SidebarItem[], targetUrl: string, parentItems: SidebarItem[] = []) {

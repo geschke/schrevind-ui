@@ -32,6 +32,12 @@
           </div>
         </template>
 
+        <template #tmplDepotName="data">
+          <router-link :to="{ name: 'depotdetail', params: { id: data.value.ID } }">
+            {{ data.value.Name }}
+          </router-link>
+        </template>
+
         <template #tmplDepotActions="data">
           <div class="btn-group btn-group-sm" role="group" aria-label="Depot actions">
             <router-link
@@ -43,6 +49,7 @@
               <i class="bi bi-pencil"></i>
             </router-link>
             <button
+              v-if="canDeleteDepot"
               type="button"
               class="btn btn-outline-primary"
               @click="deleteItem(data.value)"
@@ -54,7 +61,7 @@
         </template>
       </GTable>
 
-      <div class="row">
+      <div class="row" v-if="canCreateDepot">
         <div class="col-12">
           <router-link type="button" class="btn btn-primary" :to="{ name: 'depotnew' }">
             {{ t("depots.list.addButton") }}
@@ -117,6 +124,7 @@
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useDepotsStore } from "@/stores/depots";
+import { usePermissions } from "@/composables/usePermissions";
 import { getErrorCode } from "@/helper/errorCode";
 import type { Depot } from "@/types/depots";
 import { GTable } from "goar-components";
@@ -130,6 +138,7 @@ const { t, locale } = useI18n();
 const CREATED_DEPOT_FLASH_KEY = "schrevind.depots.createdName";
 
 const storeDepots = useDepotsStore();
+const { canCreateDepot, canDeleteDepot } = usePermissions();
 const toast: any = ref(null);
 const loading = ref(false);
 const toBeDeleted = ref<Depot | null>(null);
@@ -138,7 +147,10 @@ const createdBannerMessage = ref("");
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("depots.list.table.columns.id"), field: "ID" },
-  { title: t("depots.list.table.columns.name"), field: "Name" },
+  {
+    title: t("depots.list.table.columns.name"),
+    field: "tmplDepotName",
+  },
   { title: t("depots.list.table.columns.brokerName"), field: "BrokerName" },
   { title: t("depots.list.table.columns.accountNumber"), field: "AccountNumber" },
   { title: t("depots.list.table.columns.baseCurrency"), field: "BaseCurrency" },
@@ -192,7 +204,7 @@ function showCreateSuccessBannerFromFlash() {
 function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(milliseconds).toLocaleString(locale.value || "de-DE");
+  return new Date(milliseconds).toLocaleString(locale.value || "de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 function errorContent(errorCode: string) {

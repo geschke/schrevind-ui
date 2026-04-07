@@ -61,6 +61,16 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/depots/:id",
+    name: "depotdetail",
+    props: true,
+    component: () => import("@/pages/depots/DepotDetailPage.vue"),
+    meta: {
+      menuPath: "/depots",
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/securities",
     name: "securities",
     component: () => import("@/pages/securities/SecurityListPage.vue"),
@@ -142,10 +152,19 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/dividend-entries",
+    name: "dividendentries",
+    component: () => import("@/pages/dividendEntries/DividendEntryListPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/dividend-entries/new",
     name: "dividendentrynew",
     component: () => import("@/pages/dividendEntries/DividendEntryAddPage.vue"),
     meta: {
+      menuPath: "/dividend-entries/new",
       requiresAuth: true,
     },
   },
@@ -190,6 +209,43 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/pages/admin/UserPasswordPage.vue"),
     meta: {
       menuPath: "/admin/user",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/admin/group",
+    name: "admingroups",
+    component: () => import("@/pages/admin/GroupListPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/admin/group/new",
+    name: "admingroupnew",
+    component: () => import("@/pages/admin/GroupAddPage.vue"),
+    meta: {
+      menuPath: "/admin/group",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/admin/group/edit/:id",
+    name: "admingroupedit",
+    props: true,
+    component: () => import("@/pages/admin/GroupEditPage.vue"),
+    meta: {
+      menuPath: "/admin/group",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/admin/group/:id/members",
+    name: "admingroupmembers",
+    props: true,
+    component: () => import("@/pages/admin/GroupMembersPage.vue"),
+    meta: {
+      menuPath: "/admin/group",
       requiresAuth: true,
     },
   },

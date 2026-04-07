@@ -92,6 +92,28 @@
       "referenceDataLoadFailed": "Depots, Wertpapiere, Währungen und Quellensteuerdaten konnten nicht geladen werden.",
       "unknown": "Es ist ein unbekannter Fehler aufgetreten."
     },
+    "list": {
+      "title": "Dividendeneinträge",
+      "addButton": "Dividendeneintrag hinzufügen",
+      "table": {
+        "empty": "Keine Dividendeneinträge verfügbar.",
+        "columns": {
+          "id": "ID",
+          "payDate": "Zahltag",
+          "exDate": "Ex-Tag",
+          "depot": "Depot",
+          "security": "Wertpapier",
+          "quantity": "Stückzahl",
+          "grossAmount": "Brutto",
+          "payoutAmount": "Auszahlung",
+          "createdAt": "Erstellt"
+        }
+      },
+      "errors": {
+        "loadFailed": "Fehler beim Laden der Dividendeneinträge.",
+        "unauthorized": "Keine Berechtigung für diese Aktion."
+      }
+    },
     "add": {
       "title": "Dividendeneintrag anlegen",
       "submit": "Dividendeneintrag speichern",
@@ -257,6 +279,71 @@
       },
       "toasts": {
         "updatedContent": "Die Depotdaten wurden geändert."
+      }
+    },
+    "detail": {
+      "editButton": "Bearbeiten",
+      "deleteButton": "Löschen",
+      "info": {
+        "name": "Name",
+        "brokerName": "Broker",
+        "accountNumber": "Kontonummer",
+        "baseCurrency": "Basiswährung",
+        "status": "Status",
+        "description": "Beschreibung",
+        "createdAt": "Erstellt",
+        "updatedAt": "Aktualisiert"
+      },
+      "access": {
+        "title": "Zugriff",
+        "table": {
+          "columns": {
+            "user": "Benutzer",
+            "role": "Rolle",
+            "actions": "Aktionen"
+          },
+          "empty": "Kein Zugriff vergeben."
+        },
+        "roles": {
+          "owner": "Eigentümer",
+          "editor": "Bearbeiter",
+          "viewer": "Betrachter"
+        },
+        "removeButton": "Entfernen",
+        "openAddButton": "+ Person hinzufügen",
+        "addSection": {
+          "title": "Person hinzufügen",
+          "userLabel": "Benutzer",
+          "roleLabel": "Rolle",
+          "userPlaceholder": "Benutzer wählen...",
+          "addButton": "Hinzufügen",
+          "cancelButton": "Abbrechen",
+          "noUsers": "Keine weiteren Benutzer verfügbar."
+        }
+      },
+      "deleteModal": {
+        "title": "Depot löschen?",
+        "body": "Soll dieses Depot wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Das Depot wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "accessAddedTitle": "Zugriff erteilt",
+        "accessAddedContent": "Der Benutzer hat nun Zugriff auf das Depot.",
+        "accessRemovedTitle": "Zugriff entfernt",
+        "accessRemovedContent": "Der Zugriff wurde entfernt.",
+        "accessChangedTitle": "Rolle geändert",
+        "accessChangedContent": "Die Rolle wurde erfolgreich geändert.",
+        "deletedTitle": "Depot gelöscht",
+        "deletedContent": "Das Depot wurde dauerhaft gelöscht."
+      },
+      "errors": {
+        "loadFailed": "Fehler beim Laden der Depotdaten.",
+        "accessLoadFailed": "Fehler beim Laden der Zugriffsrechte.",
+        "lastOwner": "Mindestens ein Eigentümer muss erhalten bleiben.",
+        "accessNotFound": "Dieser Zugriff wurde nicht gefunden.",
+        "invalidRole": "Ungültige Rolle angegeben.",
+        "unknown": "Es ist ein unbekannter Fehler aufgetreten."
       }
     }
   },
@@ -429,7 +516,12 @@
     "cards": {
       "dividendEntries": {
         "title": "Dividendeneinträge",
-        "description": "Dividendenzahlungen und Ausschüttungen erfassen.",
+        "description": "Vorhandene Dividendeneinträge anzeigen.",
+        "action": "Einträge öffnen"
+      },
+      "dividendEntryAdd": {
+        "title": "Dividendeneintrag hinzufügen",
+        "description": "Neue Dividendenzahlung oder Ausschüttung erfassen.",
         "action": "Eingabe öffnen"
       },
       "depots": {
@@ -462,7 +554,8 @@
   "adminOverview": {
     "title": "Admin",
     "links": {
-      "users": "Benutzer"
+      "users": "Benutzer",
+      "groups": "Gruppen"
     }
   },
   "adminUsers": {
@@ -472,6 +565,7 @@
       "passwordConfirm": "Passwort wiederholen",
       "firstname": "Vorname",
       "lastname": "Nachname",
+      "group": "Gruppe",
       "cancel": "Abbrechen",
       "save": "Speichern",
       "okTitle": "OK",
@@ -486,7 +580,8 @@
       "unknown": "Es ist ein unbekannter Fehler aufgetreten.",
       "userNotFound": "Benutzer konnte nicht gefunden werden.",
       "userNotFoundDelete": "Benutzer wurde nicht gefunden (evtl. bereits gelöscht).",
-      "cannotDeleteOwnAccount": "Der aktuell angemeldete Benutzer kann nicht gelöscht werden."
+      "cannotDeleteOwnAccount": "Der aktuell angemeldete Benutzer kann nicht gelöscht werden.",
+      "noActiveGroup": "Kein aktiver Gruppenkontext. Bitte eine Gruppe auswählen."
     },
     "validation": {
       "emailRequired": "E-Mail-Adresse wird benötigt.",
@@ -531,11 +626,25 @@
         "delete": "Benutzer löschen"
       },
       "createdBanner": "Benutzer wurde erfolgreich angelegt.",
-      "createdBannerWithEmail": "Benutzer {email} wurde erfolgreich angelegt."
+      "createdBannerWithEmail": "Benutzer {email} wurde erfolgreich angelegt.",
+      "nakedUserBadge": "Keine Gruppe"
     },
     "add": {
       "title": "Benutzer anlegen",
       "submit": "Benutzer anlegen",
+      "groupLabel": "Gruppe",
+      "groupPlaceholder": "Gruppe wählen...",
+      "noGroupsHint": "Es sind noch keine Gruppen vorhanden. Bitte zuerst eine Gruppe anlegen.",
+      "systemContextHint": "Benutzer hat noch keine Gruppe. Jetzt zuweisen?",
+      "assignGroupLabel": "Gruppe zuweisen",
+      "assignGroupPlaceholder": "Gruppe wählen...",
+      "assignGroupSubmit": "Zuweisen",
+      "assignGroupSkip": "Später",
+      "assignGroupSuccess": "Gruppe wurde zugewiesen.",
+      "assignGroupError": "Gruppe konnte nicht zugewiesen werden.",
+      "validation": {
+        "groupRequired": "Bitte eine Gruppe auswählen."
+      },
       "errors": {
         "invalidPassword": "Ungültiges Passwort.",
         "invalidJson": "Ungültige Anfrage beim Anlegen des Benutzers.",
@@ -573,13 +682,137 @@
       }
     }
   },
+  "adminGroups": {
+    "common": {
+      "name": "Gruppenname",
+      "cancel": "Abbrechen",
+      "okTitle": "OK",
+      "errorTitle": "Fehler",
+      "backToList": "Zur Gruppenliste"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Daten.",
+      "groupDataLoadFailed": "Fehler beim Laden der Gruppendaten.",
+      "groupNotFound": "Gruppe konnte nicht gefunden werden.",
+      "groupNotFoundDelete": "Gruppe wurde nicht gefunden (evtl. bereits gelöscht).",
+      "cannotDeleteSystemGroup": "Die Systemgruppe kann nicht gelöscht werden.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "validation": {
+      "nameRequired": "Gruppenname wird benötigt.",
+      "nameMin": "Mindestlänge zwei Zeichen."
+    },
+    "list": {
+      "title": "Gruppen",
+      "addButton": "Gruppe hinzufügen",
+      "table": {
+        "empty": "Keine Daten verfügbar.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "actions": "Aktionen"
+        }
+      },
+      "modal": {
+        "title": "Gruppe löschen?",
+        "body": "Soll die Gruppe wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "nameLabel": "Name",
+        "idLabel": "ID",
+        "warning": "Die Gruppe wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Gruppe gelöscht",
+        "deletedContent": "Die Gruppe wurde aus der Datenbank gelöscht."
+      },
+      "actions": {
+        "edit": "Gruppe bearbeiten",
+        "members": "Mitglieder verwalten",
+        "delete": "Gruppe löschen"
+      },
+      "createdBanner": "Gruppe wurde erfolgreich angelegt.",
+      "createdBannerWithName": "Gruppe \"{name}\" wurde erfolgreich angelegt."
+    },
+    "add": {
+      "title": "Gruppe anlegen",
+      "submit": "Gruppe anlegen",
+      "errors": {
+        "invalidJson": "Ungültige Anfrage beim Anlegen der Gruppe.",
+        "dbError": "Datenbankfehler beim Anlegen der Gruppe.",
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+      }
+    },
+    "edit": {
+      "title": "Gruppe ändern",
+      "submit": "Speichern",
+      "toasts": {
+        "updatedContent": "Die Gruppendaten wurden geändert."
+      },
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      }
+    },
+    "members": {
+      "title": "Mitglieder der Gruppe",
+      "addButton": "Mitglieder hinzufügen",
+      "table": {
+        "empty": "Keine Mitglieder in dieser Gruppe.",
+        "columns": {
+          "id": "ID",
+          "email": "E-Mail",
+          "name": "Name",
+          "actions": "Aktionen"
+        }
+      },
+      "addSection": {
+        "title": "Benutzer hinzufügen",
+        "noUsers": "Alle Benutzer sind bereits Mitglied dieser Gruppe.",
+        "addSelected": "Ausgewählte hinzufügen",
+        "cancel": "Abbrechen",
+        "columns": {
+          "email": "E-Mail",
+          "name": "Name"
+        }
+      },
+      "removeModal": {
+        "title": "Mitglied entfernen?",
+        "body": "Soll das Mitglied wirklich aus der Gruppe entfernt werden?",
+        "confirm": "Entfernen",
+        "nameLabel": "Name",
+        "emailLabel": "E-Mail",
+        "idLabel": "ID",
+        "warning": "Das Mitglied wird aus der Gruppe entfernt."
+      },
+      "toasts": {
+        "addedTitle": "Mitglied hinzugefügt",
+        "addedContent": "Das Mitglied wurde der Gruppe hinzugefügt.",
+        "addedSelectedContent": "{count} Mitglied(er) wurden der Gruppe hinzugefügt.",
+        "removedTitle": "Mitglied entfernt",
+        "removedContent": "Das Mitglied wurde aus der Gruppe entfernt."
+      },
+      "actions": {
+        "add": "Hinzufügen",
+        "remove": "Mitglied entfernen"
+      },
+      "errors": {
+        "loadFailed": "Fehler beim Laden der Mitgliederliste.",
+        "usersLoadFailed": "Fehler beim Laden der Benutzerliste.",
+        "noneSelected": "Bitte mindestens einen Benutzer auswählen."
+      }
+    }
+  },
   "layout": {
     "topbar": {
       "searchPlaceholder": "Suche nach...",
       "searchAria": "Suche nach...",
       "editUser": "Benutzer bearbeiten",
       "changeOwnPassword": "Passwort ändern",
-      "logout": "Abmelden"
+      "logout": "Abmelden",
+      "groupSwitcher": {
+        "label": "Gruppe",
+        "ariaLabel": "Aktive Gruppe wechseln"
+      }
     },
     "locale": {
       "de": "Deutsch",
@@ -598,12 +831,14 @@
     },
     "items": {
       "overview": "Übersicht",
-      "dividendEntries": "Dividendeneingabe",
+      "dividendEntries": "Dividendeneinträge",
+      "dividendEntryAdd": "Dividendeneintrag hinzufügen",
       "depots": "Depots",
       "securities": "Wertpapiere",
       "withholdingTaxDefaults": "Quellensteuern",
       "currencies": "Währungen",
-      "users": "Benutzer"
+      "users": "Benutzer",
+      "groups": "Gruppen"
     }
   },
   "landing": {

@@ -11,6 +11,7 @@
     </button>
     <!-- Navbar-->
     <ul class="navbar-nav ms-auto me-3 me-lg-4">
+      <GroupSwitcher />
       <li class="nav-item me-2">
         <LanguageSwitcher
           id-prefix="navbarLocaleDropdown"
@@ -92,6 +93,7 @@
 import AboutModal from "@/components/helper/AboutModal.vue";
 import TheNavbar from "@/components/TheNavbar.vue";
 import LanguageSwitcher from "@/components/helper/LanguageSwitcher.vue";
+import GroupSwitcher from "@/components/GroupSwitcher.vue";
 
 import { useUserAuthStore } from "../stores/userauth";
 import { useI18n } from "vue-i18n";
@@ -110,10 +112,6 @@ const currentUserId = computed(() => {
   return String(rawId);
 });
 
-const drawer = ref(true);
-const rail = ref(true);
-
-
 async function signout() {
   try {
     await storeUserAuth.signout();
@@ -128,9 +126,6 @@ async function signout() {
 // push route path parameter to TheNavbar, so it could match
 // URLs with IDs or another path parameter
 // or in general: find a solution to this, so the right menu item will be opened
-
-const open = ref(['Users']);
-
 
 onMounted(() => {
 

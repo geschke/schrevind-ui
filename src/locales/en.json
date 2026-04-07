@@ -92,6 +92,28 @@
       "referenceDataLoadFailed": "Depots, securities, currencies and withholding tax data could not be loaded.",
       "unknown": "An unknown error occurred."
     },
+    "list": {
+      "title": "Dividend entries",
+      "addButton": "Add dividend entry",
+      "table": {
+        "empty": "No dividend entries available.",
+        "columns": {
+          "id": "ID",
+          "payDate": "Pay date",
+          "exDate": "Ex date",
+          "depot": "Depot",
+          "security": "Security",
+          "quantity": "Quantity",
+          "grossAmount": "Gross",
+          "payoutAmount": "Payout",
+          "createdAt": "Created"
+        }
+      },
+      "errors": {
+        "loadFailed": "Failed to load dividend entries.",
+        "unauthorized": "Not authorized for this action."
+      }
+    },
     "add": {
       "title": "Create dividend entry",
       "submit": "Save dividend entry",
@@ -257,6 +279,71 @@
       },
       "toasts": {
         "updatedContent": "Depot data was updated."
+      }
+    },
+    "detail": {
+      "editButton": "Edit",
+      "deleteButton": "Delete",
+      "info": {
+        "name": "Name",
+        "brokerName": "Broker",
+        "accountNumber": "Account number",
+        "baseCurrency": "Base currency",
+        "status": "Status",
+        "description": "Description",
+        "createdAt": "Created",
+        "updatedAt": "Updated"
+      },
+      "access": {
+        "title": "Access",
+        "table": {
+          "columns": {
+            "user": "User",
+            "role": "Role",
+            "actions": "Actions"
+          },
+          "empty": "No access granted."
+        },
+        "roles": {
+          "owner": "Owner",
+          "editor": "Editor",
+          "viewer": "Viewer"
+        },
+        "removeButton": "Remove",
+        "openAddButton": "+ Add person",
+        "addSection": {
+          "title": "Add person",
+          "userLabel": "User",
+          "roleLabel": "Role",
+          "userPlaceholder": "Select user...",
+          "addButton": "Add",
+          "cancelButton": "Cancel",
+          "noUsers": "No additional users available."
+        }
+      },
+      "deleteModal": {
+        "title": "Delete depot?",
+        "body": "Do you really want to delete this depot?",
+        "confirm": "Delete",
+        "warning": "The depot will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "accessAddedTitle": "Access granted",
+        "accessAddedContent": "The user now has access to the depot.",
+        "accessRemovedTitle": "Access removed",
+        "accessRemovedContent": "Access has been removed.",
+        "accessChangedTitle": "Role changed",
+        "accessChangedContent": "The role was changed successfully.",
+        "deletedTitle": "Depot deleted",
+        "deletedContent": "The depot was permanently deleted."
+      },
+      "errors": {
+        "loadFailed": "Failed to load depot data.",
+        "accessLoadFailed": "Failed to load access rights.",
+        "lastOwner": "At least one owner must remain.",
+        "accessNotFound": "This access entry was not found.",
+        "invalidRole": "Invalid role specified.",
+        "unknown": "An unknown error occurred."
       }
     }
   },
@@ -429,7 +516,12 @@
     "cards": {
       "dividendEntries": {
         "title": "Dividend entries",
-        "description": "Record dividend payments and distributions.",
+        "description": "Review existing dividend entries.",
+        "action": "Open entries"
+      },
+      "dividendEntryAdd": {
+        "title": "Add dividend entry",
+        "description": "Record a new dividend payment or distribution.",
         "action": "Open entry form"
       },
       "depots": {
@@ -462,7 +554,8 @@
   "adminOverview": {
     "title": "Admin",
     "links": {
-      "users": "Users"
+      "users": "Users",
+      "groups": "Groups"
     }
   },
   "adminUsers": {
@@ -472,6 +565,7 @@
       "passwordConfirm": "Repeat password",
       "firstname": "First name",
       "lastname": "Last name",
+      "group": "Group",
       "cancel": "Cancel",
       "save": "Save",
       "okTitle": "OK",
@@ -486,7 +580,8 @@
       "unknown": "An unknown error occurred.",
       "userNotFound": "User was not found.",
       "userNotFoundDelete": "User was not found (possibly already deleted).",
-      "cannotDeleteOwnAccount": "The currently signed-in user cannot delete their own account."
+      "cannotDeleteOwnAccount": "The currently signed-in user cannot delete their own account.",
+      "noActiveGroup": "No active group context. Please select a group."
     },
     "validation": {
       "emailRequired": "Email address is required.",
@@ -531,11 +626,25 @@
         "delete": "Delete user"
       },
       "createdBanner": "User was created successfully.",
-      "createdBannerWithEmail": "User {email} was created successfully."
+      "createdBannerWithEmail": "User {email} was created successfully.",
+      "nakedUserBadge": "No group"
     },
     "add": {
       "title": "Create user",
       "submit": "Create user",
+      "groupLabel": "Group",
+      "groupPlaceholder": "Select group...",
+      "noGroupsHint": "No groups exist yet. Please create a group first.",
+      "systemContextHint": "User has no group yet. Assign one now?",
+      "assignGroupLabel": "Assign group",
+      "assignGroupPlaceholder": "Select group...",
+      "assignGroupSubmit": "Assign",
+      "assignGroupSkip": "Later",
+      "assignGroupSuccess": "Group was assigned.",
+      "assignGroupError": "Group could not be assigned.",
+      "validation": {
+        "groupRequired": "Please select a group."
+      },
       "errors": {
         "invalidPassword": "Invalid password.",
         "invalidJson": "Invalid request while creating the user.",
@@ -573,9 +682,133 @@
       }
     }
   },
+  "adminGroups": {
+    "common": {
+      "name": "Group name",
+      "cancel": "Cancel",
+      "okTitle": "OK",
+      "errorTitle": "Error",
+      "backToList": "Back to group list"
+    },
+    "errors": {
+      "loadFailed": "Failed to load data.",
+      "groupDataLoadFailed": "Failed to load group data.",
+      "groupNotFound": "Group was not found.",
+      "groupNotFoundDelete": "Group was not found (possibly already deleted).",
+      "cannotDeleteSystemGroup": "The system group cannot be deleted.",
+      "unknown": "An unknown error occurred."
+    },
+    "validation": {
+      "nameRequired": "Group name is required.",
+      "nameMin": "Minimum length is two characters."
+    },
+    "list": {
+      "title": "Groups",
+      "addButton": "Add group",
+      "table": {
+        "empty": "No data available.",
+        "columns": {
+          "id": "ID",
+          "name": "Name",
+          "actions": "Actions"
+        }
+      },
+      "modal": {
+        "title": "Delete group?",
+        "body": "Do you really want to delete this group?",
+        "confirm": "Delete",
+        "nameLabel": "Name",
+        "idLabel": "ID",
+        "warning": "The group will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Group deleted",
+        "deletedContent": "The group was removed from the database."
+      },
+      "actions": {
+        "edit": "Edit group",
+        "members": "Manage members",
+        "delete": "Delete group"
+      },
+      "createdBanner": "Group was created successfully.",
+      "createdBannerWithName": "Group \"{name}\" was created successfully."
+    },
+    "add": {
+      "title": "Create group",
+      "submit": "Create group",
+      "errors": {
+        "invalidJson": "Invalid request while creating the group.",
+        "dbError": "Database error while creating the group.",
+        "unauthorized": "Not authorized for this action.",
+        "network": "Network error. No response from server."
+      }
+    },
+    "edit": {
+      "title": "Edit group",
+      "submit": "Save",
+      "toasts": {
+        "updatedContent": "Group data was updated."
+      },
+      "alerts": {
+        "saved": "Changes were saved."
+      }
+    },
+    "members": {
+      "title": "Group members",
+      "addButton": "Add members",
+      "table": {
+        "empty": "No members in this group.",
+        "columns": {
+          "id": "ID",
+          "email": "Email",
+          "name": "Name",
+          "actions": "Actions"
+        }
+      },
+      "addSection": {
+        "title": "Add users",
+        "noUsers": "All users are already members of this group.",
+        "addSelected": "Add selected",
+        "cancel": "Cancel",
+        "columns": {
+          "email": "Email",
+          "name": "Name"
+        }
+      },
+      "removeModal": {
+        "title": "Remove member?",
+        "body": "Do you really want to remove this member from the group?",
+        "confirm": "Remove",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "idLabel": "ID",
+        "warning": "The member will be removed from the group."
+      },
+      "toasts": {
+        "addedTitle": "Member added",
+        "addedContent": "The member was added to the group.",
+        "addedSelectedContent": "{count} member(s) were added to the group.",
+        "removedTitle": "Member removed",
+        "removedContent": "The member was removed from the group."
+      },
+      "actions": {
+        "add": "Add",
+        "remove": "Remove member"
+      },
+      "errors": {
+        "loadFailed": "Failed to load member list.",
+        "usersLoadFailed": "Failed to load user list.",
+        "noneSelected": "Please select at least one user."
+      }
+    }
+  },
   "layout": {
     "topbar": {
       "searchPlaceholder": "Search for...",
+      "groupSwitcher": {
+        "label": "Group",
+        "ariaLabel": "Switch active group"
+      },
       "searchAria": "Search for...",
       "editUser": "Edit user",
       "changeOwnPassword": "Change password",
@@ -598,12 +831,14 @@
     },
     "items": {
       "overview": "Overview",
-      "dividendEntries": "Dividend entry",
+      "dividendEntries": "Dividend entries",
+      "dividendEntryAdd": "Add dividend entry",
       "depots": "Depots",
       "securities": "Securities",
       "withholdingTaxDefaults": "Withholding taxes",
       "currencies": "Currencies",
-      "users": "Users"
+      "users": "Users",
+      "groups": "Groups"
     }
   },
   "landing": {
