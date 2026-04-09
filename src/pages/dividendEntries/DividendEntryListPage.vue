@@ -62,6 +62,20 @@
         <template #tmplPayoutAmount="data">
           {{ formatAmount(data.value.PayoutAmount, data.value.PayoutCurrency) }}
         </template>
+
+        <template #tmplExpandDetails="data">
+          <div class="card card-body border-0 bg-body-tertiary">
+            <div v-for="section in buildDetailSections(data.item)" :key="section.title" class="mb-3">
+              <div class="fw-semibold mb-2">{{ section.title }}</div>
+              <div v-for="(fieldRow, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`" class="row g-2 mb-2">
+                <div v-for="field in fieldRow" :key="field.label" :class="field.columnClass ?? 'col-12 col-md-6 col-xl-4'">
+                  <div class="small text-body-secondary">{{ field.label }}</div>
+                  <div :class="{ 'detail-note': field.preserveLineBreaks }">{{ field.value }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </GTable>
 
       <div class="row">
@@ -89,6 +103,18 @@ import { GToast, GToastDanger } from "goar-components";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 
+type DetailField = {
+  label: string;
+  value: string;
+  columnClass?: string;
+  preserveLineBreaks?: boolean;
+};
+
+type DetailSection = {
+  title: string;
+  rows: DetailField[][];
+};
+
 const { t, locale } = useI18n();
 const itemsPerPage = 20;
 type SortField = "PayDate" | "ExDate" | "SecurityName";
@@ -106,6 +132,7 @@ const headers = computed<GTableHeader[]>(() => [
   { title: t("dividendEntries.list.table.columns.payDate"), field: "PayDate", sortable: true },
   { title: t("dividendEntries.list.table.columns.exDate"), field: "ExDate", sortable: true },
   { title: t("dividendEntries.list.table.columns.depot"), field: "tmplDepotName" },
+  { title: "", field: "tmplExpandDetails", type: "expandable" },
   { title: t("dividendEntries.list.table.columns.security"), field: "SecurityName", sortable: true },
   { title: t("dividendEntries.list.table.columns.quantity"), field: "Quantity" },
   { title: t("dividendEntries.list.table.columns.grossAmount"), field: "tmplGrossAmount" },
@@ -200,6 +227,115 @@ function formatAmount(amount: string, currency: string): string {
   return `${normalizedAmount} ${normalizedCurrency}`;
 }
 
+function formatDetailAmount(amount: string, currency: string): string {
+  const normalizedAmount = String(amount ?? "").trim();
+  const normalizedCurrency = String(currency ?? "").trim();
+
+  if (normalizedAmount === "" && normalizedCurrency === "") return "-";
+  if (normalizedAmount === "") return normalizedCurrency;
+  if (normalizedCurrency === "") return `${normalizedAmount} (${t("dividendEntries.list.details.labels.missingCurrency")})`;
+  return `${normalizedAmount} ${normalizedCurrency}`;
+}
+
+function formatExchangeRate(label: string, rate: string): string {
+  const normalizedLabel = String(label ?? "").trim();
+  const normalizedRate = String(rate ?? "").trim();
+
+  if (normalizedLabel === "" || normalizedRate === "") {
+    return "";
+  }
+
+  return `${normalizedLabel} ${normalizedRate}`;
+}
+
+function formatTextValue(value: unknown): string {
+  const normalized = String(value ?? "").trim();
+  return normalized === "" ? "-" : normalized;
+}
+
+function buildDetailSections(item: DividendEntry): DetailSection[] {
+  const currencyFields: DetailField[] = [
+    {
+      label: t("dividendEntries.common.dividendPerUnitAmount"),
+      value: formatDetailAmount(item.DividendPerUnitAmount, item.DividendPerUnitCurrency),
+    },
+    {
+      label: t("dividendEntries.list.details.labels.calcGrossAmountBase"),
+      value: formatTextValue(item.CalcGrossAmountBase),
+    },
+    {
+      label: t("dividendEntries.list.details.labels.calcAfterWithholdingAmountBase"),
+      value: formatTextValue(item.CalcAfterWithholdingAmountBase),
+    },
+  ];
+
+  const exchangeRateValue = formatExchangeRate(item.FXRateLabel, item.FXRate);
+  if (exchangeRateValue !== "") {
+    currencyFields.splice(1, 0, {
+      label: t("dividendEntries.common.exchangeRate"),
+      value: exchangeRateValue,
+    });
+  }
+
+  return [
+    {
+      title: t("dividendEntries.list.details.sections.currency"),
+      rows: [currencyFields],
+    },
+    {
+      title: t("dividendEntries.sections.withholdingTax"),
+      rows: [
+        [
+          {
+            label: t("dividendEntries.common.withholdingTaxCountryCode"),
+            value: formatTextValue(item.WithholdingTaxCountryCode),
+            columnClass: "col-12 col-md-6",
+          },
+          {
+            label: t("dividendEntries.common.withholdingTaxPercent"),
+            value: formatTextValue(item.WithholdingTaxPercent),
+            columnClass: "col-12 col-md-6",
+          },
+        ],
+        [
+          {
+            label: t("dividendEntries.common.withholdingTaxAmount"),
+            value: formatDetailAmount(item.WithholdingTaxAmount, item.WithholdingTaxCurrency),
+            columnClass: "col-12 col-xl-4",
+          },
+          {
+            label: t("dividendEntries.common.withholdingTaxAmountCredit"),
+            value: formatDetailAmount(item.WithholdingTaxAmountCredit, item.WithholdingTaxAmountCreditCurrency),
+            columnClass: "col-12 col-xl-4",
+          },
+          {
+            label: t("dividendEntries.common.withholdingTaxAmountRefundable"),
+            value: formatDetailAmount(item.WithholdingTaxAmountRefundable, item.WithholdingTaxAmountRefundableCurrency),
+            columnClass: "col-12 col-xl-4",
+          },
+        ],
+      ],
+    },
+    {
+      title: t("dividendEntries.sections.other"),
+      rows: [
+        [
+          {
+            label: t("dividendEntries.common.foreignFeesAmount"),
+            value: formatDetailAmount(item.ForeignFeesAmount, item.ForeignFeesCurrency),
+          },
+          {
+            label: t("dividendEntries.common.note"),
+            value: formatTextValue(item.Note),
+            preserveLineBreaks: true,
+            columnClass: "col-12 col-xl-8",
+          },
+        ],
+      ],
+    },
+  ];
+}
+
 function isSupportedSortField(field: string): field is SortField {
   return field === "PayDate" || field === "ExDate" || field === "SecurityName";
 }
@@ -237,4 +373,8 @@ function formatTimestamp(unixTs: number): string {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.detail-note {
+  white-space: pre-wrap;
+}
+</style>

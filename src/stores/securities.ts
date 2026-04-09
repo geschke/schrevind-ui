@@ -51,6 +51,19 @@ export const useSecuritiesStore = defineStore("securities", () => {
     return items.map((item) => normalizeSecurity(item));
   }
 
+  async function requestSecurities(params?: SecuritiesQueryParams): Promise<{ items: Security[]; count: number }> {
+    return axios
+      .get("/securities/list", {
+        withCredentials: true,
+        params: buildQueryParams(params),
+      })
+      .then((response) => {
+        const items = normalizeSecurityItems(response.data);
+        const count = Number(response.data?.count ?? items.length);
+        return { items, count };
+      });
+  }
+
   function buildQueryParams(params?: SecuritiesQueryParams) {
     return {
       offset: params?.offset ?? 0,
@@ -61,10 +74,28 @@ export const useSecuritiesStore = defineStore("securities", () => {
   }
 
   async function fetchSecurities(params?: SecuritiesQueryParams) {
+    return requestSecurities(params)
+      .then(({ items, count }) => {
+        securities.value = items;
+        securitiesCount.value = count;
+        securitiesLoaded.value = true;
+      })
+      .catch((error: unknown) => {
+        securities.value = [];
+        securitiesCount.value = 0;
+        securitiesLoaded.value = false;
+        throw error;
+      });
+  }
+
+  async function fetchAllSecurities(params?: Omit<SecuritiesQueryParams, "offset" | "limit"> & { batchSize?: number }) {
     return axios
-      .get("/securities/list", {
+      .get("/securities/list-all", {
         withCredentials: true,
-        params: buildQueryParams(params),
+        params: {
+          ...(params?.sort ? { sort: params.sort } : {}),
+          ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
+        },
       })
       .then((response) => {
         securities.value = normalizeSecurityItems(response.data);
@@ -94,9 +125,6 @@ export const useSecuritiesStore = defineStore("securities", () => {
         }
 
         return security;
-      })
-      .catch((error: unknown) => {
-        throw error;
       });
   }
 
@@ -149,6 +177,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
     getSecuritiesCount,
     getItem,
     fetchSecurities,
+    fetchAllSecurities,
     fetchSecurityById,
     addSecurity,
     updateSecurity,

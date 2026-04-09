@@ -95,6 +95,22 @@
     "list": {
       "title": "Dividend entries",
       "addButton": "Add dividend entry",
+      "details": {
+        "sections": {
+          "currency": "Currency"
+        },
+        "labels": {
+          "userId": "User ID",
+          "securityId": "Security ID",
+          "securityISIN": "ISIN",
+          "securityWKN": "WKN",
+          "securitySymbol": "Symbol",
+          "updatedAt": "Updated",
+          "calcGrossAmountBase": "Calculated gross (base)",
+          "calcAfterWithholdingAmountBase": "Calculated after withholding (base)",
+          "missingCurrency": "without currency"
+        }
+      },
       "table": {
         "empty": "No dividend entries available.",
         "columns": {

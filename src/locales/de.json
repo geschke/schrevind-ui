@@ -95,6 +95,22 @@
     "list": {
       "title": "Dividendeneinträge",
       "addButton": "Dividendeneintrag hinzufügen",
+      "details": {
+        "sections": {
+          "currency": "Währung"
+        },
+        "labels": {
+          "userId": "Benutzer-ID",
+          "securityId": "Wertpapier-ID",
+          "securityISIN": "ISIN",
+          "securityWKN": "WKN",
+          "securitySymbol": "Symbol",
+          "updatedAt": "Aktualisiert",
+          "calcGrossAmountBase": "Berechnetes Brutto (Basis)",
+          "calcAfterWithholdingAmountBase": "Berechnet nach Quellensteuer (Basis)",
+          "missingCurrency": "ohne Währung"
+        }
+      },
       "table": {
         "empty": "Keine Dividendeneinträge verfügbar.",
         "columns": {

@@ -16,7 +16,7 @@
       @blur="handleBlur"
     />
 
-    <div v-if="isOpen" class="list-group position-absolute w-100 shadow-sm currency-picker-list">
+    <div v-if="isOpen" ref="pickerListRef" class="list-group position-absolute w-100 shadow-sm currency-picker-list">
       <button
         v-for="(currency, index) in filteredCurrencies"
         :key="currency.ID"
@@ -66,7 +66,7 @@
 import { getErrorCode } from "@/helper/errorCode";
 import { useCurrenciesStore } from "@/stores/currencies";
 import type { Currency } from "@/types/currencies";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 type NotifyPayload = {
@@ -102,6 +102,7 @@ const storeCurrencies = useCurrenciesStore();
 const inputValue = ref(normalizeCurrencyCode(props.modelValue));
 const isOpen = ref(false);
 const highlightedIndex = ref(-1);
+const pickerListRef = ref<HTMLElement | null>(null);
 const lastValidValue = ref("");
 const showCreateDialog = ref(false);
 const pendingCurrencyCode = ref("");
@@ -173,6 +174,9 @@ function updateValue(nextValue: string) {
 function openSuggestions(highlightFirst = false) {
   isOpen.value = true;
   highlightedIndex.value = highlightFirst && filteredCurrencies.value.length > 0 ? 0 : -1;
+  if (highlightedIndex.value >= 0) {
+    void nextTick(() => scrollHighlightedIntoView());
+  }
 }
 
 function closeSuggestions() {
@@ -214,9 +218,11 @@ function handleKeydown(event: KeyboardEvent) {
     if (filteredCurrencies.value.length === 0) return;
     if (highlightedIndex.value < 0) {
       highlightedIndex.value = 0;
+      void nextTick(() => scrollHighlightedIntoView());
       return;
     }
     highlightedIndex.value = (highlightedIndex.value + 1 + filteredCurrencies.value.length) % filteredCurrencies.value.length;
+    void nextTick(() => scrollHighlightedIntoView());
     return;
   }
 
@@ -230,9 +236,11 @@ function handleKeydown(event: KeyboardEvent) {
     if (filteredCurrencies.value.length === 0) return;
     if (highlightedIndex.value < 0) {
       highlightedIndex.value = filteredCurrencies.value.length - 1;
+      void nextTick(() => scrollHighlightedIntoView());
       return;
     }
     highlightedIndex.value = (highlightedIndex.value - 1 + filteredCurrencies.value.length) % filteredCurrencies.value.length;
+    void nextTick(() => scrollHighlightedIntoView());
     return;
   }
 
@@ -258,6 +266,14 @@ function selectCurrency(code: string) {
   updateValue(normalized);
   lastValidValue.value = normalized;
   closeSuggestions();
+}
+
+function scrollHighlightedIntoView() {
+  if (!pickerListRef.value || highlightedIndex.value < 0) return;
+
+  const optionElements = pickerListRef.value.querySelectorAll<HTMLElement>(".list-group-item-action");
+  const activeElement = optionElements[highlightedIndex.value];
+  activeElement?.scrollIntoView({ block: "nearest" });
 }
 
 function confirmCurrentValue() {
@@ -352,6 +368,21 @@ function currencyCreateErrorContent(errorCode: string) {
       return t("currencies.errors.unknown");
   }
 }
+
+watch(filteredCurrencies, (nextCurrencies) => {
+  if (nextCurrencies.length === 0) {
+    highlightedIndex.value = -1;
+    return;
+  }
+
+  if (highlightedIndex.value >= nextCurrencies.length) {
+    highlightedIndex.value = nextCurrencies.length - 1;
+  }
+
+  if (isOpen.value && highlightedIndex.value >= 0) {
+    void nextTick(() => scrollHighlightedIntoView());
+  }
+});
 </script>
 
 <style scoped>

@@ -54,15 +54,22 @@
                   autocomplete="off"
                   @focus="openSecurityPicker"
                   @input="onSecurityInput"
+                  @keydown="onSecurityKeydown"
                 />
                 <input type="hidden" v-model="securityId" v-bind="securityIdAttrs" />
-                <div v-if="isSecurityPickerOpen" class="list-group position-absolute w-100 shadow-sm security-picker-list">
+                <div
+                  v-if="isSecurityPickerOpen"
+                  ref="securityPickerListRef"
+                  class="list-group position-absolute w-100 shadow-sm security-picker-list"
+                >
                   <button
-                    v-for="security in filteredSecurityOptions"
+                    v-for="(security, index) in filteredSecurityOptions"
                     :key="security.ID"
                     type="button"
                     class="list-group-item list-group-item-action"
+                    :class="{ active: index === highlightedSecurityIndex }"
                     @mousedown.prevent="selectSecurityOption(security)"
+                    @mousemove="highlightedSecurityIndex = index"
                   >
                     {{ formatSecurityLabel(security) }}
                   </button>
@@ -244,7 +251,11 @@
                       @keydown="onWithholdingCountryKeydown"
                       @blur="onWithholdingCountryBlur"
                     />
-                    <div v-if="isWithholdingCountryPickerOpen" class="list-group position-absolute w-100 shadow-sm security-picker-list">
+                    <div
+                      v-if="isWithholdingCountryPickerOpen"
+                      ref="withholdingCountryPickerListRef"
+                      class="list-group position-absolute w-100 shadow-sm security-picker-list"
+                    >
                       <button
                         v-for="(item, index) in withholdingCountrySuggestions"
                         :key="`${item.DepotID}-${item.CountryCode}`"
@@ -534,8 +545,11 @@ const fxRateLabelManuallyChanged = ref(false);
 const securitySearchQuery = ref("");
 const isSecurityPickerOpen = ref(false);
 const isSecurityFilterActive = ref(false);
+const highlightedSecurityIndex = ref(-1);
 const securityPickerRef = ref<HTMLElement | null>(null);
+const securityPickerListRef = ref<HTMLElement | null>(null);
 const withholdingCountryPickerRef = ref<HTMLElement | null>(null);
+const withholdingCountryPickerListRef = ref<HTMLElement | null>(null);
 const withholdingCountrySearchQuery = ref("");
 const isWithholdingCountryPickerOpen = ref(false);
 const highlightedWithholdingCountryIndex = ref(-1);
@@ -876,6 +890,39 @@ function openWithholdingCountryPicker() {
   highlightedWithholdingCountryIndex.value = -1;
 }
 
+function getApplicableWithholdingTaxDefault(countryCode: string) {
+  const normalizedCountryCode = normalizeCountryCode(countryCode);
+  const selectedDepotId = selectedDepotIdNumber.value;
+
+  if (normalizedCountryCode === "") {
+    return undefined;
+  }
+
+  if (selectedDepotId > 0) {
+    const depotSpecificDefault = relevantWithholdingTaxDefaults.value.find((item) => {
+      return item.DepotID === selectedDepotId && item.CountryCode.toUpperCase() === normalizedCountryCode;
+    });
+
+    if (depotSpecificDefault) {
+      return depotSpecificDefault;
+    }
+  }
+
+  return relevantWithholdingTaxDefaults.value.find((item) => {
+    return item.DepotID === 0 && item.CountryCode.toUpperCase() === normalizedCountryCode;
+  });
+}
+
+function applyWithholdingTaxPercentDefault(countryCode: string) {
+  const withholdingTaxDefault = getApplicableWithholdingTaxDefault(countryCode);
+
+  if (!withholdingTaxDefault) {
+    return;
+  }
+
+  setFieldValue("withholdingTaxPercent", normalizeOptionalString(withholdingTaxDefault.WithholdingTaxPercentDefault).trim());
+}
+
 function onWithholdingCountryInput() {
   const normalized = normalizeCountryCode(withholdingTaxCountryCode.value);
   if (normalized !== withholdingTaxCountryCode.value) {
@@ -885,10 +932,14 @@ function onWithholdingCountryInput() {
   withholdingCountrySearchQuery.value = normalized;
   isWithholdingCountryPickerOpen.value = true;
   highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+  if (highlightedWithholdingCountryIndex.value >= 0) {
+    void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
+  }
 }
 
 function selectWithholdingCountrySuggestion(countryCode: string) {
   setFieldValue("withholdingTaxCountryCode", countryCode);
+  applyWithholdingTaxPercentDefault(countryCode);
   withholdingCountrySearchQuery.value = countryCode;
   isWithholdingCountryPickerOpen.value = false;
   highlightedWithholdingCountryIndex.value = -1;
@@ -910,6 +961,7 @@ async function confirmWithholdingCountryValue() {
 
   const exists = relevantWithholdingTaxDefaults.value.some((item) => item.CountryCode.toUpperCase() === countryCode);
   if (exists) {
+    applyWithholdingTaxPercentDefault(countryCode);
     return;
   }
 
@@ -934,11 +986,22 @@ function closeWithholdingCountryPicker() {
   highlightedWithholdingCountryIndex.value = -1;
 }
 
+function scrollHighlightedWithholdingCountryIntoView() {
+  if (!withholdingCountryPickerListRef.value || highlightedWithholdingCountryIndex.value < 0) return;
+
+  const optionElements = withholdingCountryPickerListRef.value.querySelectorAll<HTMLElement>(".list-group-item-action");
+  const activeElement = optionElements[highlightedWithholdingCountryIndex.value];
+  activeElement?.scrollIntoView({ block: "nearest" });
+}
+
 function onWithholdingCountryKeydown(event: KeyboardEvent) {
   if (event.key === "ArrowDown") {
     if (!isWithholdingCountryPickerOpen.value) {
       isWithholdingCountryPickerOpen.value = true;
       highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+      if (highlightedWithholdingCountryIndex.value >= 0) {
+        void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
+      }
       return;
     }
 
@@ -949,12 +1012,14 @@ function onWithholdingCountryKeydown(event: KeyboardEvent) {
 
     if (highlightedWithholdingCountryIndex.value < 0) {
       highlightedWithholdingCountryIndex.value = 0;
+      void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
       return;
     }
 
     highlightedWithholdingCountryIndex.value =
       (highlightedWithholdingCountryIndex.value + 1 + withholdingCountrySuggestions.value.length) %
       withholdingCountrySuggestions.value.length;
+    void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
     return;
   }
 
@@ -962,6 +1027,9 @@ function onWithholdingCountryKeydown(event: KeyboardEvent) {
     if (!isWithholdingCountryPickerOpen.value) {
       isWithholdingCountryPickerOpen.value = true;
       highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length > 0 ? 0 : -1;
+      if (highlightedWithholdingCountryIndex.value >= 0) {
+        void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
+      }
       return;
     }
 
@@ -972,12 +1040,14 @@ function onWithholdingCountryKeydown(event: KeyboardEvent) {
 
     if (highlightedWithholdingCountryIndex.value < 0) {
       highlightedWithholdingCountryIndex.value = withholdingCountrySuggestions.value.length - 1;
+      void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
       return;
     }
 
     highlightedWithholdingCountryIndex.value =
       (highlightedWithholdingCountryIndex.value - 1 + withholdingCountrySuggestions.value.length) %
       withholdingCountrySuggestions.value.length;
+    void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
     return;
   }
 
@@ -1081,23 +1151,97 @@ function clearSecuritySelection() {
 function openSecurityPicker() {
   isSecurityPickerOpen.value = true;
   isSecurityFilterActive.value = false;
+  highlightedSecurityIndex.value = filteredSecurityOptions.value.length > 0 ? 0 : -1;
+  void nextTick(() => scrollHighlightedSecurityIntoView());
+}
+
+function closeSecurityPicker() {
+  isSecurityPickerOpen.value = false;
+  highlightedSecurityIndex.value = -1;
 }
 
 function selectSecurityOption(security: Security) {
   setFieldValue("securityId", String(security.ID));
   applySecuritySnapshot(security.ID);
   securitySearchQuery.value = formatSecurityLabel(security);
-  isSecurityPickerOpen.value = false;
+  closeSecurityPicker();
   isSecurityFilterActive.value = false;
 }
 
 function onSecurityInput() {
   isSecurityPickerOpen.value = true;
   isSecurityFilterActive.value = true;
+  highlightedSecurityIndex.value = filteredSecurityOptions.value.length > 0 ? 0 : -1;
+  void nextTick(() => scrollHighlightedSecurityIntoView());
 
   const selectedLabel = getSelectedSecurityLabel();
   if (selectedLabel === "" || securitySearchQuery.value !== selectedLabel) {
     clearSecuritySelection();
+  }
+}
+
+function scrollHighlightedSecurityIntoView() {
+  if (!securityPickerListRef.value || highlightedSecurityIndex.value < 0) return;
+
+  const optionElements = securityPickerListRef.value.querySelectorAll<HTMLElement>(".list-group-item-action");
+  const activeElement = optionElements[highlightedSecurityIndex.value];
+  activeElement?.scrollIntoView({ block: "nearest" });
+}
+
+function onSecurityKeydown(event: KeyboardEvent) {
+  if (event.key === "ArrowDown") {
+    if (!isSecurityPickerOpen.value) {
+      openSecurityPicker();
+      return;
+    }
+
+    event.preventDefault();
+    if (filteredSecurityOptions.value.length === 0) return;
+
+    if (highlightedSecurityIndex.value < 0) {
+      highlightedSecurityIndex.value = 0;
+      return;
+    }
+
+    highlightedSecurityIndex.value =
+      (highlightedSecurityIndex.value + 1 + filteredSecurityOptions.value.length) % filteredSecurityOptions.value.length;
+    void nextTick(() => scrollHighlightedSecurityIntoView());
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    if (!isSecurityPickerOpen.value) {
+      openSecurityPicker();
+      return;
+    }
+
+    event.preventDefault();
+    if (filteredSecurityOptions.value.length === 0) return;
+
+    if (highlightedSecurityIndex.value < 0) {
+      highlightedSecurityIndex.value = filteredSecurityOptions.value.length - 1;
+      return;
+    }
+
+    highlightedSecurityIndex.value =
+      (highlightedSecurityIndex.value - 1 + filteredSecurityOptions.value.length) % filteredSecurityOptions.value.length;
+    void nextTick(() => scrollHighlightedSecurityIntoView());
+    return;
+  }
+
+  if (event.key === "Escape") {
+    closeSecurityPicker();
+    return;
+  }
+
+  if ((event.key === "Enter" || event.key === " ") && isSecurityPickerOpen.value) {
+    if (
+      highlightedSecurityIndex.value >= 0 &&
+      filteredSecurityOptions.value[highlightedSecurityIndex.value]
+    ) {
+      event.preventDefault();
+      selectSecurityOption(filteredSecurityOptions.value[highlightedSecurityIndex.value]);
+    }
   }
 }
 
@@ -1151,7 +1295,7 @@ function applyWithholdingCurrencyDefault() {
 function handleDocumentClick(event: MouseEvent) {
   const target = event.target as Node | null;
   if (!target || !securityPickerRef.value?.contains(target)) {
-    isSecurityPickerOpen.value = false;
+    closeSecurityPicker();
   }
 
   if (!target || !withholdingCountryPickerRef.value?.contains(target)) {
@@ -1260,6 +1404,36 @@ watch(securityId, (nextSecurityId) => {
   }
 });
 
+watch(filteredSecurityOptions, (nextOptions) => {
+  if (nextOptions.length === 0) {
+    highlightedSecurityIndex.value = -1;
+    return;
+  }
+
+  if (highlightedSecurityIndex.value >= nextOptions.length) {
+    highlightedSecurityIndex.value = nextOptions.length - 1;
+  }
+
+  if (isSecurityPickerOpen.value && highlightedSecurityIndex.value >= 0) {
+    void nextTick(() => scrollHighlightedSecurityIntoView());
+  }
+});
+
+watch(withholdingCountrySuggestions, (nextOptions) => {
+  if (nextOptions.length === 0) {
+    highlightedWithholdingCountryIndex.value = -1;
+    return;
+  }
+
+  if (highlightedWithholdingCountryIndex.value >= nextOptions.length) {
+    highlightedWithholdingCountryIndex.value = nextOptions.length - 1;
+  }
+
+  if (isWithholdingCountryPickerOpen.value && highlightedWithholdingCountryIndex.value >= 0) {
+    void nextTick(() => scrollHighlightedWithholdingCountryIntoView());
+  }
+});
+
 watch(withholdingTaxAmount, () => {
   applyWithholdingCurrencyDefault();
 });
@@ -1270,7 +1444,7 @@ onMounted(() => {
 
   Promise.all([
     storeDepots.fetchDepots(),
-    storeSecurities.fetchSecurities(),
+    storeSecurities.fetchAllSecurities(),
     storeCurrencies.fetchCurrencies(),
     storeWithholdingTaxDefaults.fetchWithholdingTaxDefaults(),
   ])
