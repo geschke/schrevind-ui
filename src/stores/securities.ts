@@ -3,6 +3,16 @@ import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
 import type { Security, CreateSecurityPayload, UpdateSecurityPayload } from "@/types/securities";
 
+type SecuritiesSortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "CreatedAt" | "UpdatedAt";
+type SecuritiesSortDirection = "asc" | "desc" | "none";
+
+type SecuritiesQueryParams = {
+  offset?: number;
+  limit?: number;
+  sort?: SecuritiesSortField;
+  direction?: SecuritiesSortDirection;
+};
+
 function normalizeSecurity(item: unknown): Security {
   const raw = (item ?? {}) as Record<string, unknown>;
 
@@ -41,14 +51,20 @@ export const useSecuritiesStore = defineStore("securities", () => {
     return items.map((item) => normalizeSecurity(item));
   }
 
-  async function fetchSecurities(params?: { offset?: number; limit?: number }) {
+  function buildQueryParams(params?: SecuritiesQueryParams) {
+    return {
+      offset: params?.offset ?? 0,
+      limit: params?.limit ?? 10,
+      ...(params?.sort ? { sort: params.sort } : {}),
+      ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
+    };
+  }
+
+  async function fetchSecurities(params?: SecuritiesQueryParams) {
     return axios
       .get("/securities/list", {
         withCredentials: true,
-        params: {
-          offset: params?.offset ?? 0,
-          limit: params?.limit ?? 10,
-        },
+        params: buildQueryParams(params),
       })
       .then((response) => {
         securities.value = normalizeSecurityItems(response.data);

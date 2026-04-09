@@ -22,6 +22,7 @@
         :showPageFirstLast="true"
         :showPageIcons="true"
         @pageChange="onPageChange"
+        @sortChange="onSortChange"
       >
         <template #tmplLoading>
           <div class="col text-center">
@@ -35,6 +36,14 @@
           <div class="col text-center">
             <i class="bi bi-inbox"></i> {{ t("securities.list.table.empty") }}
           </div>
+        </template>
+
+        <template #CreatedAt="data">
+          {{ formatDate(data.value.CreatedAt) }}
+        </template>
+
+        <template #UpdatedAt="data">
+          {{ formatDate(data.value.UpdatedAt) }}
         </template>
 
         <template #tmplSecurityActions="data">
@@ -139,6 +148,8 @@ import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
 const CREATED_SECURITY_FLASH_KEY = "schrevind.securities.createdName";
+type SortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "CreatedAt" | "UpdatedAt";
+type SortDirection = "asc" | "desc" | "none";
 
 const storeSecurities = useSecuritiesStore();
 const toast: any = ref(null);
@@ -148,16 +159,18 @@ const createdBannerVisible = ref(false);
 const createdBannerMessage = ref("");
 const itemsPerPage = 10;
 const currentOffset = ref(0);
+const currentSortField = ref<SortField>("ID");
+const currentSortDirection = ref<SortDirection>("none");
 
 const headers = computed<GTableHeader[]>(() => [
-  { title: t("securities.list.table.columns.id"), field: "ID" },
-  { title: t("securities.list.table.columns.name"), field: "Name" },
-  { title: t("securities.list.table.columns.isin"), field: "ISIN" },
-  { title: t("securities.list.table.columns.wkn"), field: "WKN" },
-  { title: t("securities.list.table.columns.symbol"), field: "Symbol" },
-  { title: t("securities.list.table.columns.status"), field: "Status" },
-  { title: t("securities.list.table.columns.createdAt"), render: (item: Security) => formatDate(item.CreatedAt) },
-  { title: t("securities.list.table.columns.updatedAt"), render: (item: Security) => formatDate(item.UpdatedAt) },
+  { title: t("securities.list.table.columns.id"), field: "ID", sortable: true },
+  { title: t("securities.list.table.columns.name"), field: "Name", sortable: true },
+  { title: t("securities.list.table.columns.isin"), field: "ISIN", sortable: true },
+  { title: t("securities.list.table.columns.wkn"), field: "WKN", sortable: true },
+  { title: t("securities.list.table.columns.symbol"), field: "Symbol", sortable: true },
+  { title: t("securities.list.table.columns.status"), field: "Status", sortable: true },
+  { title: t("securities.list.table.columns.createdAt"), field: "CreatedAt", sortable: true },
+  { title: t("securities.list.table.columns.updatedAt"), field: "UpdatedAt", sortable: true },
   { title: t("securities.list.table.columns.actions"), field: "tmplSecurityActions" },
 ]);
 
@@ -201,7 +214,16 @@ async function loadPage(offset: number, limit: number) {
   currentOffset.value = offset;
 
   try {
-    await storeSecurities.fetchSecurities({ offset, limit });
+    await storeSecurities.fetchSecurities({
+      offset,
+      limit,
+      ...(currentSortDirection.value !== "none"
+        ? {
+            sort: currentSortField.value,
+            direction: currentSortDirection.value,
+          }
+        : {}),
+    });
   } catch (requestError: unknown) {
     toast.value?.addToast(<GToastContent>{
       ...GToastDanger,
@@ -215,6 +237,14 @@ async function loadPage(offset: number, limit: number) {
 
 function onPageChange({ offset, limit }: { page: number; offset: number; limit: number }) {
   void loadPage(offset, limit);
+}
+
+function onSortChange({ field, direction }: { field: string; direction: SortDirection }) {
+  if (!isSupportedSortField(field)) return;
+
+  currentSortField.value = field;
+  currentSortDirection.value = direction;
+  void loadPage(0, itemsPerPage);
 }
 
 function errorContent(errorCode: string) {
@@ -233,6 +263,19 @@ function deleteErrorContent(errorCode: string) {
     default:
       return errorContent(errorCode);
   }
+}
+
+function isSupportedSortField(field: string): field is SortField {
+  return (
+    field === "ID" ||
+    field === "Name" ||
+    field === "ISIN" ||
+    field === "WKN" ||
+    field === "Symbol" ||
+    field === "Status" ||
+    field === "CreatedAt" ||
+    field === "UpdatedAt"
+  );
 }
 
 function deleteItem(item: Security) {
