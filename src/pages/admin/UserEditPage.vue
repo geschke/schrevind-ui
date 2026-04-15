@@ -52,6 +52,14 @@
           </div>
         </div>
 
+        <div class="row mb-3">
+          <label for="locale" class="col-sm-2 col-form-label">{{ t("adminUsers.common.locale") }}</label>
+          <div class="col-sm-10 col-md-4 col-lg-3">
+            <input type="text" class="form-control" v-model="locale" v-bind="localeAttrs" id="locale" maxlength="5" />
+            <small class="text-danger" v-if="errors.locale">{{ errors.locale }}</small>
+          </div>
+        </div>
+
         <div class="form-row mt-3">
           <div class="form-group col-md-8 offset-2">
             <button type="button" @click="$router.go(-1)" class="btn btn-secondary">{{ t("adminUsers.common.cancel") }}</button>
@@ -113,6 +121,12 @@ const validationSchema = yup.object().shape({
     .required(() => t("adminUsers.validation.lastnameRequired"))
     .trim()
     .min(2, () => t("adminUsers.validation.lastnameMin")),
+  locale: yup
+    .string()
+    .transform((value) => value?.trim() ?? "")
+    .test("locale", () => t("adminUsers.validation.localeInvalid"), (value) => {
+      return value === "" || /^..-..$/.test(value ?? "");
+    }),
 });
 
 const props = defineProps<{ id: string }>();
@@ -132,6 +146,7 @@ const { defineField, errors, handleSubmit } = useForm({ validationSchema });
 const [email, emailAttrs] = defineField("email");
 const [firstname, firstnameAttrs] = defineField("firstname");
 const [lastname, lastnameAttrs] = defineField("lastname");
+const [locale, localeAttrs] = defineField("locale");
 
 function errorContent(errorCode: string) {
   if (errorCode) {
@@ -140,6 +155,9 @@ function errorContent(errorCode: string) {
     }
     if (errorCode === "USERNAME_EXISTS") {
       return t("adminUsers.errors.usernameExists");
+    }
+    if (errorCode === "INVALID_LOCALE") {
+      return t("adminUsers.validation.localeInvalid");
     }
     return t("adminUsers.errors.unknown");
   }
@@ -189,6 +207,7 @@ function fillFormElements() {
   email.value = foundUser.Email;
   firstname.value = foundUser.FirstName;
   lastname.value = foundUser.LastName;
+  locale.value = foundUser.Locale;
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -209,6 +228,7 @@ const onSubmit = handleSubmit((values) => {
       FirstName: values.firstname,
       LastName: values.lastname,
       Email: values.email,
+      Locale: values.locale ?? "",
     })
     .then(() => {
       saveState.value = "success";

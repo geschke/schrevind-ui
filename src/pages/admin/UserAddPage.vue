@@ -122,6 +122,14 @@
             </div>
           </div>
 
+          <div class="row mb-3">
+            <label for="locale" class="col-sm-2 col-form-label">{{ t("adminUsers.common.locale") }}</label>
+            <div class="col-sm-10 col-md-4 col-lg-3">
+              <input type="text" class="form-control" v-model="locale" v-bind="localeAttrs" id="locale" maxlength="5" />
+              <small class="text-danger" v-if="errors.locale">{{ errors.locale }}</small>
+            </div>
+          </div>
+
           <div class="form-row mt-3">
             <div class="form-group col-md-8 offset-2">
               <button type="button" @click="$router.go(-1)" class="btn btn-secondary">{{ t("adminUsers.common.cancel") }}</button>
@@ -182,6 +190,12 @@ const validationSchema = yup.object().shape({
     .required(() => t("adminUsers.validation.lastnameRequired"))
     .trim()
     .min(2, () => t("adminUsers.validation.lastnameMin")),
+  locale: yup
+    .string()
+    .transform((value) => value?.trim() ?? "")
+    .test("locale", () => t("adminUsers.validation.localeInvalid"), (value) => {
+      return value === "" || /^..-..$/.test(value ?? "");
+    }),
 });
 
 const saveState = ref<SaveState>("idle");
@@ -215,6 +229,7 @@ const [password, passwordAttrs] = defineField("password");
 const [passwordConfirm, passwordConfirmAttrs] = defineField("passwordConfirm");
 const [firstname, firstnameAttrs] = defineField("firstname");
 const [lastname, lastnameAttrs] = defineField("lastname");
+const [locale, localeAttrs] = defineField("locale");
 
 function dismissErrorMessage() {
   saveState.value = "idle";
@@ -233,6 +248,8 @@ function errorContent(code: string) {
       return t("adminUsers.validation.passwordMin");
     case "PASSWORD_MISMATCH":
       return t("adminUsers.validation.passwordConfirmMismatch");
+    case "INVALID_LOCALE":
+      return t("adminUsers.validation.localeInvalid");
     case "INVALID_PASSWORD":
       return t("adminUsers.add.errors.invalidPassword");
     case "INVALID_JSON":
@@ -288,6 +305,7 @@ const onSubmit = handleSubmit((values) => {
       FirstName: values.firstname,
       LastName: values.lastname,
       Email: values.email,
+      Locale: values.locale ?? "",
       Password: values.password,
       PasswordConfirm: values.passwordConfirm,
     })

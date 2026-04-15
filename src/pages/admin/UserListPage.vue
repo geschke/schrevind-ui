@@ -107,6 +107,9 @@
                 <dt class="col-sm-3">{{ t("adminUsers.list.modal.emailLabel") }}</dt>
                 <dd class="col-sm-9">{{ toBeDeleted.Email || "-" }}</dd>
 
+                <dt class="col-sm-3">{{ t("adminUsers.common.locale") }}</dt>
+                <dd class="col-sm-9">{{ toBeDeleted.Locale || "-" }}</dd>
+
                 <dt class="col-sm-3">{{ t("adminUsers.list.modal.idLabel") }}</dt>
                 <dd class="col-sm-9">{{ toBeDeleted.ID }}</dd>
               </dl>
@@ -158,6 +161,7 @@ const headers = computed<GTableHeader[]>(() => [
   { title: t("adminUsers.list.table.columns.id"), field: "ID" },
   { title: t("adminUsers.list.table.columns.email"), field: "Email" },
   { title: t("adminUsers.list.table.columns.name"), field: "tmplUserName" },
+  { title: t("adminUsers.list.table.columns.locale"), field: "Locale" },
   { title: t("adminUsers.list.table.columns.actions"), field: "tmplUserActions" },
 ]);
 

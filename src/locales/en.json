@@ -651,6 +651,7 @@
       "passwordConfirm": "Repeat password",
       "firstname": "First name",
       "lastname": "Last name",
+      "locale": "Locale",
       "group": "Group",
       "cancel": "Cancel",
       "save": "Save",
@@ -678,7 +679,8 @@
       "firstnameRequired": "Please enter your first name.",
       "firstnameMin": "Minimum length is two characters.",
       "lastnameRequired": "Please enter your last name.",
-      "lastnameMin": "Minimum length is two characters."
+      "lastnameMin": "Minimum length is two characters.",
+      "localeInvalid": "Please enter the locale in the format xx-XX."
     },
     "list": {
       "title": "Users",
@@ -689,6 +691,7 @@
           "id": "ID",
           "email": "Email",
           "name": "Name",
+          "locale": "Locale",
           "actions": "Actions"
         }
       },

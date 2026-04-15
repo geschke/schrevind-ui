@@ -3,6 +3,7 @@ export type User = {
   Email: string;
   FirstName: string;
   LastName: string;
+  Locale: string;
   Password?: string;
   PasswordConfirm?: string;
   // GroupCount is optionally returned by the backend to indicate group membership.
@@ -16,6 +17,7 @@ export type CreateUserPayload = {
   FirstName: string;
   LastName: string;
   Email: string;
+  Locale: string;
   Password: string;
   PasswordConfirm: string;
 };
@@ -26,6 +28,7 @@ export type UpdateUserPayload = {
   FirstName: string;
   LastName: string;
   Email: string;
+  Locale: string;
 };
 
 export type UpdateUserPasswordPayload = {

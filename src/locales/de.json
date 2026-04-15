@@ -651,6 +651,7 @@
       "passwordConfirm": "Passwort wiederholen",
       "firstname": "Vorname",
       "lastname": "Nachname",
+      "locale": "Locale",
       "group": "Gruppe",
       "cancel": "Abbrechen",
       "save": "Speichern",
@@ -678,7 +679,8 @@
       "firstnameRequired": "Bitte geben Sie Ihren Vornamen ein.",
       "firstnameMin": "Mindestlänge zwei Zeichen.",
       "lastnameRequired": "Bitte geben Sie Ihren Nachnamen ein.",
-      "lastnameMin": "Mindestlänge zwei Zeichen."
+      "lastnameMin": "Mindestlänge zwei Zeichen.",
+      "localeInvalid": "Bitte geben Sie die Locale im Format xx-XX ein."
     },
     "list": {
       "title": "Benutzer",
@@ -689,6 +691,7 @@
           "id": "ID",
           "email": "E-Mail",
           "name": "Name",
+          "locale": "Locale",
           "actions": "Aktionen"
         }
       },

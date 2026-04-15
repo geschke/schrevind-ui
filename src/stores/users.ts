@@ -10,6 +10,20 @@ import type {
   DeleteUserPayload,
 } from "@/types/users";
 
+function normalizeUser(item: unknown): User {
+  const raw = (item ?? {}) as Record<string, unknown>;
+
+  return {
+    ...raw,
+    ID: Number(raw.ID ?? 0),
+    Email: String(raw.Email ?? ""),
+    FirstName: String(raw.FirstName ?? ""),
+    LastName: String(raw.LastName ?? ""),
+    Locale: String(raw.Locale ?? ""),
+    GroupCount: raw.GroupCount === undefined ? undefined : Number(raw.GroupCount),
+  };
+}
+
 function getActiveGroupIDOrThrow(): number {
   const storeUserAuth = useUserAuthStore();
   const id = storeUserAuth.activeGroupID;
@@ -31,9 +45,7 @@ export const useUsersStore = defineStore("users", () => {
       .get("/users/list", { withCredentials: true })
       .then((response) => {
         const items = response.data?.items ?? {};
-        const usersDO: User[] = Object.values(items).map((item) => ({
-          ...(item as User),
-        }));
+        const usersDO: User[] = Object.values(items).map((item) => normalizeUser(item));
         users.value = usersDO;
         usersLoaded.value = true;
       })
@@ -49,6 +61,7 @@ export const useUsersStore = defineStore("users", () => {
       FirstName: payload.FirstName,
       LastName: payload.LastName,
       Email: payload.Email,
+      Locale: payload.Locale,
       Password: payload.Password,
       PasswordConfirm: payload.PasswordConfirm,
     };
@@ -66,6 +79,7 @@ export const useUsersStore = defineStore("users", () => {
       Email: payload.Email,
       FirstName: payload.FirstName,
       LastName: payload.LastName,
+      Locale: payload.Locale,
     };
     return await axios
       .post(`/users/update/${payload.ID}`, body, { withCredentials: true })
