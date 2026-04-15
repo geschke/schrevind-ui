@@ -4,6 +4,7 @@
       <h2>{{ t("dividendEntries.list.title") }}</h2>
 
       <GTable
+        ref="dividendEntriesTable"
         :headers="headers"
         :items="dividendEntries"
         :count="dividendEntriesCount"
@@ -123,6 +124,7 @@ type SortDirection = "asc" | "desc" | "none";
 const storeDividendEntries = useDividendEntriesStore();
 const storeDepots = useDepotsStore();
 const toast: any = ref(null);
+const dividendEntriesTable: any = ref(null);
 const loading = ref(false);
 const currentSortField = ref<SortField>("PayDate");
 const currentSortDirection = ref<SortDirection>("none");
@@ -161,6 +163,7 @@ onMounted(() => {
 
 async function loadPage(offset: number, limit: number) {
   loading.value = true;
+  collapseExpandedRows();
 
   try {
     await storeDividendEntries.fetchDividendEntriesByUser({
@@ -173,6 +176,7 @@ async function loadPage(offset: number, limit: number) {
           }
         : {}),
     });
+    collapseExpandedRows();
   } catch (requestError: unknown) {
     toast.value?.addToast(<GToastContent>{
       ...GToastDanger,
@@ -184,13 +188,19 @@ async function loadPage(offset: number, limit: number) {
   }
 }
 
+function collapseExpandedRows() {
+  dividendEntriesTable.value?.collapseAll?.();
+}
+
 function onPageChange({ offset, limit }: { page: number; offset: number; limit: number }) {
+  collapseExpandedRows();
   void loadPage(offset, limit);
 }
 
 function onSortChange({ field, direction }: { field: string; direction: SortDirection }) {
   if (!isSupportedSortField(field)) return;
 
+  collapseExpandedRows();
   currentSortField.value = field;
   currentSortDirection.value = direction;
   void loadPage(0, itemsPerPage);

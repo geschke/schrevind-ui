@@ -518,7 +518,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n";
 import { GToast, GToastSuccess, GToastDanger, GToastWarning } from "goar-components";
 import type { GToastContent } from "goar-components";
-import { getErrorCode } from "@/helper/errorCode";
+import { getBackendFieldErrors, getErrorCode } from "@/helper/errorCode";
 import { useCurrenciesStore } from "@/stores/currencies";
 import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
@@ -688,7 +688,7 @@ const validationSchema = yup.object().shape({
   securitySymbol: yup.string().transform((value) => value?.trim() ?? ""),
 });
 
-const { defineField, errors, handleSubmit, resetForm, setFieldValue } = useForm({
+const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue } = useForm({
   validationSchema,
   initialValues,
 });
@@ -1342,51 +1342,95 @@ function suggestRefundableWithholdingTax() {
   }
 }
 
+const backendFieldMap: Record<string, string> = {
+  DepotID: "depotId",
+  SecurityID: "securityId",
+  PayDate: "payDate",
+  ExDate: "exDate",
+  SecurityName: "securityId",
+  SecurityISIN: "securityId",
+  DividendPerUnitCurrency: "dividendPerUnitCurrency",
+  Quantity: "quantity",
+  DividendPerUnitAmount: "dividendPerUnitAmount",
+  GrossAmount: "grossAmount",
+  GrossCurrency: "grossCurrency",
+  PayoutAmount: "payoutAmount",
+  PayoutCurrency: "payoutCurrency",
+  WithholdingTaxPercent: "withholdingTaxPercent",
+  WithholdingTaxAmount: "withholdingTaxAmount",
+  WithholdingTaxCurrency: "withholdingTaxCurrency",
+  WithholdingTaxAmountCredit: "withholdingTaxAmountCredit",
+  WithholdingTaxAmountCreditCurrency: "withholdingTaxAmountCreditCurrency",
+  WithholdingTaxAmountRefundable: "withholdingTaxAmountRefundable",
+  WithholdingTaxAmountRefundableCurrency: "withholdingTaxAmountRefundableCurrency",
+  ForeignFeesAmount: "foreignFeesAmount",
+  ForeignFeesCurrency: "foreignFeesCurrency",
+  FXRateLabel: "fxRateLabel",
+  FXRate: "fxRate",
+};
+
+const backendErrorFields = [
+  "depotId",
+  "securityId",
+  "payDate",
+  "exDate",
+  "quantity",
+  "dividendPerUnitAmount",
+  "dividendPerUnitCurrency",
+  "grossAmount",
+  "grossCurrency",
+  "payoutAmount",
+  "payoutCurrency",
+  "fxRateLabel",
+  "fxRate",
+  "withholdingTaxPercent",
+  "withholdingTaxAmount",
+  "withholdingTaxCurrency",
+  "withholdingTaxAmountCredit",
+  "withholdingTaxAmountCreditCurrency",
+  "withholdingTaxAmountRefundable",
+  "withholdingTaxAmountRefundableCurrency",
+  "foreignFeesAmount",
+  "foreignFeesCurrency",
+];
+
+function clearBackendFieldErrors() {
+  setErrors(Object.fromEntries(backendErrorFields.map((field) => [field, ""])));
+}
+
+function translateBackendCode(code: string) {
+  const key = `dividendEntries.backendErrors.${code}`;
+  const translated = t(key);
+
+  return translated === key ? t("dividendEntries.backendErrors.UNKNOWN_ERROR") : translated;
+}
+
+function applyBackendFieldErrors(fieldErrors: Record<string, string>) {
+  const mappedErrors: Record<string, string> = {};
+
+  Object.entries(fieldErrors).forEach(([backendField, code]) => {
+    const formField = backendFieldMap[backendField];
+
+    if (!formField) {
+      return;
+    }
+
+    mappedErrors[formField] = translateBackendCode(code);
+  });
+
+  if (Object.keys(mappedErrors).length > 0) {
+    setErrors(mappedErrors);
+  }
+}
+
 function errorContent(code: string) {
   switch (code) {
-    case "MISSING_DEPOT_ID":
-    case "DEPOT_ID_REQUIRED":
-      return t("dividendEntries.validation.depotIdRequired");
-    case "MISSING_SECURITY_ID":
-    case "SECURITY_ID_REQUIRED":
-      return t("dividendEntries.validation.securityIdRequired");
-    case "MISSING_PAY_DATE":
-    case "PAY_DATE_REQUIRED":
-      return t("dividendEntries.validation.payDateRequired");
-    case "MISSING_EX_DATE":
-    case "EX_DATE_REQUIRED":
-      return t("dividendEntries.validation.exDateRequired");
-    case "MISSING_QUANTITY":
-    case "QUANTITY_REQUIRED":
-      return t("dividendEntries.validation.quantityRequired");
-    case "MISSING_DIVIDEND_PER_UNIT_AMOUNT":
-    case "DIVIDEND_PER_UNIT_AMOUNT_REQUIRED":
-      return t("dividendEntries.validation.dividendPerUnitAmountRequired");
-    case "MISSING_DIVIDEND_PER_UNIT_CURRENCY":
-    case "DIVIDEND_PER_UNIT_CURRENCY_REQUIRED":
-      return t("dividendEntries.validation.dividendPerUnitCurrencyRequired");
-    case "MISSING_GROSS_AMOUNT":
-    case "GROSS_AMOUNT_REQUIRED":
-      return t("dividendEntries.validation.grossAmountRequired");
-    case "MISSING_GROSS_CURRENCY":
-    case "GROSS_CURRENCY_REQUIRED":
-      return t("dividendEntries.validation.grossCurrencyRequired");
-    case "MISSING_PAYOUT_AMOUNT":
-    case "PAYOUT_AMOUNT_REQUIRED":
-      return t("dividendEntries.validation.payoutAmountRequired");
-    case "MISSING_PAYOUT_CURRENCY":
-    case "PAYOUT_CURRENCY_REQUIRED":
-      return t("dividendEntries.validation.payoutCurrencyRequired");
-    case "INVALID_JSON":
-      return t("dividendEntries.add.errors.invalidJson");
-    case "UNAUTHORIZED":
-      return t("dividendEntries.add.errors.unauthorized");
+    case "VALIDATION_ERROR":
+      return t("dividendEntries.add.errors.validationError");
     case "NETWORK_ERROR":
       return t("dividendEntries.add.errors.network");
-    case "DB_ERROR":
-      return t("dividendEntries.add.errors.dbError");
     default:
-      return t("dividendEntries.errors.unknown");
+      return translateBackendCode(code);
   }
 }
 
@@ -1468,6 +1512,7 @@ onBeforeUnmount(() => {
 const onSubmit = handleSubmit((values) => {
   saveState.value = "saving";
   messageError.value = "";
+  clearBackendFieldErrors();
   const selectedSecurity = storeSecurities.getItem(values.securityId ?? "");
 
   storeDividendEntries
@@ -1515,12 +1560,19 @@ const onSubmit = handleSubmit((values) => {
         title: t("dividendEntries.common.okTitle"),
         content: t("dividendEntries.add.alerts.saved"),
       });
-    })
-    .catch((requestError: unknown) => {
-      const errorMessage = errorContent(getErrorCode(requestError));
-      saveState.value = "error";
-      messageError.value = errorMessage;
-      toast.value?.addToast(<GToastContent>{
+      })
+      .catch((requestError: unknown) => {
+        const errorCode = getErrorCode(requestError);
+        const fieldErrors = getBackendFieldErrors(requestError);
+        const errorMessage = errorContent(errorCode);
+
+        if (errorCode === "VALIDATION_ERROR") {
+          applyBackendFieldErrors(fieldErrors);
+        }
+
+        saveState.value = "error";
+        messageError.value = errorMessage;
+        toast.value?.addToast(<GToastContent>{
         ...GToastDanger,
         title: t("dividendEntries.common.errorTitle"),
         content: errorMessage,

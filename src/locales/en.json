@@ -92,6 +92,44 @@
       "referenceDataLoadFailed": "Depots, securities, currencies and withholding tax data could not be loaded.",
       "unknown": "An unknown error occurred."
     },
+    "backendErrors": {
+      "UNKNOWN_ERROR": "An unknown error occurred.",
+      "DB_NOT_INITIALIZED": "The backend database is not initialized.",
+      "AUTH_NOT_CONFIGURED": "Server-side authentication is not configured correctly.",
+      "UNAUTHORIZED": "You are not signed in or your session has expired.",
+      "INVALID_JSON": "The request could not be processed by the server.",
+      "DB_ERROR": "A database error occurred while saving.",
+      "FORBIDDEN_DEPOT": "You are not allowed to create dividend entries for this depot.",
+      "INVALID_DIVIDEND_ENTRY_ID": "The dividend entry ID is invalid.",
+      "DIVIDEND_ENTRY_NOT_FOUND": "The dividend entry was not found.",
+      "INVALID_DEPOT_ID": "Please choose a valid depot.",
+      "INVALID_SECURITY_ID": "Please choose a valid security.",
+      "MISSING_PAY_DATE": "Please enter the pay date.",
+      "MISSING_EX_DATE": "Please enter the ex date.",
+      "MISSING_SECURITY_NAME": "The selected security has no name. Please choose a valid security.",
+      "MISSING_SECURITY_ISIN": "The selected security has no ISIN. Please choose a valid security.",
+      "MISSING_DIVIDEND_PER_UNIT_CURRENCY": "Please enter the per-unit currency.",
+      "MISSING_GROSS_CURRENCY": "Please enter the gross currency.",
+      "MISSING_PAYOUT_CURRENCY": "Please enter the payout currency.",
+      "ERR_DECIMAL_EMPTY": "Please enter an amount.",
+      "ERR_DECIMAL_WHITESPACE": "The number must not contain spaces.",
+      "ERR_DECIMAL_NEGATIVE": "Negative values are not allowed.",
+      "ERR_DECIMAL_INVALID_CHARS": "The number contains invalid characters.",
+      "ERR_DECIMAL_MISSING_DIGITS": "The input must contain at least one digit.",
+      "ERR_DECIMAL_INVALID_FORMAT": "The decimal format is invalid.",
+      "ERR_DECIMAL_INVALID_GROUPING": "The thousands grouping is invalid.",
+      "ERR_CURRENCY_REQUIRED": "Please enter the corresponding currency.",
+      "ERR_CURRENCY_INVALID_FORMAT": "Please enter a currency code with exactly three uppercase letters.",
+      "ERR_CURRENCY_UNKNOWN": "This currency does not exist in the database.",
+      "ERR_FX_RATE_LABEL_REQUIRED": "Please enter the currency pair for the exchange rate.",
+      "ERR_FX_RATE_LABEL_INVALID_FORMAT": "Please enter the currency pair in the format AAA/BBB.",
+      "ERR_FX_RATE_LABEL_UNKNOWN_CURRENCY": "One currency from the currency pair does not exist in the database.",
+      "ERR_FX_RATE_PAIR_MISMATCH": "The currency pair does not match the required conversion into the depot base currency.",
+      "ERR_FX_RATE_ZERO": "The exchange rate must not be 0 when conversion is required.",
+      "ERR_DEPOT_NOT_FOUND": "The specified depot was not found.",
+      "ERR_BASE_CURRENCY_MISSING": "The depot has no base currency configured.",
+      "ERR_CALCULATION_FAILED": "An amount could not be processed internally."
+    },
     "list": {
       "title": "Dividend entries",
       "addButton": "Add dividend entry",
@@ -140,7 +178,8 @@
         "invalidJson": "Invalid request while creating the dividend entry.",
         "unauthorized": "Not authorized for this action.",
         "dbError": "Database error while creating the dividend entry.",
-        "network": "Network error. No response from server."
+        "network": "Network error. No response from server.",
+        "validationError": "Please correct the marked fields."
       }
     }
   },
@@ -148,6 +187,7 @@
     "common": {
       "currency": "Currency",
       "name": "Name",
+      "decimalPlaces": "Decimal places",
       "status": "Status",
       "cancel": "Cancel",
       "okTitle": "OK",
@@ -164,7 +204,8 @@
     },
     "validation": {
       "currencyInvalid": "Please enter exactly three letters for the currency.",
-      "nameRequired": "Please enter a name for the currency."
+      "nameRequired": "Please enter a name for the currency.",
+      "decimalPlacesInvalid": "Please enter an integer between 0 and 8."
     },
     "list": {
       "title": "Currencies",
@@ -175,6 +216,7 @@
           "id": "ID",
           "currency": "Currency",
           "name": "Name",
+          "decimalPlaces": "Decimal places",
           "status": "Status",
           "createdAt": "Created",
           "updatedAt": "Updated",

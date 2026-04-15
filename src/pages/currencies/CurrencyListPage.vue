@@ -85,6 +85,9 @@
                 <dt class="col-sm-4">{{ t("currencies.common.name") }}</dt>
                 <dd class="col-sm-8">{{ toBeDeleted.Name || "-" }}</dd>
 
+                <dt class="col-sm-4">{{ t("currencies.common.decimalPlaces") }}</dt>
+                <dd class="col-sm-8">{{ formatDecimalPlaces(toBeDeleted.DecimalPlaces) }}</dd>
+
                 <dt class="col-sm-4">{{ t("currencies.list.table.columns.id") }}</dt>
                 <dd class="col-sm-8">{{ toBeDeleted.ID }}</dd>
               </dl>
@@ -137,6 +140,7 @@ const headers = computed<GTableHeader[]>(() => [
   { title: t("currencies.list.table.columns.id"), field: "ID" },
   { title: t("currencies.list.table.columns.currency"), field: "Currency" },
   { title: t("currencies.list.table.columns.name"), field: "Name" },
+  { title: t("currencies.list.table.columns.decimalPlaces"), render: (item: Currency) => formatDecimalPlaces(item.DecimalPlaces) },
   { title: t("currencies.list.table.columns.status"), field: "Status" },
   { title: t("currencies.list.table.columns.createdAt"), render: (item: Currency) => formatDate(item.CreatedAt) },
   { title: t("currencies.list.table.columns.updatedAt"), render: (item: Currency) => formatDate(item.UpdatedAt) },
@@ -188,6 +192,10 @@ function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
   return new Date(milliseconds).toLocaleString(locale.value || "de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function formatDecimalPlaces(value: Currency["DecimalPlaces"]): string {
+  return typeof value === "number" && Number.isInteger(value) ? String(value) : "-";
 }
 
 function errorContent(errorCode: string) {

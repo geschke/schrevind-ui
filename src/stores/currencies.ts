@@ -3,6 +3,15 @@ import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
 import type { Currency, CreateCurrencyPayload, UpdateCurrencyPayload } from "@/types/currencies";
 
+function normalizeDecimalPlaces(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const normalized = Number(value);
+  return Number.isInteger(normalized) ? normalized : null;
+}
+
 function normalizeCurrency(item: unknown): Currency {
   const raw = (item ?? {}) as Record<string, unknown>;
 
@@ -11,6 +20,7 @@ function normalizeCurrency(item: unknown): Currency {
     ID: Number(raw.ID ?? 0),
     Currency: String(raw.Currency ?? ""),
     Name: String(raw.Name ?? ""),
+    DecimalPlaces: normalizeDecimalPlaces(raw.DecimalPlaces),
     Status: String(raw.Status ?? ""),
     CreatedAt: Number(raw.CreatedAt ?? 0),
     UpdatedAt: Number(raw.UpdatedAt ?? 0),
@@ -77,6 +87,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
+      ...(Number.isInteger(payload.DecimalPlaces) ? { DecimalPlaces: payload.DecimalPlaces } : {}),
     };
 
     return axios
@@ -92,6 +103,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
+      ...(Number.isInteger(payload.DecimalPlaces) ? { DecimalPlaces: payload.DecimalPlaces } : {}),
     };
 
     return axios

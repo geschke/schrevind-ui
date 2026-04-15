@@ -9,6 +9,18 @@ const axios = axiosInstance.create({
     //timeout: 10000, // Timeout in milliseconds
 });
 
+function normalizeFieldErrors(value: unknown): Record<string, string> {
+    if (!value || typeof value !== 'object') {
+        return {};
+    }
+
+    return Object.fromEntries(
+        Object.entries(value as Record<string, unknown>)
+            .filter(([field, code]) => field.trim() !== '' && typeof code === 'string' && code.trim() !== '')
+            .map(([field, code]) => [field, String(code)])
+    );
+}
+
 // Request Interceptor: Add auth token to each request if available
 /*axios.interceptors.request.use(
     config => {
@@ -30,9 +42,10 @@ axios.interceptors.response.use(
     response => response, // Pass through successful responses
     error => {
         let errorCode = 'UNKNOWN_ERROR';
+        const responseData = error.response?.data;
 
-        if (error.response && error.response.data?.message) {
-            errorCode = error.response.data.message;
+        if (error.response && responseData?.message) {
+            errorCode = responseData.message;
         } else if (error.request) {
             errorCode = 'NETWORK_ERROR';
         }
@@ -41,10 +54,14 @@ axios.interceptors.response.use(
             code?: string;
             status?: number;
             backendMessage?: string;
+            fieldErrors?: Record<string, string>;
+            backendData?: unknown;
         };
         appError.code = errorCode;
         appError.status = error.response?.status;
-        appError.backendMessage = error.response?.data?.message;
+        appError.backendMessage = responseData?.message;
+        appError.fieldErrors = normalizeFieldErrors(responseData?.fieldErrors);
+        appError.backendData = responseData;
 
         return Promise.reject(appError);
     }

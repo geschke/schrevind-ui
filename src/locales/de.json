@@ -92,6 +92,44 @@
       "referenceDataLoadFailed": "Depots, Wertpapiere, Währungen und Quellensteuerdaten konnten nicht geladen werden.",
       "unknown": "Es ist ein unbekannter Fehler aufgetreten."
     },
+    "backendErrors": {
+      "UNKNOWN_ERROR": "Es ist ein unbekannter Fehler aufgetreten.",
+      "DB_NOT_INITIALIZED": "Die Backend-Datenbank ist nicht initialisiert.",
+      "AUTH_NOT_CONFIGURED": "Die Authentifizierung ist serverseitig nicht korrekt konfiguriert.",
+      "UNAUTHORIZED": "Sie sind nicht eingeloggt oder Ihre Sitzung ist abgelaufen.",
+      "INVALID_JSON": "Die Anfrage konnte vom Server nicht verarbeitet werden.",
+      "DB_ERROR": "Beim Speichern ist ein Datenbankfehler aufgetreten.",
+      "FORBIDDEN_DEPOT": "Sie dürfen für dieses Depot keine Dividendeneinträge erstellen.",
+      "INVALID_DIVIDEND_ENTRY_ID": "Die Dividendeneintrag-ID ist ungültig.",
+      "DIVIDEND_ENTRY_NOT_FOUND": "Der Dividendeneintrag wurde nicht gefunden.",
+      "INVALID_DEPOT_ID": "Bitte wählen Sie ein gültiges Depot.",
+      "INVALID_SECURITY_ID": "Bitte wählen Sie ein gültiges Wertpapier.",
+      "MISSING_PAY_DATE": "Bitte geben Sie den Zahltag ein.",
+      "MISSING_EX_DATE": "Bitte geben Sie den Ex-Tag ein.",
+      "MISSING_SECURITY_NAME": "Das gewählte Wertpapier enthält keinen Namen. Bitte wählen Sie ein gültiges Wertpapier.",
+      "MISSING_SECURITY_ISIN": "Das gewählte Wertpapier enthält keine ISIN. Bitte wählen Sie ein gültiges Wertpapier.",
+      "MISSING_DIVIDEND_PER_UNIT_CURRENCY": "Bitte geben Sie die Währung je Einheit ein.",
+      "MISSING_GROSS_CURRENCY": "Bitte geben Sie die Brutto-Währung ein.",
+      "MISSING_PAYOUT_CURRENCY": "Bitte geben Sie die Auszahlungs-Währung ein.",
+      "ERR_DECIMAL_EMPTY": "Bitte geben Sie einen Betrag ein.",
+      "ERR_DECIMAL_WHITESPACE": "Die Zahl darf keine Leerzeichen enthalten.",
+      "ERR_DECIMAL_NEGATIVE": "Negative Werte sind nicht erlaubt.",
+      "ERR_DECIMAL_INVALID_CHARS": "Die Zahl enthält ungültige Zeichen.",
+      "ERR_DECIMAL_MISSING_DIGITS": "Die Eingabe muss mindestens eine Ziffer enthalten.",
+      "ERR_DECIMAL_INVALID_FORMAT": "Das Dezimalformat ist ungültig.",
+      "ERR_DECIMAL_INVALID_GROUPING": "Die Tausendergruppierung ist ungültig.",
+      "ERR_CURRENCY_REQUIRED": "Bitte geben Sie die zugehörige Währung ein.",
+      "ERR_CURRENCY_INVALID_FORMAT": "Bitte geben Sie einen Währungscode mit genau drei Großbuchstaben ein.",
+      "ERR_CURRENCY_UNKNOWN": "Diese Währung ist nicht in der Datenbank vorhanden.",
+      "ERR_FX_RATE_LABEL_REQUIRED": "Bitte geben Sie das Währungspaar zum Umrechnungskurs ein.",
+      "ERR_FX_RATE_LABEL_INVALID_FORMAT": "Bitte geben Sie das Währungspaar im Format AAA/BBB ein.",
+      "ERR_FX_RATE_LABEL_UNKNOWN_CURRENCY": "Eine Währung aus dem Währungspaar ist nicht in der Datenbank vorhanden.",
+      "ERR_FX_RATE_PAIR_MISMATCH": "Das Währungspaar passt nicht zur benötigten Umrechnung in die Depot-Basiswährung.",
+      "ERR_FX_RATE_ZERO": "Der Umrechnungskurs darf bei notwendiger Umrechnung nicht 0 sein.",
+      "ERR_DEPOT_NOT_FOUND": "Das angegebene Depot wurde nicht gefunden.",
+      "ERR_BASE_CURRENCY_MISSING": "Für das Depot ist keine Basiswährung hinterlegt.",
+      "ERR_CALCULATION_FAILED": "Ein Betrag konnte intern nicht verarbeitet werden."
+    },
     "list": {
       "title": "Dividendeneinträge",
       "addButton": "Dividendeneintrag hinzufügen",
@@ -140,7 +178,8 @@
         "invalidJson": "Ungültige Anfrage beim Anlegen des Dividendeneintrags.",
         "unauthorized": "Keine Berechtigung für diese Aktion.",
         "dbError": "Datenbankfehler beim Anlegen des Dividendeneintrags.",
-        "network": "Netzwerkfehler. Keine Verbindung zum Server."
+        "network": "Netzwerkfehler. Keine Verbindung zum Server.",
+        "validationError": "Bitte korrigieren Sie die markierten Felder."
       }
     }
   },
@@ -148,6 +187,7 @@
     "common": {
       "currency": "Währung",
       "name": "Name",
+      "decimalPlaces": "Nachkommastellen",
       "status": "Status",
       "cancel": "Abbrechen",
       "okTitle": "OK",
@@ -164,7 +204,8 @@
     },
     "validation": {
       "currencyInvalid": "Bitte geben Sie genau drei Buchstaben für die Währung an.",
-      "nameRequired": "Bitte geben Sie einen Namen für die Währung ein."
+      "nameRequired": "Bitte geben Sie einen Namen für die Währung ein.",
+      "decimalPlacesInvalid": "Bitte geben Sie eine ganze Zahl zwischen 0 und 8 ein."
     },
     "list": {
       "title": "Währungen",
@@ -175,6 +216,7 @@
           "id": "ID",
           "currency": "Währung",
           "name": "Name",
+          "decimalPlaces": "Nachkommastellen",
           "status": "Status",
           "createdAt": "Erstellt",
           "updatedAt": "Aktualisiert",

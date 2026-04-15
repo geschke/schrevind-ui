@@ -29,6 +29,24 @@
           </div>
         </div>
 
+        <div class="row mb-3">
+          <label for="decimalPlaces" class="col-sm-2 col-form-label">{{ t("currencies.common.decimalPlaces") }}</label>
+          <div class="col-sm-10 col-md-4 col-lg-3">
+            <input
+              type="number"
+              name="decimalPlaces"
+              v-model="decimalPlaces"
+              v-bind="decimalPlacesAttrs"
+              class="form-control"
+              id="decimalPlaces"
+              min="0"
+              max="8"
+              step="1"
+            />
+            <small class="text-danger" v-if="errors.decimalPlaces">{{ errors.decimalPlaces }}</small>
+          </div>
+        </div>
+
         <div class="form-row mt-3">
           <div class="form-group col-md-8 offset-2">
             <button type="button" @click="$router.go(-1)" class="btn btn-secondary">{{ t("currencies.common.cancel") }}</button>
@@ -73,6 +91,16 @@ const validationSchema = yup.object().shape({
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("currencies.validation.nameRequired")),
+  decimalPlaces: yup
+    .string()
+    .transform((value) => value?.trim() ?? "")
+    .test("decimal-places", () => t("currencies.validation.decimalPlacesInvalid"), (value) => {
+      if (value === "" || value === undefined) return true;
+      if (!/^\d+$/.test(value)) return false;
+
+      const numericValue = Number(value);
+      return Number.isInteger(numericValue) && numericValue >= 0 && numericValue <= 8;
+    }),
 });
 
 const saveState = ref<SaveState>("idle");
@@ -87,6 +115,7 @@ const { defineField, errors, handleSubmit } = useForm({
 
 const [currency, currencyAttrs] = defineField("currency");
 const [name, nameAttrs] = defineField("name");
+const [decimalPlaces, decimalPlacesAttrs] = defineField("decimalPlaces");
 
 watch(currency, (nextValue) => {
   const rawValue = typeof nextValue === "string" ? nextValue : "";
@@ -110,6 +139,9 @@ function errorContent(code: string) {
       return t("currencies.errors.currencyNotFound");
     case "MISSING_NAME":
       return t("currencies.validation.nameRequired");
+    case "INVALID_CURRENCY_PLACES":
+    case "INVALID_DECIMAL_PLACES":
+      return t("currencies.validation.decimalPlacesInvalid");
     case "CURRENCY_ALREADY_IN_USE":
       return t("currencies.errors.currencyAlreadyInUse");
     case "INVALID_JSON":
@@ -127,6 +159,11 @@ function errorContent(code: string) {
   }
 }
 
+function parseOptionalDecimalPlaces(value: unknown): number | undefined {
+  const normalized = typeof value === "number" ? String(value) : typeof value === "string" ? value.trim() : "";
+  return normalized === "" ? undefined : Number(normalized);
+}
+
 const onSubmit = handleSubmit((values) => {
   saveState.value = "saving";
   messageError.value = "";
@@ -135,6 +172,7 @@ const onSubmit = handleSubmit((values) => {
     .addCurrency({
       Currency: values.currency,
       Name: values.name,
+      DecimalPlaces: parseOptionalDecimalPlaces(values.decimalPlaces),
       Status: "active",
     })
     .then(() => {
