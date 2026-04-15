@@ -160,12 +160,29 @@
           "quantity": "Stückzahl",
           "grossAmount": "Brutto",
           "payoutAmount": "Auszahlung",
-          "createdAt": "Erstellt"
+          "createdAt": "Erstellt",
+          "actions": "Aktionen"
         }
+      },
+      "actions": {
+        "edit": "Dividendeneintrag bearbeiten",
+        "delete": "Dividendeneintrag löschen"
+      },
+      "modal": {
+        "title": "Dividendeneintrag löschen?",
+        "body": "Soll dieser Dividendeneintrag wirklich gelöscht werden?",
+        "confirm": "Löschen",
+        "warning": "Der Dividendeneintrag wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "toasts": {
+        "deletedTitle": "Dividendeneintrag gelöscht",
+        "deletedContent": "Der Dividendeneintrag wurde aus der Datenbank gelöscht."
       },
       "errors": {
         "loadFailed": "Fehler beim Laden der Dividendeneinträge.",
-        "unauthorized": "Keine Berechtigung für diese Aktion."
+        "unauthorized": "Keine Berechtigung für diese Aktion.",
+        "dividendEntryNotFoundDelete": "Dividendeneintrag wurde nicht gefunden (evtl. bereits gelöscht).",
+        "forbiddenDepot": "Keine Berechtigung für das Depot dieses Dividendeneintrags."
       }
     },
     "add": {
@@ -180,6 +197,16 @@
         "dbError": "Datenbankfehler beim Anlegen des Dividendeneintrags.",
         "network": "Netzwerkfehler. Keine Verbindung zum Server.",
         "validationError": "Bitte korrigieren Sie die markierten Felder."
+      }
+    },
+    "edit": {
+      "title": "Dividendeneintrag bearbeiten",
+      "submit": "Speichern",
+      "alerts": {
+        "saved": "Änderungen wurden gespeichert."
+      },
+      "errors": {
+        "loadFailed": "Der Dividendeneintrag konnte nicht geladen werden."
       }
     }
   },

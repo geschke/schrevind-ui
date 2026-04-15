@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import axios from "@/helper/axiosInstance";
 import { useUserAuthStore } from "@/stores/userauth";
 import { computed, ref } from "vue";
-import type { CreateDividendEntryPayload, DividendEntry } from "@/types/dividendEntries";
+import type { CreateDividendEntryPayload, DividendEntry, UpdateDividendEntryPayload } from "@/types/dividendEntries";
 
 type DividendEntriesSortField = "PayDate" | "ExDate" | "SecurityName";
 type DividendEntriesSortDirection = "asc" | "desc" | "none";
@@ -105,6 +105,40 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     };
   }
 
+  function buildDividendEntryRequestBody(payload: CreateDividendEntryPayload, userId: number) {
+    return {
+      UserID: userId,
+      DepotID: payload.DepotID,
+      SecurityID: payload.SecurityID,
+      PayDate: payload.PayDate,
+      ExDate: payload.ExDate,
+      SecurityName: payload.SecurityName,
+      SecurityISIN: payload.SecurityISIN,
+      SecurityWKN: payload.SecurityWKN,
+      SecuritySymbol: payload.SecuritySymbol,
+      Quantity: payload.Quantity,
+      DividendPerUnitAmount: payload.DividendPerUnitAmount,
+      DividendPerUnitCurrency: payload.DividendPerUnitCurrency,
+      FXRateLabel: payload.FXRateLabel,
+      FXRate: payload.FXRate,
+      GrossAmount: payload.GrossAmount,
+      GrossCurrency: payload.GrossCurrency,
+      PayoutAmount: payload.PayoutAmount,
+      PayoutCurrency: payload.PayoutCurrency,
+      WithholdingTaxCountryCode: payload.WithholdingTaxCountryCode,
+      WithholdingTaxPercent: payload.WithholdingTaxPercent,
+      WithholdingTaxAmount: payload.WithholdingTaxAmount,
+      WithholdingTaxCurrency: payload.WithholdingTaxCurrency,
+      WithholdingTaxAmountCredit: payload.WithholdingTaxAmountCredit,
+      WithholdingTaxAmountCreditCurrency: payload.WithholdingTaxAmountCreditCurrency,
+      WithholdingTaxAmountRefundable: payload.WithholdingTaxAmountRefundable,
+      WithholdingTaxAmountRefundableCurrency: payload.WithholdingTaxAmountRefundableCurrency,
+      ForeignFeesAmount: payload.ForeignFeesAmount,
+      ForeignFeesCurrency: payload.ForeignFeesCurrency,
+      Note: payload.Note,
+    };
+  }
+
   async function fetchDividendEntriesByUser(params?: DividendEntriesQueryParams) {
     const currentUserId = getCurrentUserIdOrThrow();
 
@@ -176,43 +210,60 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       });
   }
 
+  async function fetchDividendEntryById(id: number | string): Promise<DividendEntry> {
+    return axios
+      .get(`/dividend-entries/${id}`, { withCredentials: true })
+      .then((response) => {
+        const rawItem = response.data?.item ?? response.data?.dividendEntry ?? response.data;
+        const item = normalizeDividendEntry(rawItem);
+
+        const existingIndex = dividendEntries.value.findIndex((entry) => entry.ID === item.ID);
+        if (existingIndex >= 0) {
+          dividendEntries.value.splice(existingIndex, 1, item);
+        } else {
+          dividendEntries.value.push(item);
+        }
+
+        return item;
+      })
+      .catch((error: unknown) => {
+        throw error;
+      });
+  }
+
   async function addDividendEntry(payload: CreateDividendEntryPayload) {
     const currentUserId = getCurrentUserIdOrThrow();
-    const dividendEntryDO = {
-      UserID: currentUserId,
-      DepotID: payload.DepotID,
-      SecurityID: payload.SecurityID,
-      PayDate: payload.PayDate,
-      ExDate: payload.ExDate,
-      SecurityName: payload.SecurityName,
-      SecurityISIN: payload.SecurityISIN,
-      SecurityWKN: payload.SecurityWKN,
-      SecuritySymbol: payload.SecuritySymbol,
-      Quantity: payload.Quantity,
-      DividendPerUnitAmount: payload.DividendPerUnitAmount,
-      DividendPerUnitCurrency: payload.DividendPerUnitCurrency,
-      FXRateLabel: payload.FXRateLabel,
-      FXRate: payload.FXRate,
-      GrossAmount: payload.GrossAmount,
-      GrossCurrency: payload.GrossCurrency,
-      PayoutAmount: payload.PayoutAmount,
-      PayoutCurrency: payload.PayoutCurrency,
-      WithholdingTaxCountryCode: payload.WithholdingTaxCountryCode,
-      WithholdingTaxPercent: payload.WithholdingTaxPercent,
-      WithholdingTaxAmount: payload.WithholdingTaxAmount,
-      WithholdingTaxCurrency: payload.WithholdingTaxCurrency,
-      WithholdingTaxAmountCredit: payload.WithholdingTaxAmountCredit,
-      WithholdingTaxAmountCreditCurrency: payload.WithholdingTaxAmountCreditCurrency,
-      WithholdingTaxAmountRefundable: payload.WithholdingTaxAmountRefundable,
-      WithholdingTaxAmountRefundableCurrency: payload.WithholdingTaxAmountRefundableCurrency,
-      ForeignFeesAmount: payload.ForeignFeesAmount,
-      ForeignFeesCurrency: payload.ForeignFeesCurrency,
-      Note: payload.Note,
-    };
+    const dividendEntryDO = buildDividendEntryRequestBody(payload, currentUserId);
 
     return axios.post("/dividend-entries/add", dividendEntryDO, { withCredentials: true }).catch((error: unknown) => {
       throw error;
     });
+  }
+
+  async function updateDividendEntry(payload: UpdateDividendEntryPayload) {
+    const currentUserId = getCurrentUserIdOrThrow();
+    const dividendEntryDO = buildDividendEntryRequestBody(payload, currentUserId);
+
+    return axios
+      .post(`/dividend-entries/update/${payload.ID}`, dividendEntryDO, { withCredentials: true })
+      .then(() => fetchDividendEntryById(payload.ID))
+      .catch((error: unknown) => {
+        throw error;
+      });
+  }
+
+  async function deleteDividendEntry(payload: Pick<DividendEntry, "ID">) {
+    return axios
+      .post(`/dividend-entries/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .then(() => {
+        const existingIndex = dividendEntries.value.findIndex((item) => item.ID === payload.ID);
+        if (existingIndex >= 0) {
+          dividendEntries.value.splice(existingIndex, 1);
+        }
+      })
+      .catch((error: unknown) => {
+        throw error;
+      });
   }
 
   return {
@@ -223,6 +274,9 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     fetchDividendEntriesByUser,
     fetchDividendEntriesByDepot,
     fetchDividendEntriesBySecurity,
+    fetchDividendEntryById,
     addDividendEntry,
+    updateDividendEntry,
+    deleteDividendEntry,
   };
 });

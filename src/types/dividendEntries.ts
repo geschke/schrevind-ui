@@ -66,3 +66,7 @@ export type CreateDividendEntryPayload = {
   ForeignFeesCurrency: string;
   Note: string;
 };
+
+export type UpdateDividendEntryPayload = CreateDividendEntryPayload & {
+  ID: number;
+};

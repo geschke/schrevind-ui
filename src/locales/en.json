@@ -160,12 +160,29 @@
           "quantity": "Quantity",
           "grossAmount": "Gross",
           "payoutAmount": "Payout",
-          "createdAt": "Created"
+          "createdAt": "Created",
+          "actions": "Actions"
         }
+      },
+      "actions": {
+        "edit": "Edit dividend entry",
+        "delete": "Delete dividend entry"
+      },
+      "modal": {
+        "title": "Delete dividend entry?",
+        "body": "Do you really want to delete this dividend entry?",
+        "confirm": "Delete",
+        "warning": "The dividend entry will be permanently deleted. This action cannot be undone."
+      },
+      "toasts": {
+        "deletedTitle": "Dividend entry deleted",
+        "deletedContent": "The dividend entry was removed from the database."
       },
       "errors": {
         "loadFailed": "Failed to load dividend entries.",
-        "unauthorized": "Not authorized for this action."
+        "unauthorized": "Not authorized for this action.",
+        "dividendEntryNotFoundDelete": "Dividend entry was not found (possibly already deleted).",
+        "forbiddenDepot": "Not authorized for the depot of this dividend entry."
       }
     },
     "add": {
@@ -180,6 +197,16 @@
         "dbError": "Database error while creating the dividend entry.",
         "network": "Network error. No response from server.",
         "validationError": "Please correct the marked fields."
+      }
+    },
+    "edit": {
+      "title": "Edit dividend entry",
+      "submit": "Save",
+      "alerts": {
+        "saved": "Changes were saved."
+      },
+      "errors": {
+        "loadFailed": "The dividend entry could not be loaded."
       }
     }
   },

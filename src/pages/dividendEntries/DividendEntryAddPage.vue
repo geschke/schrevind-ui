@@ -3,12 +3,12 @@
     <template #default>
       <div class="row">
         <div class="col">
-          <h2>{{ t("dividendEntries.add.title") }}</h2>
+          <h2>{{ pageTitle }}</h2>
         </div>
       </div>
 
       <div v-if="saveState === 'success'" class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ t("dividendEntries.add.alerts.saved") }}
+        {{ successMessage }}
         <button type="button" class="btn-close" aria-label="Close" @click="dismissSuccessMessage"></button>
       </div>
 
@@ -452,10 +452,10 @@
               {{ t("dividendEntries.common.cancel") }}
             </button>
 
-            <button class="btn btn-primary ms-2" :disabled="saveDisabled">
-              <span v-if="saveState !== 'saving'">{{ t("dividendEntries.add.submit") }}</span>
-              <span v-else class="spinner-border spinner-border-sm"></span>
-            </button>
+              <button class="btn btn-primary ms-2" :disabled="saveDisabled">
+                <span v-if="saveState !== 'saving'">{{ submitLabel }}</span>
+                <span v-else class="spinner-border spinner-border-sm"></span>
+              </button>
           </div>
         </div>
       </form>
@@ -524,11 +524,13 @@ import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import { useWithholdingTaxDefaultsStore } from "@/stores/withholdingTaxDefaults";
+import type { DividendEntry } from "@/types/dividendEntries";
 import type { Security } from "@/types/securities";
 
 type SaveState = "idle" | "saving" | "success" | "error";
 
 const { t } = useI18n();
+const props = defineProps<{ id?: string }>();
 const storeCurrencies = useCurrenciesStore();
 const storeDepots = useDepotsStore();
 const storeSecurities = useSecuritiesStore();
@@ -560,6 +562,14 @@ const newWithholdingTaxCountryCode = ref("");
 const newWithholdingTaxCountryName = ref("");
 const newWithholdingTaxPercentDefault = ref("");
 const withholdingTaxCreateCountryCodeRef = ref<HTMLInputElement | null>(null);
+const editingDividendEntry = ref<DividendEntry | null>(null);
+const isEditMode = computed(() => String(props.id ?? "").trim() !== "");
+const editEntryId = computed(() => Number(props.id ?? 0));
+const pageTitle = computed(() => (isEditMode.value ? t("dividendEntries.edit.title") : t("dividendEntries.add.title")));
+const submitLabel = computed(() => (isEditMode.value ? t("dividendEntries.edit.submit") : t("dividendEntries.add.submit")));
+const successMessage = computed(() =>
+  isEditMode.value ? t("dividendEntries.edit.alerts.saved") : t("dividendEntries.add.alerts.saved")
+);
 
 const initialValues = {
   depotId: "",
@@ -1434,6 +1444,117 @@ function errorContent(code: string) {
   }
 }
 
+function formatStoredSecurityLabel(entry: DividendEntry): string {
+  const selectedSecurity = storeSecurities.getItem(entry.SecurityID);
+
+  if (selectedSecurity) {
+    return formatSecurityLabel(selectedSecurity);
+  }
+
+  const parts = [entry.SecurityName, entry.SecurityISIN].filter((value) => String(value ?? "").trim() !== "");
+  return parts.length > 0 ? parts.join(" | ") : "";
+}
+
+function buildFormValuesFromDividendEntry(entry: DividendEntry) {
+  return {
+    ...initialValues,
+    depotId: String(entry.DepotID || ""),
+    securityId: String(entry.SecurityID || ""),
+    payDate: entry.PayDate,
+    exDate: entry.ExDate,
+    quantity: entry.Quantity,
+    dividendPerUnitAmount: entry.DividendPerUnitAmount,
+    dividendPerUnitCurrency: entry.DividendPerUnitCurrency,
+    grossAmount: entry.GrossAmount,
+    grossCurrency: entry.GrossCurrency,
+    payoutAmount: entry.PayoutAmount,
+    payoutCurrency: entry.PayoutCurrency,
+    fxRateLabel: entry.FXRateLabel,
+    fxRate: entry.FXRate || "1",
+    withholdingTaxCountryCode: entry.WithholdingTaxCountryCode,
+    withholdingTaxPercent: entry.WithholdingTaxPercent,
+    withholdingTaxAmount: entry.WithholdingTaxAmount,
+    withholdingTaxCurrency: entry.WithholdingTaxCurrency,
+    withholdingTaxAmountCredit: entry.WithholdingTaxAmountCredit,
+    withholdingTaxAmountCreditCurrency: entry.WithholdingTaxAmountCreditCurrency,
+    withholdingTaxAmountRefundable: entry.WithholdingTaxAmountRefundable,
+    withholdingTaxAmountRefundableCurrency: entry.WithholdingTaxAmountRefundableCurrency,
+    foreignFeesAmount: entry.ForeignFeesAmount,
+    foreignFeesCurrency: entry.ForeignFeesCurrency,
+    note: entry.Note,
+    securityName: entry.SecurityName,
+    securityISIN: entry.SecurityISIN,
+    securityWKN: entry.SecurityWKN,
+    securitySymbol: entry.SecuritySymbol,
+  };
+}
+
+function fillFormElements(entry: DividendEntry) {
+  editingDividendEntry.value = entry;
+  resetForm({ values: buildFormValuesFromDividendEntry(entry) });
+  securitySearchQuery.value = formatStoredSecurityLabel(entry);
+  isSecurityPickerOpen.value = false;
+  isSecurityFilterActive.value = false;
+  withholdingCountrySearchQuery.value = normalizeCountryCode(entry.WithholdingTaxCountryCode);
+  autoFxRateLabel.value = entry.FXRateLabel;
+  fxRateLabelManuallyChanged.value = entry.FXRateLabel !== "";
+}
+
+async function loadDividendEntryForEdit() {
+  if (!Number.isInteger(editEntryId.value) || editEntryId.value <= 0) {
+    referenceDataError.value = t("dividendEntries.edit.errors.loadFailed");
+    return;
+  }
+
+  try {
+    const existingEntry = storeDividendEntries.getItem(editEntryId.value);
+    const entry = existingEntry ?? (await storeDividendEntries.fetchDividendEntryById(editEntryId.value));
+    fillFormElements(entry);
+  } catch (requestError: unknown) {
+    referenceDataError.value = errorContent(getErrorCode(requestError));
+    toast.value?.addToast(<GToastContent>{
+      ...GToastDanger,
+      title: t("dividendEntries.common.errorTitle"),
+      content: referenceDataError.value,
+    });
+  }
+}
+
+function buildSubmitPayload(values: typeof initialValues) {
+  const selectedSecurity = storeSecurities.getItem(values.securityId ?? "");
+
+  return {
+    DepotID: normalizeIdentifier(values.depotId),
+    SecurityID: normalizeIdentifier(values.securityId),
+    PayDate: values.payDate,
+    ExDate: values.exDate,
+    SecurityName: normalizeOptionalString(selectedSecurity?.Name ?? values.securityName),
+    SecurityISIN: normalizeOptionalString(selectedSecurity?.ISIN ?? values.securityISIN),
+    SecurityWKN: normalizeOptionalString(selectedSecurity?.WKN ?? values.securityWKN),
+    SecuritySymbol: normalizeOptionalString(selectedSecurity?.Symbol ?? values.securitySymbol),
+    Quantity: values.quantity,
+    DividendPerUnitAmount: values.dividendPerUnitAmount,
+    DividendPerUnitCurrency: normalizeCurrencyCode(values.dividendPerUnitCurrency),
+    FXRateLabel: normalizeOptionalString(values.fxRateLabel),
+    FXRate: normalizeOptionalString(values.fxRate, "1"),
+    GrossAmount: values.grossAmount,
+    GrossCurrency: normalizeCurrencyCode(values.grossCurrency),
+    PayoutAmount: values.payoutAmount,
+    PayoutCurrency: normalizeCurrencyCode(values.payoutCurrency),
+    WithholdingTaxCountryCode: normalizeOptionalString(values.withholdingTaxCountryCode),
+    WithholdingTaxPercent: normalizeOptionalString(values.withholdingTaxPercent),
+    WithholdingTaxAmount: normalizeOptionalString(values.withholdingTaxAmount),
+    WithholdingTaxCurrency: normalizeCurrencyCode(values.withholdingTaxCurrency),
+    WithholdingTaxAmountCredit: normalizeOptionalString(values.withholdingTaxAmountCredit),
+    WithholdingTaxAmountCreditCurrency: normalizeCurrencyCode(values.withholdingTaxAmountCreditCurrency),
+    WithholdingTaxAmountRefundable: normalizeOptionalString(values.withholdingTaxAmountRefundable),
+    WithholdingTaxAmountRefundableCurrency: normalizeCurrencyCode(values.withholdingTaxAmountRefundableCurrency),
+    ForeignFeesAmount: normalizeOptionalString(values.foreignFeesAmount),
+    ForeignFeesCurrency: normalizeCurrencyCode(values.foreignFeesCurrency),
+    Note: normalizeOptionalString(values.note),
+  };
+}
+
 watch(securityId, (nextSecurityId) => {
   applySecuritySnapshot(nextSecurityId);
   if (String(nextSecurityId ?? "") === "") {
@@ -1492,6 +1613,11 @@ onMounted(() => {
     storeCurrencies.fetchCurrencies(),
     storeWithholdingTaxDefaults.fetchWithholdingTaxDefaults(),
   ])
+    .then(async () => {
+      if (isEditMode.value) {
+        await loadDividendEntryForEdit();
+      }
+    })
     .catch(() => {
       referenceDataError.value = t("dividendEntries.errors.referenceDataLoadFailed");
       toast.value?.addToast(<GToastContent>{
@@ -1513,52 +1639,39 @@ const onSubmit = handleSubmit((values) => {
   saveState.value = "saving";
   messageError.value = "";
   clearBackendFieldErrors();
-  const selectedSecurity = storeSecurities.getItem(values.securityId ?? "");
+  const payload = buildSubmitPayload(values);
 
-  storeDividendEntries
-    .addDividendEntry({
-      DepotID: normalizeIdentifier(values.depotId),
-      SecurityID: normalizeIdentifier(values.securityId),
-      PayDate: values.payDate,
-      ExDate: values.exDate,
-      SecurityName: normalizeOptionalString(selectedSecurity?.Name ?? values.securityName),
-      SecurityISIN: normalizeOptionalString(selectedSecurity?.ISIN ?? values.securityISIN),
-      SecurityWKN: normalizeOptionalString(selectedSecurity?.WKN ?? values.securityWKN),
-      SecuritySymbol: normalizeOptionalString(selectedSecurity?.Symbol ?? values.securitySymbol),
-      Quantity: values.quantity,
-      DividendPerUnitAmount: values.dividendPerUnitAmount,
-      DividendPerUnitCurrency: normalizeCurrencyCode(values.dividendPerUnitCurrency),
-      FXRateLabel: normalizeOptionalString(values.fxRateLabel),
-      FXRate: normalizeOptionalString(values.fxRate, "1"),
-      GrossAmount: values.grossAmount,
-      GrossCurrency: normalizeCurrencyCode(values.grossCurrency),
-      PayoutAmount: values.payoutAmount,
-      PayoutCurrency: normalizeCurrencyCode(values.payoutCurrency),
-      WithholdingTaxCountryCode: normalizeOptionalString(values.withholdingTaxCountryCode),
-      WithholdingTaxPercent: normalizeOptionalString(values.withholdingTaxPercent),
-      WithholdingTaxAmount: normalizeOptionalString(values.withholdingTaxAmount),
-      WithholdingTaxCurrency: normalizeCurrencyCode(values.withholdingTaxCurrency),
-      WithholdingTaxAmountCredit: normalizeOptionalString(values.withholdingTaxAmountCredit),
-      WithholdingTaxAmountCreditCurrency: normalizeCurrencyCode(values.withholdingTaxAmountCreditCurrency),
-      WithholdingTaxAmountRefundable: normalizeOptionalString(values.withholdingTaxAmountRefundable),
-      WithholdingTaxAmountRefundableCurrency: normalizeCurrencyCode(values.withholdingTaxAmountRefundableCurrency),
-      ForeignFeesAmount: normalizeOptionalString(values.foreignFeesAmount),
-      ForeignFeesCurrency: normalizeCurrencyCode(values.foreignFeesCurrency),
-      Note: normalizeOptionalString(values.note),
-    })
-    .then(() => {
+  if (isEditMode.value && (!Number.isInteger(editEntryId.value) || editEntryId.value <= 0)) {
+    saveState.value = "error";
+    messageError.value = t("dividendEntries.edit.errors.loadFailed");
+    return;
+  }
+
+  const saveRequest = isEditMode.value
+    ? storeDividendEntries.updateDividendEntry({
+        ID: editEntryId.value,
+        ...payload,
+      })
+    : storeDividendEntries.addDividendEntry(payload);
+
+  saveRequest
+    .then((updatedEntry) => {
       saveState.value = "success";
-      resetForm({ values: { ...initialValues } });
-      autoCurrencySeed.value = "";
-      autoFxRateLabel.value = "";
-      fxRateLabelManuallyChanged.value = false;
-      securitySearchQuery.value = "";
-      isSecurityPickerOpen.value = false;
-      isSecurityFilterActive.value = false;
+      if (isEditMode.value && updatedEntry) {
+        fillFormElements(updatedEntry);
+      } else {
+        resetForm({ values: { ...initialValues } });
+        autoCurrencySeed.value = "";
+        autoFxRateLabel.value = "";
+        fxRateLabelManuallyChanged.value = false;
+        securitySearchQuery.value = "";
+        isSecurityPickerOpen.value = false;
+        isSecurityFilterActive.value = false;
+      }
       toast.value?.addToast(<GToastContent>{
         ...GToastSuccess,
         title: t("dividendEntries.common.okTitle"),
-        content: t("dividendEntries.add.alerts.saved"),
+        content: successMessage.value,
       });
       })
       .catch((requestError: unknown) => {

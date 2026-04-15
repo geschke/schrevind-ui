@@ -77,6 +77,27 @@
             </div>
           </div>
         </template>
+
+        <template #tmplDividendEntryActions="data">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Dividend entry actions">
+            <router-link
+              type="button"
+              class="btn btn-outline-primary"
+              :to="{ name: 'dividendentryedit', params: { id: data.value.ID } }"
+              :aria-label="t('dividendEntries.list.actions.edit')"
+            >
+              <i class="bi bi-pencil"></i>
+            </router-link>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              @click="deleteItem(data.value)"
+              :aria-label="t('dividendEntries.list.actions.delete')"
+            >
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+        </template>
       </GTable>
 
       <div class="row">
@@ -84,6 +105,53 @@
           <router-link type="button" class="btn btn-primary" :to="{ name: 'dividendentrynew' }">
             {{ t("dividendEntries.list.addButton") }}
           </router-link>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modalDividendEntryDelete" tabindex="-1" aria-labelledby="modalDividendEntryDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="modalDividendEntryDeleteLabel">{{ t("dividendEntries.list.modal.title") }}</h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                :aria-label="t('dividendEntries.common.cancel')"
+                @click="closeDelete"
+              />
+            </div>
+            <div v-if="toBeDeleted" class="modal-body">
+              <p class="mb-3">{{ t("dividendEntries.list.modal.body") }}</p>
+
+              <dl class="row mb-0">
+                <dt class="col-sm-4">{{ t("dividendEntries.list.table.columns.id") }}</dt>
+                <dd class="col-sm-8">{{ toBeDeleted.ID }}</dd>
+
+                <dt class="col-sm-4">{{ t("dividendEntries.common.payDate") }}</dt>
+                <dd class="col-sm-8">{{ formatDateValue(toBeDeleted.PayDate) }}</dd>
+
+                <dt class="col-sm-4">{{ t("dividendEntries.common.depotId") }}</dt>
+                <dd class="col-sm-8">{{ getDepotName(toBeDeleted.DepotID) }}</dd>
+
+                <dt class="col-sm-4">{{ t("dividendEntries.common.securityId") }}</dt>
+                <dd class="col-sm-8">{{ formatSecurityLabel(toBeDeleted) }}</dd>
+              </dl>
+
+              <p class="text-danger small mt-3 mb-0">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                {{ t("dividendEntries.list.modal.warning") }}
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDelete">
+                {{ t("dividendEntries.common.cancel") }}
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteItemConfirm">
+                {{ t("dividendEntries.list.modal.confirm") }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -100,7 +168,8 @@ import { getErrorCode } from "@/helper/errorCode";
 import type { DividendEntry } from "@/types/dividendEntries";
 import { GTable } from "goar-components";
 import type { GTableHeader, GToastContent } from "goar-components";
-import { GToast, GToastDanger } from "goar-components";
+import { GToast, GToastDanger, GToastSuccess, GToastWarning } from "goar-components";
+import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -126,6 +195,9 @@ const storeDepots = useDepotsStore();
 const toast: any = ref(null);
 const dividendEntriesTable: any = ref(null);
 const loading = ref(false);
+const toBeDeleted = ref<DividendEntry | null>(null);
+const currentOffset = ref(0);
+const currentLimit = ref(itemsPerPage);
 const currentSortField = ref<SortField>("PayDate");
 const currentSortDirection = ref<SortDirection>("none");
 
@@ -143,6 +215,7 @@ const headers = computed<GTableHeader[]>(() => [
     title: t("dividendEntries.list.table.columns.createdAt"),
     render: (item: DividendEntry) => formatTimestamp(item.CreatedAt),
   },
+  { title: t("dividendEntries.list.table.columns.actions"), field: "tmplDividendEntryActions" },
 ]);
 
 const dividendEntries = computed(() => storeDividendEntries.getDividendEntries);
@@ -163,6 +236,8 @@ onMounted(() => {
 
 async function loadPage(offset: number, limit: number) {
   loading.value = true;
+  currentOffset.value = offset;
+  currentLimit.value = limit;
   collapseExpandedRows();
 
   try {
@@ -215,6 +290,55 @@ function errorContent(errorCode: string) {
     default:
       return t("dividendEntries.errors.unknown");
   }
+}
+
+function deleteErrorContent(errorCode: string) {
+  switch (errorCode) {
+    case "INVALID_DIVIDEND_ENTRY_ID":
+    case "DIVIDEND_ENTRY_NOT_FOUND":
+      return t("dividendEntries.list.errors.dividendEntryNotFoundDelete");
+    case "FORBIDDEN_DEPOT":
+      return t("dividendEntries.list.errors.forbiddenDepot");
+    default:
+      return errorContent(errorCode);
+  }
+}
+
+function deleteItem(item: DividendEntry) {
+  const deleteModal = new Modal("#modalDividendEntryDelete", {});
+  toBeDeleted.value = item;
+  deleteModal.show();
+}
+
+function closeDelete() {
+  toBeDeleted.value = null;
+}
+
+function deleteItemConfirm() {
+  if (toBeDeleted.value) {
+    deleteDividendEntry(toBeDeleted.value);
+  }
+}
+
+function deleteDividendEntry(item: DividendEntry) {
+  storeDividendEntries
+    .deleteDividendEntry(item)
+    .then(() => {
+      closeDelete();
+      toast.value?.addToast(<GToastContent>{
+        ...GToastSuccess,
+        title: t("dividendEntries.list.toasts.deletedTitle"),
+        content: t("dividendEntries.list.toasts.deletedContent"),
+      });
+      void loadPage(currentOffset.value, currentLimit.value);
+    })
+    .catch((requestError: unknown) => {
+      toast.value?.addToast(<GToastContent>{
+        ...GToastWarning,
+        title: t("dividendEntries.common.errorTitle"),
+        content: deleteErrorContent(getErrorCode(requestError)),
+      });
+    });
 }
 
 function getDepotName(depotId: number): string {

@@ -169,6 +169,16 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/dividend-entries/edit/:id",
+    name: "dividendentryedit",
+    props: true,
+    component: () => import("@/pages/dividendEntries/DividendEntryAddPage.vue"),
+    meta: {
+      menuPath: "/dividend-entries",
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/admin",
     component: () => import("@/pages/admin/OverviewPage.vue"),
     meta: {
