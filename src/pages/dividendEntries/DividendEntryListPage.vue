@@ -187,8 +187,16 @@ type DetailSection = {
 
 const { t, locale } = useI18n();
 const itemsPerPage = 20;
+const LIST_STATE_SESSION_KEY = "schrevind.dividendEntries.listState";
 type SortField = "PayDate" | "ExDate" | "SecurityName";
 type SortDirection = "asc" | "desc" | "none";
+
+type ListState = {
+  offset: number;
+  limit: number;
+  sortField: SortField;
+  sortDirection: SortDirection;
+};
 
 const storeDividendEntries = useDividendEntriesStore();
 const storeDepots = useDepotsStore();
@@ -225,7 +233,10 @@ const depotNames = computed<Record<number, string>>(() =>
 );
 
 onMounted(() => {
-  void loadPage(0, itemsPerPage);
+  const savedState = loadListState();
+  currentSortField.value = savedState.sortField;
+  currentSortDirection.value = savedState.sortDirection;
+  void loadPage(savedState.offset, savedState.limit);
 
   if (!storeDepots.depotsLoaded) {
     void storeDepots.fetchDepots().catch(() => {
@@ -234,10 +245,62 @@ onMounted(() => {
   }
 });
 
+function loadListState(): ListState {
+  try {
+    const rawState = sessionStorage.getItem(LIST_STATE_SESSION_KEY);
+    if (!rawState) return defaultListState();
+
+    const parsedState = JSON.parse(rawState) as Partial<ListState>;
+    const offset = Number(parsedState.offset ?? 0);
+    const limit = Number(parsedState.limit ?? itemsPerPage);
+    const sortField = isSupportedSortField(String(parsedState.sortField ?? ""))
+      ? parsedState.sortField
+      : "PayDate";
+    const sortDirection = isSupportedSortDirection(String(parsedState.sortDirection ?? ""))
+      ? parsedState.sortDirection
+      : "none";
+
+    return {
+      offset: Number.isInteger(offset) && offset >= 0 ? offset : 0,
+      limit: Number.isInteger(limit) && limit > 0 ? limit : itemsPerPage,
+      sortField,
+      sortDirection,
+    };
+  } catch {
+    return defaultListState();
+  }
+}
+
+function defaultListState(): ListState {
+  return {
+    offset: 0,
+    limit: itemsPerPage,
+    sortField: "PayDate",
+    sortDirection: "none",
+  };
+}
+
+function saveListState() {
+  try {
+    sessionStorage.setItem(
+      LIST_STATE_SESSION_KEY,
+      JSON.stringify({
+        offset: currentOffset.value,
+        limit: currentLimit.value,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value,
+      } satisfies ListState)
+    );
+  } catch {
+    // Restoring the list position is optional; ignore unavailable storage.
+  }
+}
+
 async function loadPage(offset: number, limit: number) {
   loading.value = true;
   currentOffset.value = offset;
   currentLimit.value = limit;
+  saveListState();
   collapseExpandedRows();
 
   try {
@@ -278,6 +341,9 @@ function onSortChange({ field, direction }: { field: string; direction: SortDire
   collapseExpandedRows();
   currentSortField.value = field;
   currentSortDirection.value = direction;
+  currentOffset.value = 0;
+  currentLimit.value = itemsPerPage;
+  saveListState();
   void loadPage(0, itemsPerPage);
 }
 
@@ -472,6 +538,10 @@ function buildDetailSections(item: DividendEntry): DetailSection[] {
 
 function isSupportedSortField(field: string): field is SortField {
   return field === "PayDate" || field === "ExDate" || field === "SecurityName";
+}
+
+function isSupportedSortDirection(direction: string): direction is SortDirection {
+  return direction === "asc" || direction === "desc" || direction === "none";
 }
 
 function formatDateValue(value: string): string {

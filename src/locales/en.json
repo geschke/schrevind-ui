@@ -31,6 +31,7 @@
       "foreignFeesCurrency": "Foreign fees currency",
       "note": "Note",
       "cancel": "Cancel",
+      "backToList": "Back to dividend entry list",
       "okTitle": "OK",
       "warningTitle": "Notice",
       "errorTitle": "Error"

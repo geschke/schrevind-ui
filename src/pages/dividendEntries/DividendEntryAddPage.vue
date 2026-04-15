@@ -5,6 +5,11 @@
         <div class="col">
           <h2>{{ pageTitle }}</h2>
         </div>
+        <div v-if="isEditMode" class="col-auto">
+          <router-link class="btn btn-outline-secondary" :to="{ name: 'dividendentries' }">
+            {{ t("dividendEntries.common.backToList") }}
+          </router-link>
+        </div>
       </div>
 
       <div v-if="saveState === 'success'" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -447,10 +452,13 @@
         
         
         <div class="row py-2 mb-2">
-          <div class="offset-sm-3 col-sm-9">
-            <button type="button" @click="$router.go(-1)" class="btn btn-secondary">
-              {{ t("dividendEntries.common.cancel") }}
-            </button>
+            <div class="offset-sm-3 col-sm-9">
+              <router-link v-if="isEditMode" type="button" class="btn btn-secondary" :to="{ name: 'dividendentries' }">
+                {{ t("dividendEntries.common.backToList") }}
+              </router-link>
+              <button v-else type="button" @click="$router.go(-1)" class="btn btn-secondary">
+                {{ t("dividendEntries.common.cancel") }}
+              </button>
 
               <button class="btn btn-primary ms-2" :disabled="saveDisabled">
                 <span v-if="saveState !== 'saving'">{{ submitLabel }}</span>
