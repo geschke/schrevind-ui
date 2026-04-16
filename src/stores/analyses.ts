@@ -10,6 +10,7 @@ import type {
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
+const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -81,9 +82,12 @@ export const useAnalysesStore = defineStore("analyses", () => {
   const analysisLoaded = ref(false);
   const getCurrentAnalysis = computed(() => currentAnalysis.value);
 
-  async function fetchDividendsByYearAnalysis(): Promise<AnalysisTable> {
+  async function fetchAnalysis(endpoint: string): Promise<AnalysisTable> {
+    currentAnalysis.value = null;
+    analysisLoaded.value = false;
+
     return axios
-      .get(DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT, { withCredentials: true })
+      .get(endpoint, { withCredentials: true })
       .then((response) => {
         const analysis = normalizeAnalysisPayload(response.data);
 
@@ -99,9 +103,18 @@ export const useAnalysesStore = defineStore("analyses", () => {
       });
   }
 
+  async function fetchDividendsByYearAnalysis(): Promise<AnalysisTable> {
+    return fetchAnalysis(DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT);
+  }
+
+  async function fetchDividendsByYearMonthAnalysis(): Promise<AnalysisTable> {
+    return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
+  }
+
   return {
     analysisLoaded,
     getCurrentAnalysis,
     fetchDividendsByYearAnalysis,
+    fetchDividendsByYearMonthAnalysis,
   };
 });

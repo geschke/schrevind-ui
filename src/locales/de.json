@@ -677,6 +677,7 @@
     "menu": "Analysen",
     "common": {
       "year": "Jahr",
+      "month": "Monat",
       "empty": "Keine Daten verfügbar.",
       "errorTitle": "Fehler"
     },
@@ -691,8 +692,18 @@
       "description": "Wählen Sie eine Auswertung aus."
     },
     "dividends_by_year": {
-      "title": "Dividenden nach Jahr",
-      "description": "Jährliche Dividendensummen anzeigen.",
+      "title": "Jahre",
+      "description": "Jahresbezogene Auswertungen öffnen.",
+      "action": "Analyse öffnen",
+      "columns": {
+        "gross": "Brutto",
+        "after_withholding": "Nach Quellensteuer",
+        "net": "Netto"
+      }
+    },
+    "dividends_by_year_month": {
+      "title": "Monate",
+      "description": "Monatsbezogene Auswertungen öffnen.",
       "action": "Analyse öffnen",
       "columns": {
         "gross": "Brutto",

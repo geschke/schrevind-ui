@@ -677,6 +677,7 @@
     "menu": "Analytics",
     "common": {
       "year": "Year",
+      "month": "Month",
       "empty": "No data available.",
       "errorTitle": "Error"
     },
@@ -691,8 +692,18 @@
       "description": "Select a report."
     },
     "dividends_by_year": {
-      "title": "Dividends by year",
-      "description": "Review annual dividend totals.",
+      "title": "Years",
+      "description": "Open year based reports.",
+      "action": "Open analysis",
+      "columns": {
+        "gross": "Gross",
+        "after_withholding": "After withholding tax",
+        "net": "Net"
+      }
+    },
+    "dividends_by_year_month": {
+      "title": "Months",
+      "description": "Open month based reports.",
       "action": "Open analysis",
       "columns": {
         "gross": "Gross",

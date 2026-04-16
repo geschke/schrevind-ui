@@ -34,13 +34,13 @@
                 <i class="bi bi-calendar-month"></i>
               </div>
               <div>
-                <h3 class="h5 mb-1">{{ t("analytics.overview.cards.months.title") }}</h3>
-                <p class="text-muted mb-0">{{ t("analytics.overview.cards.months.description") }}</p>
+                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_year_month.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.dividends_by_year_month.description") }}</p>
               </div>
             </div>
 
             <router-link class="btn btn-info" :to="{ name: 'analysismonths' }">
-              {{ t("analytics.overview.cards.months.action") }}
+              {{ t("analyses.dividends_by_year_month.action") }}
             </router-link>
           </div>
         </div>
