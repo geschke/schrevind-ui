@@ -34,6 +34,30 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/analytics",
+    name: "analytics",
+    component: () => import("@/pages/analytics/AnalysisOverviewPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/analytics/years",
+    name: "analysisyears",
+    component: () => import("@/pages/analytics/AnalysisYearsPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/analytics/months",
+    name: "analysismonths",
+    component: () => import("@/pages/analytics/AnalysisMonthsPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/depots",
     name: "depots",
     component: () => import("@/pages/depots/DepotListPage.vue"),

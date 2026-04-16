@@ -600,6 +600,11 @@
     "title": "Übersicht",
     "description": "Dieser Bereich dient als Dashboard und Einstiegspunkt für die Datenpflege.",
     "cards": {
+      "analyses": {
+        "title": "Analysen",
+        "description": "Auswertungen nach Jahren und Monaten öffnen.",
+        "action": "Analysen öffnen"
+      },
       "dividendEntries": {
         "title": "Dividendeneinträge",
         "description": "Vorhandene Dividendeneinträge anzeigen.",
@@ -635,6 +640,37 @@
         "description": "Benutzerkonten und Zugangsdaten verwalten.",
         "action": "Benutzer öffnen"
       }
+    }
+  },
+  "analytics": {
+    "common": {
+      "placeholder": "Diese Auswertung ist vorbereitet. Die Daten werden später über die API geladen."
+    },
+    "overview": {
+      "title": "Analysen",
+      "description": "Wählen Sie eine Auswertung aus.",
+      "cards": {
+        "years": {
+          "title": "Jahre",
+          "description": "Jahresbezogene Auswertungen öffnen.",
+          "action": "Jahre öffnen"
+        },
+        "months": {
+          "title": "Monate",
+          "description": "Monatsbezogene Auswertungen öffnen.",
+          "action": "Monate öffnen"
+        }
+      }
+    },
+    "years": {
+      "title": "Analysen nach Jahren",
+      "dummyTitle": "Jahresauswertung",
+      "dummyText": "Hier werden später die Jahreswerte angezeigt."
+    },
+    "months": {
+      "title": "Analysen nach Monaten",
+      "dummyTitle": "Monatsauswertung",
+      "dummyText": "Hier werden später die Monatswerte angezeigt."
     }
   },
   "adminOverview": {
@@ -920,6 +956,10 @@
     },
     "items": {
       "overview": "Übersicht",
+      "analyses": "Analysen",
+      "analysisOverview": "Übersicht",
+      "analysisYears": "Jahre",
+      "analysisMonths": "Monate",
       "dividendEntries": "Dividendeneinträge",
       "dividendEntryAdd": "Dividendeneintrag hinzufügen",
       "depots": "Depots",

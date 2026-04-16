@@ -9,6 +9,8 @@
         :items="dividendEntries"
         :count="dividendEntriesCount"
         :items-per-page="itemsPerPage"
+        :sort-field="currentSortField"
+        :sort-direction="currentSortDirection"
         classes="table-striped table-hover"
         _bodyClasses="table-group-divider"
         headClasses="table-secondary"

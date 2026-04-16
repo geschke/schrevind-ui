@@ -600,6 +600,11 @@
     "title": "Overview",
     "description": "This area serves as dashboard and entry point for data management.",
     "cards": {
+      "analyses": {
+        "title": "Analytics",
+        "description": "Open year and month based reports.",
+        "action": "Open analytics"
+      },
       "dividendEntries": {
         "title": "Dividend entries",
         "description": "Review existing dividend entries.",
@@ -635,6 +640,37 @@
         "description": "Manage user accounts and credentials.",
         "action": "Open users"
       }
+    }
+  },
+  "analytics": {
+    "common": {
+      "placeholder": "This report view is prepared. Data will be loaded through the API later."
+    },
+    "overview": {
+      "title": "Analytics",
+      "description": "Select a report.",
+      "cards": {
+        "years": {
+          "title": "Years",
+          "description": "Open year based reports.",
+          "action": "Open years"
+        },
+        "months": {
+          "title": "Months",
+          "description": "Open month based reports.",
+          "action": "Open months"
+        }
+      }
+    },
+    "years": {
+      "title": "Year analytics",
+      "dummyTitle": "Year report",
+      "dummyText": "Year values will be shown here later."
+    },
+    "months": {
+      "title": "Month analytics",
+      "dummyTitle": "Month report",
+      "dummyText": "Month values will be shown here later."
     }
   },
   "adminOverview": {
@@ -920,6 +956,10 @@
     },
     "items": {
       "overview": "Overview",
+      "analyses": "Analytics",
+      "analysisOverview": "Overview",
+      "analysisYears": "Years",
+      "analysisMonths": "Months",
       "dividendEntries": "Dividend entries",
       "dividendEntryAdd": "Add dividend entry",
       "depots": "Depots",

@@ -98,14 +98,16 @@ import GroupSwitcher from "@/components/GroupSwitcher.vue";
 import { useUserAuthStore } from "../stores/userauth";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from 'vue-router';
-import { ref, onUpdated, onMounted, computed } from 'vue';
+import { computed } from 'vue';
 
 const storeUserAuth = useUserAuthStore();
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 
-const menuPath = ref("");
+const menuPath = computed(() => {
+  return route.meta.menuPath ? route.meta.menuPath : route.path;
+});
 const currentUserId = computed(() => {
   const rawId = storeUserAuth.getUserId;
   if (rawId == null) return null;
@@ -121,28 +123,6 @@ async function signout() {
     router.push("/");
   }
 }
-
-// todo:
-// push route path parameter to TheNavbar, so it could match
-// URLs with IDs or another path parameter
-// or in general: find a solution to this, so the right menu item will be opened
-
-onMounted(() => {
-
-  if (route.meta.menuPath) {
-    menuPath.value = route.meta.menuPath;
-  } else {
-    menuPath.value = route.path;
-  }
-
-})
-
-onUpdated(() => {
-  // todo: get breadcrumb data and use them to create senseful breadcrumb, title and more
-})
-
-
-
 
 function toggleSidebar() {
   //console.log("sidebar toggle clicked");
