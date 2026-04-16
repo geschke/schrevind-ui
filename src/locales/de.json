@@ -602,7 +602,7 @@
     "cards": {
       "analyses": {
         "title": "Analysen",
-        "description": "Auswertungen nach Jahren und Monaten öffnen.",
+        "description": "Auswertungen öffnen.",
         "action": "Analysen öffnen"
       },
       "dividendEntries": {
@@ -671,6 +671,34 @@
       "title": "Analysen nach Monaten",
       "dummyTitle": "Monatsauswertung",
       "dummyText": "Hier werden später die Monatswerte angezeigt."
+    }
+  },
+  "analyses": {
+    "menu": "Analysen",
+    "common": {
+      "year": "Jahr",
+      "empty": "Keine Daten verfügbar.",
+      "errorTitle": "Fehler"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Analyse.",
+      "unsupportedType": "Dieser Analyse-Typ wird noch nicht unterstützt.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    },
+    "overview": {
+      "title": "Analysen",
+      "menu": "Übersicht",
+      "description": "Wählen Sie eine Auswertung aus."
+    },
+    "dividends_by_year": {
+      "title": "Dividenden nach Jahr",
+      "description": "Jährliche Dividendensummen anzeigen.",
+      "action": "Analyse öffnen",
+      "columns": {
+        "gross": "Brutto",
+        "after_withholding": "Nach Quellensteuer",
+        "net": "Netto"
+      }
     }
   },
   "adminOverview": {

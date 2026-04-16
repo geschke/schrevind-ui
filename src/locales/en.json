@@ -602,7 +602,7 @@
     "cards": {
       "analyses": {
         "title": "Analytics",
-        "description": "Open year and month based reports.",
+        "description": "Open reports.",
         "action": "Open analytics"
       },
       "dividendEntries": {
@@ -671,6 +671,34 @@
       "title": "Month analytics",
       "dummyTitle": "Month report",
       "dummyText": "Month values will be shown here later."
+    }
+  },
+  "analyses": {
+    "menu": "Analytics",
+    "common": {
+      "year": "Year",
+      "empty": "No data available.",
+      "errorTitle": "Error"
+    },
+    "errors": {
+      "loadFailed": "Failed to load the analysis.",
+      "unsupportedType": "This analysis type is not supported yet.",
+      "unknown": "An unknown error occurred."
+    },
+    "overview": {
+      "title": "Analytics",
+      "menu": "Overview",
+      "description": "Select a report."
+    },
+    "dividends_by_year": {
+      "title": "Dividends by year",
+      "description": "Review annual dividend totals.",
+      "action": "Open analysis",
+      "columns": {
+        "gross": "Gross",
+        "after_withholding": "After withholding tax",
+        "net": "Net"
+      }
     }
   },
   "adminOverview": {

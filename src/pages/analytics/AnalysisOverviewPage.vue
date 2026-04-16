@@ -2,8 +2,8 @@
   <TheMainLayout>
     <template #default>
       <div class="col-12 mb-4">
-        <h2>{{ t("analytics.overview.title") }}</h2>
-        <p class="text-muted mb-0">{{ t("analytics.overview.description") }}</p>
+        <h2>{{ t("analyses.overview.title") }}</h2>
+        <p class="text-muted mb-0">{{ t("analyses.overview.description") }}</p>
       </div>
 
       <div class="col-xl-3 col-lg-6 mb-4">
@@ -11,16 +11,16 @@
           <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-primary-subtle text-primary">
-                <i class="bi bi-calendar3"></i>
+                <i class="bi bi-bar-chart-line"></i>
               </div>
               <div>
-                <h3 class="h5 mb-1">{{ t("analytics.overview.cards.years.title") }}</h3>
-                <p class="text-muted mb-0">{{ t("analytics.overview.cards.years.description") }}</p>
+                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_year.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.dividends_by_year.description") }}</p>
               </div>
             </div>
 
             <router-link class="btn btn-primary" :to="{ name: 'analysisyears' }">
-              {{ t("analytics.overview.cards.years.action") }}
+              {{ t("analyses.dividends_by_year.action") }}
             </router-link>
           </div>
         </div>

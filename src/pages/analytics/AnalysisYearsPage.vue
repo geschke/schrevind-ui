@@ -2,26 +2,77 @@
   <TheMainLayout>
     <template #default>
       <div class="col-12">
-        <h2>{{ t("analytics.years.title") }}</h2>
+        <h2>{{ pageTitle }}</h2>
 
-        <div class="alert alert-info" role="alert">
-          {{ t("analytics.common.placeholder") }}
-        </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h3 class="h5">{{ t("analytics.years.dummyTitle") }}</h3>
-            <p class="mb-0">{{ t("analytics.years.dummyText") }}</p>
+        <div v-if="loading" class="text-center py-4">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">{{ t("common.loading") }}</span>
           </div>
         </div>
+
+        <div v-else-if="analysis" class="card">
+          <div class="card-body">
+            <AnalysisTable :analysis="analysis" />
+          </div>
+        </div>
+
+        <div v-else class="alert alert-warning" role="alert">
+          {{ t("analyses.errors.loadFailed") }}
+        </div>
       </div>
+
+      <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
     </template>
   </TheMainLayout>
 </template>
 
 <script setup lang="ts">
+import AnalysisTable from "@/components/analyses/AnalysisTable.vue";
+import { getErrorCode } from "@/helper/errorCode";
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
+import { useAnalysesStore } from "@/stores/analyses";
+import { GToast, GToastDanger } from "goar-components";
+import type { GToastContent } from "goar-components";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const storeAnalyses = useAnalysesStore();
+const toast: any = ref(null);
+const loading = ref(false);
+const analysis = computed(() => storeAnalyses.getCurrentAnalysis);
+const pageTitle = computed(() => {
+  return analysis.value?.title_key ? t(analysis.value.title_key) : t("analyses.dividends_by_year.title");
+});
+
+onMounted(() => {
+  loading.value = true;
+  storeAnalyses
+    .fetchDividendsByYearAnalysis()
+    .catch((requestError: unknown) => {
+      toast.value?.addToast(<GToastContent>{
+        ...GToastDanger,
+        title: t("analyses.common.errorTitle"),
+        content: errorContent(getErrorCode(requestError)),
+      });
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+});
+
+function errorContent(errorCode: string) {
+  switch (errorCode) {
+    case "UNSUPPORTED_ANALYSIS_TYPE":
+      return t("analyses.errors.unsupportedType");
+    case "UNAUTHORIZED":
+    case "AUTH_NOT_CONFIGURED":
+    case "NETWORK_ERROR":
+    case "DB_ERROR":
+    case "DB_NOT_INITIALIZED":
+      return t("analyses.errors.loadFailed");
+    default:
+      return t("analyses.errors.unknown");
+  }
+}
 </script>
