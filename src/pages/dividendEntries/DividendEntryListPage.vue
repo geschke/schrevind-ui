@@ -9,6 +9,7 @@
         :items="dividendEntries"
         :count="dividendEntriesCount"
         :items-per-page="itemsPerPage"
+        :current-page="currentPage"
         :sort-field="currentSortField"
         :sort-direction="currentSortDirection"
         classes="table-striped table-hover"
@@ -206,10 +207,11 @@ const toast: any = ref(null);
 const dividendEntriesTable: any = ref(null);
 const loading = ref(false);
 const toBeDeleted = ref<DividendEntry | null>(null);
-const currentOffset = ref(0);
-const currentLimit = ref(itemsPerPage);
-const currentSortField = ref<SortField>("PayDate");
-const currentSortDirection = ref<SortDirection>("none");
+const initialListState = loadListState();
+const currentOffset = ref(initialListState.offset);
+const currentLimit = ref(initialListState.limit);
+const currentSortField = ref<SortField>(initialListState.sortField);
+const currentSortDirection = ref<SortDirection>(initialListState.sortDirection);
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("dividendEntries.list.table.columns.id"), field: "ID" },
@@ -230,15 +232,13 @@ const headers = computed<GTableHeader[]>(() => [
 
 const dividendEntries = computed(() => storeDividendEntries.getDividendEntries);
 const dividendEntriesCount = computed(() => storeDividendEntries.getDividendEntriesCount);
+const currentPage = computed(() => Math.floor(currentOffset.value / currentLimit.value) + 1);
 const depotNames = computed<Record<number, string>>(() =>
   Object.fromEntries(storeDepots.getDepots.map((item) => [item.ID, item.Name] as const))
 );
 
 onMounted(() => {
-  const savedState = loadListState();
-  currentSortField.value = savedState.sortField;
-  currentSortDirection.value = savedState.sortDirection;
-  void loadPage(savedState.offset, savedState.limit);
+  void loadPage(currentOffset.value, currentLimit.value);
 
   if (!storeDepots.depotsLoaded) {
     void storeDepots.fetchDepots().catch(() => {
