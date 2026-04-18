@@ -7,10 +7,13 @@ import type {
   AnalysisTable,
   AnalysisTableColumn,
   AnalysisTableRow,
+  ChartSeries,
+  DividendsByYearChart,
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
 const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
+const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -77,10 +80,33 @@ function normalizeAnalysisPayload(payload: unknown): AnalysisTable {
   return normalizeAnalysis(rawData);
 }
 
+function normalizeChartSeries(item: unknown): ChartSeries {
+  const raw = isRecord(item) ? item : {};
+  return {
+    key: String(raw.key ?? ""),
+    currency: String(raw.currency ?? ""),
+    values: Array.isArray(raw.values) ? raw.values.map(Number) : [],
+  };
+}
+
+function normalizeDividendsByYearChart(payload: unknown): DividendsByYearChart {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  const categories = Array.isArray(raw.categories) ? raw.categories.map(String) : [];
+  const series = Array.isArray(raw.series) ? raw.series.map(normalizeChartSeries) : [];
+  return { categories, series };
+}
+
 export const useAnalysesStore = defineStore("analyses", () => {
   const currentAnalysis = ref<AnalysisTable | null>(null);
   const analysisLoaded = ref(false);
   const getCurrentAnalysis = computed(() => currentAnalysis.value);
+
+  const currentChartData = ref<DividendsByYearChart | null>(null);
+  const getCurrentChartData = computed(() => currentChartData.value);
 
   async function fetchAnalysis(endpoint: string): Promise<AnalysisTable> {
     currentAnalysis.value = null;
@@ -111,10 +137,27 @@ export const useAnalysesStore = defineStore("analyses", () => {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
   }
 
+  async function fetchDividendsByYearChartData(): Promise<DividendsByYearChart> {
+    currentChartData.value = null;
+    return axios
+      .get(DIVIDENDS_BY_YEAR_CHART_ENDPOINT, { withCredentials: true })
+      .then((response) => {
+        const data = normalizeDividendsByYearChart(response.data);
+        currentChartData.value = data;
+        return data;
+      })
+      .catch((error: unknown) => {
+        currentChartData.value = null;
+        throw error;
+      });
+  }
+
   return {
     analysisLoaded,
     getCurrentAnalysis,
+    getCurrentChartData,
     fetchDividendsByYearAnalysis,
     fetchDividendsByYearMonthAnalysis,
+    fetchDividendsByYearChartData,
   };
 });

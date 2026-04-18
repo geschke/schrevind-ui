@@ -710,6 +710,43 @@
         "after_withholding": "Nach Quellensteuer",
         "net": "Netto"
       }
+    },
+    "charts": {
+      "menu": "Charts",
+      "dividends_by_year": {
+        "title": "Dividenden pro Jahr",
+        "description": "Jahresbezogene Dividendenauswertung als Balkendiagramm.",
+        "chartTitle": "Dividenden pro Jahr",
+        "tableTitle": "Tabelle · Dividenden pro Jahr"
+      },
+      "common": {
+        "baseCurrency": "Basiswährung",
+        "export": "Export",
+        "totalGross": "Gesamt Brutto",
+        "totalNet": "Gesamt Netto",
+        "afterTaxes": "nach Quellen- & Kapitalertragsteuer",
+        "bestYear": "Bestes Jahr",
+        "years": "Jahre",
+        "quickSelect": "Schnellauswahl",
+        "from": "Von",
+        "to": "Bis",
+        "values": "Werte",
+        "trendLine": "Trendlinie",
+        "options": "Optionen",
+        "barMode": "Balkenanordnung",
+        "grouped": "Gruppiert",
+        "stacked": "Gestapelt",
+        "display": "Darstellung",
+        "gridLines": "Gitterlinien",
+        "valueLabels": "Werte-Labels",
+        "legend": "Legende",
+        "syncWithChart": "synchron mit Diagramm",
+        "whtShare": "QSt-Anteil",
+        "preset3y": "3 Jahre",
+        "preset5y": "5 Jahre",
+        "preset10y": "10 Jahre",
+        "presetAll": "Alle"
+      }
     }
   },
   "adminOverview": {

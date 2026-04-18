@@ -24,3 +24,14 @@ export type AnalysisResponse = {
   message: string;
   data: AnalysisTable;
 };
+
+export type ChartSeries = {
+  key: string;
+  currency: string;
+  values: number[];
+};
+
+export type DividendsByYearChart = {
+  categories: string[];
+  series: ChartSeries[];
+};

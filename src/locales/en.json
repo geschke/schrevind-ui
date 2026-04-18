@@ -710,6 +710,43 @@
         "after_withholding": "After withholding tax",
         "net": "Net"
       }
+    },
+    "charts": {
+      "menu": "Charts",
+      "dividends_by_year": {
+        "title": "Dividends per Year",
+        "description": "Year-based dividend analysis as bar chart.",
+        "chartTitle": "Dividends per Year",
+        "tableTitle": "Table · Dividends per Year"
+      },
+      "common": {
+        "baseCurrency": "Base currency",
+        "export": "Export",
+        "totalGross": "Total Gross",
+        "totalNet": "Total Net",
+        "afterTaxes": "after withholding & capital gains tax",
+        "bestYear": "Best Year",
+        "years": "Years",
+        "quickSelect": "Quick select",
+        "from": "From",
+        "to": "To",
+        "values": "Values",
+        "trendLine": "Trend line",
+        "options": "Options",
+        "barMode": "Bar mode",
+        "grouped": "Grouped",
+        "stacked": "Stacked",
+        "display": "Display",
+        "gridLines": "Grid lines",
+        "valueLabels": "Value labels",
+        "legend": "Legend",
+        "syncWithChart": "in sync with chart",
+        "whtShare": "WHT share",
+        "preset3y": "3 Years",
+        "preset5y": "5 Years",
+        "preset10y": "10 Years",
+        "presetAll": "All"
+      }
     }
   },
   "adminOverview": {
