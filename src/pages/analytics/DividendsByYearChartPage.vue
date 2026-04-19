@@ -5,7 +5,7 @@
         <!-- Page header -->
         <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
           <div>
-            <h2 class="mb-1">{{ t('analyses.charts.dividends_by_year.title') }}</h2>
+            <h2 class="mb-1">{{ pageTitle }}</h2>
             <p class="text-muted mb-0 small">{{ t('analyses.charts.dividends_by_year.description') }}</p>
           </div>
           <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -32,13 +32,101 @@
           </div>
         </div>
 
-        <!-- Loading -->
+        <!-- Filter card — always visible once page is mounted -->
+        <div class="card mb-3">
+          <div class="card-body py-2">
+            <div class="d-flex flex-wrap align-items-end gap-3">
+              <!-- Depot filter -->
+              <div>
+                <div class="filter-label">{{ t('analyses.charts.common.depots') }}</div>
+                <div class="dropdown" ref="depotDropdownEl">
+                  <button
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    :class="{ active: selectedDepotIds.length > 0 }"
+                    @click.stop="toggleDepotDropdown"
+                  >
+                    <i class="bi bi-bank me-1"></i>{{ depotFilterLabel }}
+                  </button>
+                  <ul class="dropdown-menu depot-dropdown" :class="{ show: depotDropdownOpen }">
+                    <li>
+                      <a class="dropdown-item" href="#" @click.prevent="clearDepotSelection">
+                        <i class="bi bi-check2-all me-2" :class="selectedDepotIds.length === 0 ? 'text-primary' : 'invisible'"></i>
+                        {{ t('analyses.charts.common.allDepots') }}
+                      </a>
+                    </li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li v-for="depot in availableDepots" :key="depot.ID">
+                      <a class="dropdown-item" href="#" @click.prevent="toggleDepot(depot.ID)">
+                        <i class="bi me-2" :class="selectedDepotIds.includes(depot.ID) ? 'bi-check-square-fill text-primary' : 'bi-square text-muted'"></i>
+                        {{ depot.Name }}
+                        <span v-if="depot.BrokerName" class="text-muted ms-1 small">({{ depot.BrokerName }})</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <div class="filter-label">{{ t('analyses.charts.common.quickSelect') }}</div>
+                <div class="btn-group" role="group">
+                  <button
+                    v-for="p in presets"
+                    :key="p.key"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    :class="{ active: preset === p.key }"
+                    @click="applyPreset(p.key)"
+                    :disabled="loading"
+                  >
+                    {{ t(p.labelKey) }}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="filter-label">{{ t('analyses.charts.common.from') }}</div>
+                <select class="form-select form-select-sm" v-model="yearFrom" @change="onYearChange" :disabled="loading || availableYears.length === 0">
+                  <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">{{ t('analyses.charts.common.to') }}</div>
+                <select class="form-select form-select-sm" v-model="yearTo" @change="onYearChange" :disabled="loading || availableYears.length === 0">
+                  <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
+                </select>
+              </div>
+              <div class="ms-auto">
+                <div class="filter-label">{{ t('analyses.charts.common.values') }}</div>
+                <div class="btn-group" role="group">
+                  <input type="checkbox" class="btn-check" id="v-gross" v-model="activeValues" value="gross" />
+                  <label class="btn btn-sm btn-value btn-value-gross" for="v-gross">
+                    <span class="legend-dot" style="background: var(--c-gross)"></span>
+                    {{ t('analyses.dividends_by_year.columns.gross') }}
+                  </label>
+                  <input type="checkbox" class="btn-check" id="v-after-wht" v-model="activeValues" value="after_withholding" />
+                  <label class="btn btn-sm btn-value btn-value-after-wht" for="v-after-wht">
+                    <span class="legend-dot" style="background: var(--c-after-wht)"></span>
+                    {{ t('analyses.dividends_by_year.columns.after_withholding') }}
+                  </label>
+                  <input type="checkbox" class="btn-check" id="v-net" v-model="activeValues" value="net" />
+                  <label class="btn btn-sm btn-value btn-value-net" for="v-net">
+                    <span class="legend-dot" style="background: var(--c-net)"></span>
+                    {{ t('analyses.dividends_by_year.columns.net') }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline loading spinner (also shown during reload) -->
         <div v-if="loading" class="text-center py-5">
           <div class="spinner-border" role="status">
             <span class="visually-hidden">{{ t('common.loading') }}</span>
           </div>
         </div>
 
+        <!-- Data content — only when loaded and has rows -->
         <template v-else-if="allRows.length > 0">
           <!-- KPI row -->
           <div class="row g-3 mb-3">
@@ -75,61 +163,6 @@
                   </div>
                   <div class="kpi-value font-monospace">{{ kpis.bestYear?.year ?? '—' }}</div>
                   <div class="text-success small">{{ kpis.bestYear ? fmtMoney(kpis.bestYear.gross) : '—' }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Filter card -->
-          <div class="card mb-3">
-            <div class="card-body py-2">
-              <div class="d-flex flex-wrap align-items-end gap-3">
-                <div>
-                  <div class="filter-label">{{ t('analyses.charts.common.quickSelect') }}</div>
-                  <div class="btn-group" role="group">
-                    <button
-                      v-for="p in presets"
-                      :key="p.key"
-                      type="button"
-                      class="btn btn-sm btn-outline-secondary"
-                      :class="{ active: preset === p.key }"
-                      @click="applyPreset(p.key)"
-                    >
-                      {{ t(p.labelKey) }}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <div class="filter-label">{{ t('analyses.charts.common.from') }}</div>
-                  <select class="form-select form-select-sm" v-model="yearFrom" @change="onYearChange">
-                    <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
-                  </select>
-                </div>
-                <div>
-                  <div class="filter-label">{{ t('analyses.charts.common.to') }}</div>
-                  <select class="form-select form-select-sm" v-model="yearTo" @change="onYearChange">
-                    <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
-                  </select>
-                </div>
-                <div class="ms-auto">
-                  <div class="filter-label">{{ t('analyses.charts.common.values') }}</div>
-                  <div class="btn-group" role="group">
-                    <input type="checkbox" class="btn-check" id="v-gross" v-model="activeValues" value="gross" />
-                    <label class="btn btn-sm btn-value btn-value-gross" for="v-gross">
-                      <span class="legend-dot" style="background: var(--c-gross)"></span>
-                      {{ t('analyses.dividends_by_year.columns.gross') }}
-                    </label>
-                    <input type="checkbox" class="btn-check" id="v-after-wht" v-model="activeValues" value="after_withholding" />
-                    <label class="btn btn-sm btn-value btn-value-after-wht" for="v-after-wht">
-                      <span class="legend-dot" style="background: var(--c-after-wht)"></span>
-                      {{ t('analyses.dividends_by_year.columns.after_withholding') }}
-                    </label>
-                    <input type="checkbox" class="btn-check" id="v-net" v-model="activeValues" value="net" />
-                    <label class="btn btn-sm btn-value btn-value-net" for="v-net">
-                      <span class="legend-dot" style="background: var(--c-net)"></span>
-                      {{ t('analyses.dividends_by_year.columns.net') }}
-                    </label>
-                  </div>
                 </div>
               </div>
             </div>
@@ -222,10 +255,6 @@
             </div>
           </div>
         </template>
-
-        <div v-else-if="!loading" class="alert alert-warning" role="alert">
-          {{ t('analyses.errors.loadFailed') }}
-        </div>
       </div>
 
       <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
@@ -252,9 +281,10 @@ type ECOption = ComposeOption<
 import { getErrorCode } from '@/helper/errorCode'
 import TheMainLayout from '@/layouts/TheMainLayout.vue'
 import { useAnalysesStore } from '@/stores/analyses'
-import { GToast, GToastDanger } from 'goar-components'
+import { useDepotsStore } from '@/stores/depots'
+import { GToast, GToastDanger, GToastWarning } from 'goar-components'
 import type { GToastContent } from 'goar-components'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface ChartRow {
@@ -280,9 +310,62 @@ const cssVars = {
 
 const { t, locale } = useI18n()
 const storeAnalyses = useAnalysesStore()
+const storeDepots = useDepotsStore()
 const toast = ref<InstanceType<typeof GToast> | null>(null)
 const chartRef = ref<InstanceType<typeof VChart> | null>(null)
 const loading = ref(false)
+
+// --- Depot selection ---
+const selectedDepotIds = ref<number[]>([])
+const availableDepots = computed(() => storeDepots.getDepots)
+const depotDropdownOpen = ref(false)
+const depotDropdownEl = ref<HTMLElement | null>(null)
+
+function toggleDepotDropdown() {
+  depotDropdownOpen.value = !depotDropdownOpen.value
+}
+
+function handleDocumentClick(e: MouseEvent) {
+  if (depotDropdownEl.value && !depotDropdownEl.value.contains(e.target as Node)) {
+    depotDropdownOpen.value = false
+  }
+}
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
+
+const depotFilterLabel = computed(() => {
+  if (selectedDepotIds.value.length === 0) return t('analyses.charts.common.allDepots')
+  if (selectedDepotIds.value.length === 1) {
+    const depot = availableDepots.value.find((d) => d.ID === selectedDepotIds.value[0])
+    return depot?.Name ?? t('analyses.charts.common.allDepots')
+  }
+  return t('analyses.charts.common.nDepots', { n: selectedDepotIds.value.length })
+})
+
+const pageTitle = computed(() => {
+  const base = t('analyses.charts.dividends_by_year.title')
+  return `${base} – ${depotFilterLabel.value}`
+})
+
+function toggleDepot(id: number) {
+  if (selectedDepotIds.value.includes(id)) {
+    selectedDepotIds.value = selectedDepotIds.value.filter((x) => x !== id)
+  } else {
+    selectedDepotIds.value = [...selectedDepotIds.value, id]
+  }
+  depotDropdownOpen.value = false
+}
+
+function clearDepotSelection() {
+  selectedDepotIds.value = []
+  depotDropdownOpen.value = false
+}
+
+watch(selectedDepotIds, () => {
+  reloadChartData()
+})
 
 const rawData = computed(() => storeAnalyses.getCurrentChartData)
 
@@ -559,21 +642,43 @@ function exportCsv() {
 }
 
 // --- Fetch ---
-onMounted(() => {
+function reloadChartData() {
   loading.value = true
+  yearFrom.value = ''
+  yearTo.value = ''
+  const ids = selectedDepotIds.value.length > 0 ? selectedDepotIds.value : undefined
   storeAnalyses
-    .fetchDividendsByYearChartData()
+    .fetchDividendsByYearChartData(ids)
+    .then(() => {
+      if (allRows.value.length === 0) {
+        toast.value?.addToast({
+          ...GToastWarning,
+          title: t('analyses.common.errorTitle'),
+          content: t('analyses.common.empty'),
+        } as GToastContent)
+      }
+    })
     .catch((requestError: unknown) => {
+      const code = getErrorCode(requestError)
+      const content =
+        code === 'ANALYSIS_MULTIPLE_BASE_CURRENCIES'
+          ? t('analyses.charts.errors.multipleCurrencies')
+          : t('analyses.errors.loadFailed')
       toast.value?.addToast({
         ...GToastDanger,
         title: t('analyses.common.errorTitle'),
-        content: t('analyses.errors.loadFailed'),
+        content,
       } as GToastContent)
-      console.error(getErrorCode(requestError))
     })
     .finally(() => {
       loading.value = false
     })
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+  storeDepots.fetchDepots().catch(() => {})
+  reloadChartData()
 })
 </script>
 
@@ -633,6 +738,8 @@ onMounted(() => {
 .btn-check:checked + .btn-value-net      { background: color-mix(in oklab, var(--c-net) 14%, #fff);       border-color: var(--c-net);       color: color-mix(in oklab, var(--c-net) 70%, #212529); }
 
 .dividend-chart { height: 440px; }
+
+.depot-dropdown { min-width: 260px; max-height: 320px; overflow-y: auto; }
 
 /* Table header tints */
 .dividend-table th { font-size: 0.875rem; }

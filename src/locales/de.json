@@ -727,6 +727,9 @@
         "afterTaxes": "nach Quellen- & Kapitalertragsteuer",
         "bestYear": "Bestes Jahr",
         "years": "Jahre",
+        "depots": "Depots",
+        "allDepots": "Alle Depots",
+        "nDepots": "{n} Depots",
         "quickSelect": "Schnellauswahl",
         "from": "Von",
         "to": "Bis",
@@ -746,6 +749,9 @@
         "preset5y": "5 Jahre",
         "preset10y": "10 Jahre",
         "presetAll": "Alle"
+      },
+      "errors": {
+        "multipleCurrencies": "Die ausgewählten Depots haben unterschiedliche Basiswährungen."
       }
     }
   },

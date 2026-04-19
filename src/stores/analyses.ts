@@ -137,10 +137,14 @@ export const useAnalysesStore = defineStore("analyses", () => {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
   }
 
-  async function fetchDividendsByYearChartData(): Promise<DividendsByYearChart> {
+  async function fetchDividendsByYearChartData(depotIds?: number[]): Promise<DividendsByYearChart> {
     currentChartData.value = null;
+    const params = new URLSearchParams();
+    if (depotIds && depotIds.length > 0) {
+      depotIds.forEach((id) => params.append("depot_id", String(id)));
+    }
     return axios
-      .get(DIVIDENDS_BY_YEAR_CHART_ENDPOINT, { withCredentials: true })
+      .get(DIVIDENDS_BY_YEAR_CHART_ENDPOINT, { params, withCredentials: true })
       .then((response) => {
         const data = normalizeDividendsByYearChart(response.data);
         currentChartData.value = data;

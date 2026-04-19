@@ -727,6 +727,9 @@
         "afterTaxes": "after withholding & capital gains tax",
         "bestYear": "Best Year",
         "years": "Years",
+        "depots": "Depots",
+        "allDepots": "All depots",
+        "nDepots": "{n} depots",
         "quickSelect": "Quick select",
         "from": "From",
         "to": "To",
@@ -746,6 +749,9 @@
         "preset5y": "5 Years",
         "preset10y": "10 Years",
         "presetAll": "All"
+      },
+      "errors": {
+        "multipleCurrencies": "The selected depots have different base currencies."
       }
     }
   },
