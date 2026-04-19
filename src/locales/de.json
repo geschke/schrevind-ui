@@ -711,8 +711,22 @@
         "net": "Netto"
       }
     },
+    "dividends_by_security_year": {
+      "title": "Wertpapiere / Jahre",
+      "description": "Dividenden pro Wertpapier im Jahresverlauf.",
+      "action": "Analyse öffnen",
+      "columns": {
+        "security_name": "Wertpapier",
+        "security_isin": "ISIN",
+        "quantity": "Stückzahl",
+        "gross": "Brutto",
+        "after_withholding": "Nach Quellensteuer",
+        "net": "Netto"
+      }
+    },
     "charts": {
       "menu": "Charts",
+      "action": "Chart öffnen",
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",
         "description": "Jahresbezogene Dividendenauswertung als Balkendiagramm.",

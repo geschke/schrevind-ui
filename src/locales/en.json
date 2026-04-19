@@ -711,8 +711,22 @@
         "net": "Net"
       }
     },
+    "dividends_by_security_year": {
+      "title": "Securities / Years",
+      "description": "Dividends per security over the years.",
+      "action": "Open analysis",
+      "columns": {
+        "security_name": "Security",
+        "security_isin": "ISIN",
+        "quantity": "Quantity",
+        "gross": "Gross",
+        "after_withholding": "After withholding tax",
+        "net": "Net"
+      }
+    },
     "charts": {
       "menu": "Charts",
+      "action": "Open chart",
       "dividends_by_year": {
         "title": "Dividends per Year",
         "description": "Year-based dividend analysis as bar chart.",

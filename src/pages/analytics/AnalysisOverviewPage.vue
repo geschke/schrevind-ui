@@ -10,6 +10,26 @@
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="analysis-icon bg-warning-subtle text-warning">
+                <i class="bi bi-bar-chart-line-fill"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("analyses.charts.dividends_by_year.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.charts.dividends_by_year.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-warning" :to="{ name: 'analyticscharts' }">
+              {{ t("analyses.charts.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bar-chart-line"></i>
               </div>
@@ -41,6 +61,26 @@
 
             <router-link class="btn btn-info" :to="{ name: 'analysismonths' }">
               {{ t("analyses.dividends_by_year_month.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="analysis-icon bg-success-subtle text-success">
+                <i class="bi bi-graph-up"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_security_year.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.dividends_by_security_year.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-success" :to="{ name: 'analysissecurityyears' }">
+              {{ t("analyses.dividends_by_security_year.action") }}
             </router-link>
           </div>
         </div>

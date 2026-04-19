@@ -67,6 +67,7 @@ const sidebarMenu = computed<SidebarItem[]>(() => {
             { title: "analyses.charts.menu", type: "item", icon: "bi bi-bar-chart-line-fill", url: "/analytics/charts" },
             { title: "analyses.dividends_by_year.title", type: "item", icon: "bi bi-calendar3", url: "/analytics/years" },
             { title: "analyses.dividends_by_year_month.title", type: "item", icon: "bi bi-calendar-month", url: "/analytics/months" },
+            { title: "analyses.dividends_by_security_year.title", type: "item", icon: "bi bi-graph-up", url: "/analytics/security-years" },
           ],
         },
         { title: "nav.items.dividendEntryAdd", type: "item", icon: "bi bi-plus-circle", url: "/dividend-entries/new" },

@@ -66,6 +66,14 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/analytics/security-years",
+    name: "analysissecurityyears",
+    component: () => import("@/pages/analytics/AnalysisSecurityYearsPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/depots",
     name: "depots",
     component: () => import("@/pages/depots/DepotListPage.vue"),

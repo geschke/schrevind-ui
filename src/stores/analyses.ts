@@ -14,6 +14,7 @@ import type {
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
 const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
 const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
+const DIVIDENDS_BY_SECURITY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-security-year";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -137,6 +138,10 @@ export const useAnalysesStore = defineStore("analyses", () => {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
   }
 
+  async function fetchDividendsBySecurityYearAnalysis(): Promise<AnalysisTable> {
+    return fetchAnalysis(DIVIDENDS_BY_SECURITY_YEAR_ANALYSIS_ENDPOINT);
+  }
+
   async function fetchDividendsByYearChartData(depotIds?: number[]): Promise<DividendsByYearChart> {
     currentChartData.value = null;
     const params = new URLSearchParams();
@@ -162,6 +167,7 @@ export const useAnalysesStore = defineStore("analyses", () => {
     getCurrentChartData,
     fetchDividendsByYearAnalysis,
     fetchDividendsByYearMonthAnalysis,
+    fetchDividendsBySecurityYearAnalysis,
     fetchDividendsByYearChartData,
   };
 });
