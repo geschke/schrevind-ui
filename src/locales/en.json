@@ -711,6 +711,18 @@
         "net": "Net"
       }
     },
+    "dividends_by_year_month_security": {
+      "title": "Months / Securities",
+      "description": "Dividends per month and security.",
+      "action": "Open analysis",
+      "columns": {
+        "security_name": "Security",
+        "security_isin": "ISIN",
+        "gross": "Gross",
+        "after_withholding": "After withholding tax",
+        "net": "Net"
+      }
+    },
     "dividends_by_security_year": {
       "title": "Securities / Years",
       "description": "Dividends per security over the years.",

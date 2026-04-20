@@ -85,6 +85,26 @@
           </div>
         </div>
       </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="analysis-icon bg-secondary-subtle text-secondary">
+                <i class="bi bi-table"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_year_month_security.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.dividends_by_year_month_security.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-secondary" :to="{ name: 'analysismonthsecurity' }">
+              {{ t("analyses.dividends_by_year_month_security.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
     </template>
   </TheMainLayout>
 </template>
