@@ -678,6 +678,7 @@
     "common": {
       "year": "Jahr",
       "month": "Monat",
+      "period": "Zeitraum",
       "empty": "Keine Daten verfügbar.",
       "errorTitle": "Fehler"
     },
@@ -739,6 +740,13 @@
     "charts": {
       "menu": "Charts",
       "action": "Chart öffnen",
+      "dividends_by_year_month": {
+        "title": "Monats-Charts",
+        "description": "Dividenden pro Monat und Jahr als Balkendiagramm.",
+        "chartTitle": "Dividenden pro Monat",
+        "tableTitle": "Tabelle · Dividenden pro Monat",
+        "filterMonths": "Monate"
+      },
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",
         "description": "Jahresbezogene Dividendenauswertung als Balkendiagramm.",

@@ -35,3 +35,16 @@ export type DividendsByYearChart = {
   categories: string[];
   series: ChartSeries[];
 };
+
+export type MonthChartDataRow = {
+  year: string;
+  month: string;
+  gross: number;
+  after_withholding: number;
+  net: number;
+  currency: string;
+};
+
+export type DividendsByYearMonthChart = {
+  rows: MonthChartDataRow[];
+};

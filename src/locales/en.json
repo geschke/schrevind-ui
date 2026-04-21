@@ -678,6 +678,7 @@
     "common": {
       "year": "Year",
       "month": "Month",
+      "period": "Period",
       "empty": "No data available.",
       "errorTitle": "Error"
     },
@@ -739,6 +740,13 @@
     "charts": {
       "menu": "Charts",
       "action": "Open chart",
+      "dividends_by_year_month": {
+        "title": "Monthly Charts",
+        "description": "Dividends per month and year as bar chart.",
+        "chartTitle": "Dividends per Month",
+        "tableTitle": "Table · Dividends per Month",
+        "filterMonths": "Months"
+      },
       "dividends_by_year": {
         "title": "Dividends per Year",
         "description": "Year-based dividend analysis as bar chart.",

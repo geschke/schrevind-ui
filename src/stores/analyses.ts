@@ -9,6 +9,8 @@ import type {
   AnalysisTableRow,
   ChartSeries,
   DividendsByYearChart,
+  DividendsByYearMonthChart,
+  MonthChartDataRow,
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
@@ -16,6 +18,7 @@ const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-m
 const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-security-year";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month-security";
+const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -91,6 +94,28 @@ function normalizeChartSeries(item: unknown): ChartSeries {
   };
 }
 
+function normalizeMonthChartDataRow(item: unknown): MonthChartDataRow {
+  const raw = isRecord(item) ? item : {};
+  return {
+    year: String(raw.year ?? ""),
+    month: String(raw.month ?? ""),
+    gross: typeof raw.gross === "number" ? raw.gross : 0,
+    after_withholding: typeof raw.after_withholding === "number" ? raw.after_withholding : 0,
+    net: typeof raw.net === "number" ? raw.net : 0,
+    currency: String(raw.currency ?? ""),
+  };
+}
+
+function normalizeDividendsByYearMonthChart(payload: unknown): DividendsByYearMonthChart {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  const rows = Array.isArray(raw.rows) ? raw.rows.map(normalizeMonthChartDataRow) : [];
+  return { rows };
+}
+
 function normalizeDividendsByYearChart(payload: unknown): DividendsByYearChart {
   if (isRecord(payload) && payload.success === false) {
     throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
@@ -109,6 +134,9 @@ export const useAnalysesStore = defineStore("analyses", () => {
 
   const currentChartData = ref<DividendsByYearChart | null>(null);
   const getCurrentChartData = computed(() => currentChartData.value);
+
+  const currentMonthChartData = ref<DividendsByYearMonthChart | null>(null);
+  const getCurrentMonthChartData = computed(() => currentMonthChartData.value);
 
   async function fetchAnalysis(endpoint: string): Promise<AnalysisTable> {
     currentAnalysis.value = null;
@@ -147,6 +175,25 @@ export const useAnalysesStore = defineStore("analyses", () => {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT);
   }
 
+  async function fetchDividendsByYearMonthChartData(depotIds?: number[]): Promise<DividendsByYearMonthChart> {
+    currentMonthChartData.value = null;
+    const params = new URLSearchParams();
+    if (depotIds && depotIds.length > 0) {
+      depotIds.forEach((id) => params.append("depot_id", String(id)));
+    }
+    return axios
+      .get(DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT, { params, withCredentials: true })
+      .then((response) => {
+        const data = normalizeDividendsByYearMonthChart(response.data);
+        currentMonthChartData.value = data;
+        return data;
+      })
+      .catch((error: unknown) => {
+        currentMonthChartData.value = null;
+        throw error;
+      });
+  }
+
   async function fetchDividendsByYearChartData(depotIds?: number[]): Promise<DividendsByYearChart> {
     currentChartData.value = null;
     const params = new URLSearchParams();
@@ -174,6 +221,8 @@ export const useAnalysesStore = defineStore("analyses", () => {
     fetchDividendsByYearMonthAnalysis,
     fetchDividendsBySecurityYearAnalysis,
     fetchDividendsByYearMonthSecurityAnalysis,
+    getCurrentMonthChartData,
+    fetchDividendsByYearMonthChartData,
     fetchDividendsByYearChartData,
   };
 });

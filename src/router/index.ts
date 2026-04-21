@@ -74,6 +74,14 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/analytics/month-charts",
+    name: "analyticsmonthcharts",
+    component: () => import("@/pages/analytics/DividendsByYearMonthChartPage.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/analytics/month-security",
     name: "analysismonthsecurity",
     component: () => import("@/pages/analytics/AnalysisYearMonthSecurityPage.vue"),

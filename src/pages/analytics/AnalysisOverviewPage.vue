@@ -30,6 +30,26 @@
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="analysis-icon bg-warning-subtle text-warning">
+                <i class="bi bi-bar-chart-fill"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("analyses.charts.dividends_by_year_month.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.charts.dividends_by_year_month.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn btn-warning" :to="{ name: 'analyticsmonthcharts' }">
+              {{ t("analyses.charts.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bar-chart-line"></i>
               </div>
