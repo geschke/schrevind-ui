@@ -1,7 +1,15 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type { Currency, CreateCurrencyPayload, UpdateCurrencyPayload } from "@/types/currencies";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 function normalizeDecimalPlaces(value: unknown): number | null {
   if (value === null || value === undefined || value === "") {
@@ -48,8 +56,9 @@ export const useCurrenciesStore = defineStore("currencies", () => {
   }
 
   async function fetchCurrencies() {
+    const groupId = getActiveGroupIDOrThrow();
     return axios
-      .get("/currencies/list", { withCredentials: true })
+      .get("/currencies/list", { params: { group_id: groupId }, withCredentials: true })
       .then((response) => {
         currencies.value = normalizeCurrencyItems(response.data);
         currenciesLoaded.value = true;
@@ -62,8 +71,9 @@ export const useCurrenciesStore = defineStore("currencies", () => {
   }
 
   async function fetchCurrencyById(id: number | string): Promise<Currency> {
+    const groupId = getActiveGroupIDOrThrow();
     return axios
-      .get(`/currencies/${id}`, { withCredentials: true })
+      .get(`/currencies/${id}`, { params: { group_id: groupId }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.currency ?? response.data;
         const currency = normalizeCurrency(rawItem);
@@ -84,6 +94,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function addCurrency(payload: CreateCurrencyPayload) {
     const currencyDO = {
+      GroupID: getActiveGroupIDOrThrow(),
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
@@ -100,6 +111,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function updateCurrency(payload: UpdateCurrencyPayload) {
     const currencyDO = {
+      GroupID: getActiveGroupIDOrThrow(),
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
@@ -116,7 +128,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function deleteCurrency(payload: Pick<Currency, "ID">) {
     return axios
-      .post(`/currencies/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .post(`/currencies/delete/${payload.ID}`, { GroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => fetchCurrencies())
       .catch((error: unknown) => {
         throw error;

@@ -44,6 +44,7 @@ import { useForm } from "vee-validate";
 import { useRouter } from "vue-router";
 import * as yup from "yup";
 import { useGroupsStore } from "@/stores/groups";
+import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import { GToast, GToastDanger } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -66,6 +67,7 @@ const validationSchema = yup.object().shape({
 const saveState = ref<SaveState>("idle");
 const messageError = ref("");
 const storeGroups = useGroupsStore();
+const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
 const router = useRouter();
 
@@ -106,6 +108,7 @@ const onSubmit = handleSubmit((values) => {
       } catch {
         // Keep navigation flow even if storage is unavailable.
       }
+      storeUserAuth.refreshAuth().catch(() => {});
       router.push({ name: "admingroups" });
     })
     .catch((requestError: unknown) => {

@@ -183,6 +183,7 @@
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useGroupsStore } from "@/stores/groups";
 import { useUsersStore } from "@/stores/users";
+import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import type { User } from "@/types/users";
 import { GTable } from "goar-components";
@@ -230,6 +231,7 @@ const addUsersHeaders = computed<GTableHeader[]>(() => [
 
 const storeGroups = useGroupsStore();
 const storeUsers = useUsersStore();
+const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
 
 const loading = ref(false);
@@ -337,6 +339,7 @@ async function addSingleMember(user: User) {
   addingUserId.value = user.ID;
   try {
     await storeGroups.addMembers(props.id, [user.ID]);
+    storeUserAuth.refreshAuth().catch(() => {});
     toast.value?.addToast(<GToastContent>{
       ...GToastSuccess,
       title: t("adminGroups.members.toasts.addedTitle"),
@@ -366,6 +369,7 @@ async function addSelectedMembers() {
   addingSelected.value = true;
   try {
     await storeGroups.addMembers(props.id, ids);
+    storeUserAuth.refreshAuth().catch(() => {});
     toast.value?.addToast(<GToastContent>{
       ...GToastSuccess,
       title: t("adminGroups.members.toasts.addedTitle"),

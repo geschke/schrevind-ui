@@ -187,6 +187,11 @@ export const useUserAuthStore = defineStore("userauth", () => {
       });
   }
 
+  async function refreshAuth() {
+    authInitialized.value = false;
+    return initAuth();
+  }
+
   async function signout() {
     return await axios
       .post("/auth/logout", undefined, { withCredentials: true })
@@ -222,6 +227,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     isSystemContext,
     setActiveGroup,
     initAuth,
+    refreshAuth,
     signin,
     signout,
   };
