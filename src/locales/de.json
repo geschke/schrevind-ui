@@ -745,7 +745,9 @@
         "description": "Dividenden pro Monat und Jahr als Balkendiagramm.",
         "chartTitle": "Dividenden pro Monat",
         "tableTitle": "Tabelle · Dividenden pro Monat",
-        "filterMonths": "Monate"
+        "filterMonths": "Monate",
+        "resetFilter": "Filter zurücksetzen",
+        "multiSelect": "Mehrfachauswahl"
       },
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",

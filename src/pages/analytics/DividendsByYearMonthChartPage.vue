@@ -116,18 +116,32 @@
             <div class="d-flex flex-wrap align-items-center gap-2 mt-2 pt-2 border-top">
               <div class="filter-label">{{ t('analyses.charts.dividends_by_year_month.filterMonths') }}</div>
               <div class="btn-group flex-wrap" role="group">
-                <template v-for="m in ALL_MONTHS" :key="m">
-                  <input type="checkbox" class="btn-check" :id="`m-${m}`" v-model="selectedMonths" :value="m" />
-                  <label class="btn btn-sm btn-outline-secondary" :for="`m-${m}`">{{ monthName(m) }}</label>
-                </template>
+                <button
+                  v-for="m in ALL_MONTHS"
+                  :key="m"
+                  type="button"
+                  class="btn btn-sm"
+                  :class="selectedMonths.includes(m) ? 'btn-secondary' : 'btn-outline-secondary'"
+                  @click="onMonthClick(m)"
+                >{{ monthName(m) }}</button>
               </div>
-              <button
-                v-if="selectedMonths.length < 12"
-                class="btn btn-sm btn-link p-0 ms-1"
-                @click="selectedMonths = [...ALL_MONTHS]"
-              >
-                {{ t('analyses.charts.common.presetAll') }}
-              </button>
+              <div class="d-flex gap-1 ms-1">
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  :class="multiSelectMode ? 'btn-secondary' : 'btn-outline-secondary'"
+                  @click="multiSelectMode = !multiSelectMode"
+                  :title="t('analyses.charts.dividends_by_year_month.multiSelect')"
+                ><i class="bi bi-ui-checks"></i></button>
+                <button
+                  type="button"
+                  class="btn btn-sm filter-btn"
+                  :class="filterActive ? 'btn-outline-danger' : 'btn-outline-secondary'"
+                  @click="resetMonthFilter"
+                  :disabled="!filterActive"
+                  :title="t('analyses.charts.dividends_by_year_month.resetFilter')"
+                ><i class="bi" :class="filterActive ? 'bi-funnel-fill' : 'bi-funnel'"></i></button>
+              </div>
             </div>
           </div>
         </div>
@@ -382,6 +396,25 @@ const filteredYears = computed(() =>
 
 // --- Month filter ---
 const selectedMonths = ref<string[]>([...ALL_MONTHS])
+const multiSelectMode = ref(false)
+const filterActive = computed(() => selectedMonths.value.length < 12)
+
+function onMonthClick(m: string) {
+  if (multiSelectMode.value) {
+    const isSelected = selectedMonths.value.includes(m)
+    const next = isSelected
+      ? selectedMonths.value.filter((x) => x !== m)
+      : [...selectedMonths.value, m].sort()
+    selectedMonths.value = next.length === 0 ? [...ALL_MONTHS] : next
+  } else {
+    selectedMonths.value = [m]
+  }
+}
+
+function resetMonthFilter() {
+  selectedMonths.value = [...ALL_MONTHS]
+  multiSelectMode.value = false
+}
 
 // --- Value toggle ---
 const activeValue = ref<'gross' | 'after_withholding' | 'net'>('gross')
@@ -635,5 +668,9 @@ onMounted(() => {
 .th-avg {
   background: color-mix(in oklab, var(--bs-secondary-bg), transparent 40%);
   font-style: italic;
+}
+
+.filter-btn {
+  width: 2.25rem;
 }
 </style>

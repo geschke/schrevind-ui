@@ -745,7 +745,9 @@
         "description": "Dividends per month and year as bar chart.",
         "chartTitle": "Dividends per Month",
         "tableTitle": "Table · Dividends per Month",
-        "filterMonths": "Months"
+        "filterMonths": "Months",
+        "resetFilter": "Reset filter",
+        "multiSelect": "Multi-select"
       },
       "dividends_by_year": {
         "title": "Dividends per Year",
