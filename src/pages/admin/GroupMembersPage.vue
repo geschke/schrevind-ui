@@ -36,6 +36,12 @@
           </div>
         </template>
 
+        <template #tmplMemberRole="data">
+          <span v-if="data.value.Role" class="badge" :class="roleBadgeClass(data.value.Role)">
+            {{ t(`adminGroups.roles.${data.value.Role}`, data.value.Role) }}
+          </span>
+        </template>
+
         <template #tmplMemberActions="data">
           <div class="btn-group btn-group-sm" role="group">
             <button
@@ -206,6 +212,7 @@ const memberHeaders = computed<GTableHeader[]>(() => [
     title: t("adminGroups.members.table.columns.name"),
     render: (item: User) => [item.FirstName, item.LastName].filter(Boolean).join(" ") || "-",
   },
+  { title: t("adminGroups.members.table.columns.role"), field: "tmplMemberRole" },
   { title: t("adminGroups.members.table.columns.actions"), field: "tmplMemberActions" },
 ]);
 
@@ -271,6 +278,15 @@ onMounted(() => {
 });
 
 // ── Members loading ────────────────────────────────────────────────────────
+
+function roleBadgeClass(role: string): string {
+  switch (role) {
+    case "admin":  return "bg-danger";
+    case "owner":  return "bg-primary";
+    case "editor": return "bg-success";
+    default:       return "bg-secondary";
+  }
+}
 
 function loadMembers() {
   loading.value = true;

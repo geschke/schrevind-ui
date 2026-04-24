@@ -4,6 +4,8 @@ export type User = {
   FirstName: string;
   LastName: string;
   Locale: string;
+  Status?: string;
+  Role?: string;
   Password?: string;
   PasswordConfirm?: string;
   // GroupCount is optionally returned by the backend to indicate group membership.

@@ -1005,6 +1005,7 @@
           "id": "ID",
           "email": "E-Mail",
           "name": "Name",
+          "role": "Rolle",
           "actions": "Aktionen"
         }
       },
@@ -1043,6 +1044,12 @@
         "usersLoadFailed": "Fehler beim Laden der Benutzerliste.",
         "noneSelected": "Bitte mindestens einen Benutzer auswählen."
       }
+    },
+    "roles": {
+      "admin": "Admin",
+      "owner": "Eigentümer",
+      "editor": "Bearbeiter",
+      "viewer": "Betrachter"
     }
   },
   "layout": {
