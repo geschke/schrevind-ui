@@ -1016,7 +1016,8 @@
         "cancel": "Abbrechen",
         "columns": {
           "email": "E-Mail",
-          "name": "Name"
+          "name": "Name",
+          "role": "Rolle"
         }
       },
       "removeModal": {
@@ -1043,9 +1044,24 @@
         "loadFailed": "Fehler beim Laden der Mitgliederliste.",
         "usersLoadFailed": "Fehler beim Laden der Benutzerliste.",
         "noneSelected": "Bitte mindestens einen Benutzer auswählen."
+      },
+      "backendErrors": {
+        "UNAUTHORIZED": "Keine Berechtigung. Bitte erneut einloggen.",
+        "INVALID_GROUP_ID": "Ungültige Gruppen-ID.",
+        "INVALID_JSON": "Ungültige Anfrage.",
+        "MISSING_MEMBERS": "Keine Mitglieder angegeben.",
+        "MISSING_USER_IDS": "Keine Benutzer-IDs angegeben.",
+        "FORBIDDEN_CONTEXT_GROUP": "Der gewählte Gruppenkontext ist nicht erlaubt.",
+        "FORBIDDEN": "Keine Berechtigung für diese Aktion in der Zielgruppe.",
+        "INVALID_USER_ID": "Ungültige Benutzer-ID.",
+        "DUPLICATE_USER_ID": "Eine Benutzer-ID wurde mehrfach angegeben.",
+        "INVALID_ROLE": "Ungültige Rolle angegeben.",
+        "LAST_GROUP_ADMIN": "Diese Aktion würde dazu führen, dass die Gruppe keinen Admin mehr hat.",
+        "DB_ERROR": "Datenbankfehler beim Speichern."
       }
     },
     "roles": {
+      "member": "Mitglied",
       "admin": "Admin",
       "owner": "Eigentümer",
       "editor": "Bearbeiter",

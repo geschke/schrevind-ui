@@ -1016,7 +1016,8 @@
         "cancel": "Cancel",
         "columns": {
           "email": "Email",
-          "name": "Name"
+          "name": "Name",
+          "role": "Role"
         }
       },
       "removeModal": {
@@ -1043,9 +1044,24 @@
         "loadFailed": "Failed to load member list.",
         "usersLoadFailed": "Failed to load user list.",
         "noneSelected": "Please select at least one user."
+      },
+      "backendErrors": {
+        "UNAUTHORIZED": "Unauthorized. Please sign in again.",
+        "INVALID_GROUP_ID": "Invalid group ID.",
+        "INVALID_JSON": "Invalid request.",
+        "MISSING_MEMBERS": "No members specified.",
+        "MISSING_USER_IDS": "No user IDs specified.",
+        "FORBIDDEN_CONTEXT_GROUP": "The selected group context is not permitted.",
+        "FORBIDDEN": "You do not have permission for this action in the target group.",
+        "INVALID_USER_ID": "Invalid user ID.",
+        "DUPLICATE_USER_ID": "A user ID was specified more than once.",
+        "INVALID_ROLE": "Invalid role specified.",
+        "LAST_GROUP_ADMIN": "This action would leave the group without an admin.",
+        "DB_ERROR": "A database error occurred while saving."
       }
     },
     "roles": {
+      "member": "Member",
       "admin": "Admin",
       "owner": "Owner",
       "editor": "Editor",

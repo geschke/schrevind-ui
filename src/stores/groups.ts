@@ -1,12 +1,20 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type {
   Group,
   CreateGroupPayload,
   UpdateGroupPayload,
 } from "@/types/groups";
 import type { User } from "@/types/users";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 export const SYSTEM_GROUP_ID = 1;
 
@@ -81,9 +89,16 @@ export const useGroupsStore = defineStore("groups", () => {
       });
   }
 
-  async function addMembers(groupId: number | string, userIds: number[]) {
+  async function addMembers(groupId: number | string, members: { userID: number; role: string }[]) {
     return await axios
-      .post(`/groups/${groupId}/members/add`, { UserIDs: userIds }, { withCredentials: true })
+      .post(
+        `/groups/${groupId}/members/add`,
+        {
+          GroupID: getActiveGroupIDOrThrow(),
+          members: members.map((m) => ({ UserID: m.userID, Role: m.role })),
+        },
+        { withCredentials: true }
+      )
       .catch((error: any) => {
         throw error;
       });
@@ -91,7 +106,11 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function removeMembers(groupId: number | string, userIds: number[]) {
     return await axios
-      .post(`/groups/${groupId}/members/remove`, { UserIDs: userIds }, { withCredentials: true })
+      .post(
+        `/groups/${groupId}/members/remove`,
+        { GroupID: getActiveGroupIDOrThrow(), UserIDs: userIds },
+        { withCredentials: true }
+      )
       .catch((error: any) => {
         throw error;
       });

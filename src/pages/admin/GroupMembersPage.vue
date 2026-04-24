@@ -90,6 +90,17 @@
               @check="handleUserCheck"
               :_showEmpty="false"
             >
+              <template #tmplAddRole="data">
+                <select
+                  class="form-select form-select-sm role-select"
+                  :value="selectedRoles[data.value.ID] ?? ''"
+                  @change="selectedRoles[data.value.ID] = ($event.target as HTMLSelectElement).value"
+                >
+                  <option value="">{{ t("adminGroups.roles.member") }}</option>
+                  <option value="admin">{{ t("adminGroups.roles.admin") }}</option>
+                </select>
+              </template>
+
               <template #tmplAddAction="data">
                 <button
                   type="button"
@@ -196,7 +207,7 @@ import { GTable } from "goar-components";
 import type { GTableHeader, GToastContent } from "goar-components";
 import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-components";
 import { Modal } from "bootstrap";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -231,6 +242,7 @@ const addUsersHeaders = computed<GTableHeader[]>(() => [
     title: t("adminGroups.members.addSection.columns.name"),
     render: (item: User) => [item.FirstName, item.LastName].filter(Boolean).join(" ") || "-",
   },
+  { title: t("adminGroups.members.addSection.columns.role"), field: "tmplAddRole" },
   { title: "", field: "tmplAddAction" },
 ]);
 
@@ -251,6 +263,7 @@ const addSectionVisible = ref(false);
 const loadingAllUsers = ref(false);
 const allUsers = ref<User[]>([]);
 const selectedUserIds = ref<Set<number>>(new Set());
+const selectedRoles = reactive<Record<number, string>>({});
 const addingSelected = ref(false);
 const addingUserId = ref<number | null>(null);
 
@@ -278,6 +291,24 @@ onMounted(() => {
 });
 
 // ── Members loading ────────────────────────────────────────────────────────
+
+function memberErrorContent(code: string): string {
+  switch (code) {
+    case "UNAUTHORIZED":           return t("adminGroups.members.backendErrors.UNAUTHORIZED");
+    case "INVALID_GROUP_ID":       return t("adminGroups.members.backendErrors.INVALID_GROUP_ID");
+    case "INVALID_JSON":           return t("adminGroups.members.backendErrors.INVALID_JSON");
+    case "MISSING_MEMBERS":        return t("adminGroups.members.backendErrors.MISSING_MEMBERS");
+    case "MISSING_USER_IDS":       return t("adminGroups.members.backendErrors.MISSING_USER_IDS");
+    case "FORBIDDEN_CONTEXT_GROUP":return t("adminGroups.members.backendErrors.FORBIDDEN_CONTEXT_GROUP");
+    case "FORBIDDEN":              return t("adminGroups.members.backendErrors.FORBIDDEN");
+    case "INVALID_USER_ID":        return t("adminGroups.members.backendErrors.INVALID_USER_ID");
+    case "DUPLICATE_USER_ID":      return t("adminGroups.members.backendErrors.DUPLICATE_USER_ID");
+    case "INVALID_ROLE":           return t("adminGroups.members.backendErrors.INVALID_ROLE");
+    case "LAST_GROUP_ADMIN":       return t("adminGroups.members.backendErrors.LAST_GROUP_ADMIN");
+    case "DB_ERROR":               return t("adminGroups.members.backendErrors.DB_ERROR");
+    default:                       return t("adminGroups.errors.unknown");
+  }
+}
 
 function roleBadgeClass(role: string): string {
   switch (role) {
@@ -309,8 +340,13 @@ function loadMembers() {
 
 // ── Add section ────────────────────────────────────────────────────────────
 
+function resetSelectedRoles() {
+  Object.keys(selectedRoles).forEach((k) => delete selectedRoles[Number(k)]);
+}
+
 function openAddSection() {
   selectedUserIds.value = new Set();
+  resetSelectedRoles();
   addSectionVisible.value = true;
 
   if (storeUsers.usersLoaded) {
@@ -339,6 +375,7 @@ function openAddSection() {
 function closeAddSection() {
   addSectionVisible.value = false;
   selectedUserIds.value = new Set();
+  resetSelectedRoles();
 }
 
 function handleUserCheck({ item, status }: { item: User; status: boolean }) {
@@ -354,7 +391,7 @@ function handleUserCheck({ item, status }: { item: User; status: boolean }) {
 async function addSingleMember(user: User) {
   addingUserId.value = user.ID;
   try {
-    await storeGroups.addMembers(props.id, [user.ID]);
+    await storeGroups.addMembers(props.id, [{ userID: user.ID, role: selectedRoles[user.ID] ?? "" }]);
     storeUserAuth.refreshAuth().catch(() => {});
     toast.value?.addToast(<GToastContent>{
       ...GToastSuccess,
@@ -367,11 +404,11 @@ async function addSingleMember(user: User) {
     const next = new Set(selectedUserIds.value);
     next.delete(user.ID);
     selectedUserIds.value = next;
-  } catch {
+  } catch (err: unknown) {
     toast.value?.addToast(<GToastContent>{
       ...GToastWarning,
       title: t("adminGroups.common.errorTitle"),
-      content: t("adminGroups.errors.unknown"),
+      content: memberErrorContent(getErrorCode(err)),
     });
   } finally {
     addingUserId.value = null;
@@ -379,25 +416,25 @@ async function addSingleMember(user: User) {
 }
 
 async function addSelectedMembers() {
-  const ids = [...selectedUserIds.value];
-  if (ids.length === 0) return;
+  const members = [...selectedUserIds.value].map((id) => ({ userID: id, role: selectedRoles[id] ?? "" }));
+  if (members.length === 0) return;
 
   addingSelected.value = true;
   try {
-    await storeGroups.addMembers(props.id, ids);
+    await storeGroups.addMembers(props.id, members);
     storeUserAuth.refreshAuth().catch(() => {});
     toast.value?.addToast(<GToastContent>{
       ...GToastSuccess,
       title: t("adminGroups.members.toasts.addedTitle"),
-      content: t("adminGroups.members.toasts.addedSelectedContent", { count: ids.length }),
+      content: t("adminGroups.members.toasts.addedSelectedContent", { count: members.length }),
     });
     selectedUserIds.value = new Set();
     loadMembers();
-  } catch {
+  } catch (err: unknown) {
     toast.value?.addToast(<GToastContent>{
       ...GToastWarning,
       title: t("adminGroups.common.errorTitle"),
-      content: t("adminGroups.errors.unknown"),
+      content: memberErrorContent(getErrorCode(err)),
     });
   } finally {
     addingSelected.value = false;
@@ -431,14 +468,18 @@ function removeMemberConfirm() {
       });
       loadMembers();
     })
-    .catch(() => {
+    .catch((err: unknown) => {
       toast.value?.addToast(<GToastContent>{
         ...GToastWarning,
         title: t("adminGroups.common.errorTitle"),
-        content: t("adminGroups.errors.unknown"),
+        content: memberErrorContent(getErrorCode(err)),
       });
     });
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.role-select {
+  min-width: 120px;
+}
+</style>
