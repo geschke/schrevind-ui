@@ -85,7 +85,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function addDepot(payload: CreateDepotPayload) {
     const body = {
-      GroupID: payload.GroupID,
+      ContextGroupID: payload.ContextGroupID,
       Name: payload.Name,
       BrokerName: payload.BrokerName,
       AccountNumber: payload.AccountNumber,

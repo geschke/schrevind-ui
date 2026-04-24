@@ -15,7 +15,7 @@ export type User = {
 };
 
 export type CreateUserPayload = {
-  GroupID: number;
+  ContextGroupID: number;
   FirstName: string;
   LastName: string;
   Email: string;
@@ -25,7 +25,7 @@ export type CreateUserPayload = {
 };
 
 export type UpdateUserPayload = {
-  GroupID: number;
+  ContextGroupID: number;
   ID: number;
   FirstName: string;
   LastName: string;
@@ -34,13 +34,13 @@ export type UpdateUserPayload = {
 };
 
 export type UpdateUserPasswordPayload = {
-  GroupID: number;
+  ContextGroupID: number;
   ID: number;
   Password: string;
   PasswordDuplicate: string;
 };
 
 export type DeleteUserPayload = {
-  GroupID: number;
+  ContextGroupID: number;
   ID: number;
 };

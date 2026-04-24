@@ -223,7 +223,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeUsers
     .updateUser({
-      GroupID: storeUserAuth.activeGroupID ?? 1,
+      ContextGroupID: storeUserAuth.activeGroupID ?? 1,
       ID: user.value.ID,
       FirstName: values.firstname,
       LastName: values.lastname,

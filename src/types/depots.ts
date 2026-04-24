@@ -25,7 +25,7 @@ export type Depot = {
 };
 
 export type CreateDepotPayload = {
-  GroupID: number;
+  ContextGroupID: number;
   Name: string;
   BrokerName: string;
   AccountNumber: string;

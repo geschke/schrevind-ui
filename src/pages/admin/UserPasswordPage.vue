@@ -144,7 +144,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeUsers
     .updateUserPassword({
-      GroupID: storeUserAuth.activeGroupID ?? 1,
+      ContextGroupID: storeUserAuth.activeGroupID ?? 1,
       ID: userId,
       Password: values.password,
       PasswordDuplicate: values.passwordDuplicate,

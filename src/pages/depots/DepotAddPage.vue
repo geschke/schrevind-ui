@@ -172,7 +172,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeDepots
     .addDepot({
-      GroupID: storeUserAuth.activeGroupID ?? 1,
+      ContextGroupID: storeUserAuth.activeGroupID ?? 1,
       Name: values.name,
       BrokerName: values.brokerName ?? "",
       AccountNumber: values.accountNumber ?? "",

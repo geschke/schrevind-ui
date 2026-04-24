@@ -301,7 +301,7 @@ const onSubmit = handleSubmit((values) => {
 
   storeUsers
     .addUser({
-      GroupID: groupId,
+      ContextGroupID: groupId,
       FirstName: values.firstname,
       LastName: values.lastname,
       Email: values.email,

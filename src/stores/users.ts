@@ -57,7 +57,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function addUser(payload: CreateUserPayload) {
     const body = {
-      GroupID: payload.GroupID,
+      ContextGroupID: payload.ContextGroupID,
       FirstName: payload.FirstName,
       LastName: payload.LastName,
       Email: payload.Email,
@@ -75,7 +75,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function updateUser(payload: UpdateUserPayload) {
     const body = {
-      GroupID: payload.GroupID,
+      ContextGroupID: payload.ContextGroupID,
       Email: payload.Email,
       FirstName: payload.FirstName,
       LastName: payload.LastName,
@@ -93,7 +93,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function updateUserPassword(payload: UpdateUserPasswordPayload) {
     const body = {
-      GroupID: payload.GroupID,
+      ContextGroupID: payload.ContextGroupID,
       Password: payload.Password,
       PasswordDuplicate: payload.PasswordDuplicate,
     };
@@ -108,7 +108,7 @@ export const useUsersStore = defineStore("users", () => {
   }
 
   async function deleteUser(payload: DeleteUserPayload) {
-    const body = { GroupID: payload.GroupID };
+    const body = { ContextGroupID: payload.ContextGroupID };
     return await axios
       .post(`/users/delete/${payload.ID}`, body, { withCredentials: true })
       .then(() => fetchUsers())

@@ -251,7 +251,7 @@ function deleteItemConfirm() {
 
 function deleteUser(item: User) {
   storeUsers
-    .deleteUser({ GroupID: storeUserAuth.activeGroupID ?? 1, ID: item.ID })
+    .deleteUser({ ContextGroupID: storeUserAuth.activeGroupID ?? 1, ID: item.ID })
     .then(() => {
       toast.value?.addToast(<GToastContent>{
         ...GToastSuccess,

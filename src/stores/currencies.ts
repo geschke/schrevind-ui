@@ -58,7 +58,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
   async function fetchCurrencies() {
     const groupId = getActiveGroupIDOrThrow();
     return axios
-      .get("/currencies/list", { params: { group_id: groupId }, withCredentials: true })
+      .get("/currencies/list", { params: { context_group_id: groupId }, withCredentials: true })
       .then((response) => {
         currencies.value = normalizeCurrencyItems(response.data);
         currenciesLoaded.value = true;
@@ -73,7 +73,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
   async function fetchCurrencyById(id: number | string): Promise<Currency> {
     const groupId = getActiveGroupIDOrThrow();
     return axios
-      .get(`/currencies/${id}`, { params: { group_id: groupId }, withCredentials: true })
+      .get(`/currencies/${id}`, { params: { context_group_id: groupId }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.currency ?? response.data;
         const currency = normalizeCurrency(rawItem);
@@ -94,7 +94,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function addCurrency(payload: CreateCurrencyPayload) {
     const currencyDO = {
-      GroupID: getActiveGroupIDOrThrow(),
+      ContextGroupID: getActiveGroupIDOrThrow(),
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
@@ -111,7 +111,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function updateCurrency(payload: UpdateCurrencyPayload) {
     const currencyDO = {
-      GroupID: getActiveGroupIDOrThrow(),
+      ContextGroupID: getActiveGroupIDOrThrow(),
       Currency: payload.Currency,
       Name: payload.Name,
       Status: payload.Status,
@@ -128,7 +128,7 @@ export const useCurrenciesStore = defineStore("currencies", () => {
 
   async function deleteCurrency(payload: Pick<Currency, "ID">) {
     return axios
-      .post(`/currencies/delete/${payload.ID}`, { GroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
+      .post(`/currencies/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => fetchCurrencies())
       .catch((error: unknown) => {
         throw error;

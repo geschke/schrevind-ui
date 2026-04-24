@@ -94,7 +94,7 @@ export const useGroupsStore = defineStore("groups", () => {
       .post(
         `/groups/${groupId}/members/add`,
         {
-          GroupID: getActiveGroupIDOrThrow(),
+          ContextGroupID: getActiveGroupIDOrThrow(),
           members: members.map((m) => ({ UserID: m.userID, Role: m.role })),
         },
         { withCredentials: true }
@@ -108,7 +108,7 @@ export const useGroupsStore = defineStore("groups", () => {
     return await axios
       .post(
         `/groups/${groupId}/members/remove`,
-        { GroupID: getActiveGroupIDOrThrow(), UserIDs: userIds },
+        { ContextGroupID: getActiveGroupIDOrThrow(), UserIDs: userIds },
         { withCredentials: true }
       )
       .catch((error: any) => {
