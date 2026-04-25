@@ -28,6 +28,13 @@ function getCurrentUserIdOrThrow(): number {
   return userId;
 }
 
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
+
 function normalizeDividendEntry(item: unknown): DividendEntry {
   const raw = (item ?? {}) as Record<string, unknown>;
 
@@ -96,6 +103,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   function buildQueryParams(params?: DividendEntriesQueryParams) {
     return {
+      context_group_id: getActiveGroupIDOrThrow(),
       offset: params?.offset ?? 0,
       limit: params?.limit ?? 20,
       ...(params?.sort ? { sort: params.sort } : {}),
@@ -107,6 +115,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   function buildDividendEntryRequestBody(payload: CreateDividendEntryPayload, userId: number) {
     return {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       UserID: userId,
       DepotID: payload.DepotID,
       SecurityID: payload.SecurityID,
@@ -212,7 +221,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   async function fetchDividendEntryById(id: number | string): Promise<DividendEntry> {
     return axios
-      .get(`/dividend-entries/${id}`, { withCredentials: true })
+      .get(`/dividend-entries/${id}`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.dividendEntry ?? response.data;
         const item = normalizeDividendEntry(rawItem);
@@ -254,7 +263,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
 
   async function deleteDividendEntry(payload: Pick<DividendEntry, "ID">) {
     return axios
-      .post(`/dividend-entries/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .post(`/dividend-entries/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => {
         const existingIndex = dividendEntries.value.findIndex((item) => item.ID === payload.ID);
         if (existingIndex >= 0) {

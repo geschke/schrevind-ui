@@ -455,6 +455,20 @@
       "nameRequired": "Bitte geben Sie einen Namen für das Wertpapier ein.",
       "isinRequired": "Bitte geben Sie eine ISIN für das Wertpapier ein."
     },
+    "backendErrors": {
+      "UNAUTHORIZED": "Keine gültige Sitzung. Bitte erneut einloggen.",
+      "AUTH_NOT_CONFIGURED": "Authentifizierungsfehler auf dem Server.",
+      "DB_NOT_INITIALIZED": "Datenbankfehler auf dem Server.",
+      "INVALID_GROUP_ID": "Ungültige Gruppen-ID. Bitte Gruppenkontext prüfen.",
+      "FORBIDDEN": "Keine Berechtigung für diese Aktion.",
+      "INVALID_SECURITY_ID": "Ungültige Wertpapier-ID.",
+      "ISIN_ALREADY_IN_USE": "Diese ISIN wird in der Gruppe bereits verwendet.",
+      "SECURITY_NAME_ALREADY_IN_USE": "Dieser Name wird in der Gruppe bereits verwendet.",
+      "INVALID_STATUS": "Ungültiger Status-Wert.",
+      "INVALID_STATUS_FILTER": "Ungültiger Status-Filter.",
+      "INVALID_QUERY_PARAMS": "Ungültige Abfrageparameter.",
+      "DB_ERROR": "Datenbankfehler beim Speichern."
+    },
     "list": {
       "title": "Wertpapiere",
       "addButton": "Wertpapier hinzufügen",
@@ -484,7 +498,9 @@
       },
       "toasts": {
         "deletedTitle": "Wertpapier gelöscht",
-        "deletedContent": "Das Wertpapier wurde aus der Datenbank gelöscht."
+        "deletedContent": "Das Wertpapier wurde aus der Datenbank gelöscht.",
+        "deactivatedTitle": "Wertpapier deaktiviert",
+        "deactivatedContent": "Das Wertpapier wurde deaktiviert (statt gelöscht), da noch Dividendeneinträge darauf verweisen."
       },
       "createdBannerWithName": "Wertpapier {name} wurde erfolgreich angelegt."
     },

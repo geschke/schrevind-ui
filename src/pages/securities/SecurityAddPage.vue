@@ -113,20 +113,22 @@ function dismissErrorMessage() {
 
 function errorContent(code: string) {
   switch (code) {
+    case "UNAUTHORIZED":                    return t("securities.backendErrors.UNAUTHORIZED");
+    case "AUTH_NOT_CONFIGURED":             return t("securities.backendErrors.AUTH_NOT_CONFIGURED");
+    case "DB_NOT_INITIALIZED":              return t("securities.backendErrors.DB_NOT_INITIALIZED");
+    case "INVALID_GROUP_ID":                return t("securities.backendErrors.INVALID_GROUP_ID");
+    case "FORBIDDEN":                       return t("securities.backendErrors.FORBIDDEN");
     case "NAME_REQUIRED":
-    case "MISSING_NAME":
-      return t("securities.validation.nameRequired");
+    case "MISSING_NAME":                    return t("securities.validation.nameRequired");
     case "ISIN_REQUIRED":
-    case "MISSING_ISIN":
-      return t("securities.validation.isinRequired");
-    case "INVALID_JSON":
-      return t("securities.add.errors.invalidJson");
-    case "NETWORK_ERROR":
-      return t("securities.add.errors.network");
-    case "DB_ERROR":
-      return t("securities.add.errors.dbError");
-    default:
-      return t("securities.errors.unknown");
+    case "MISSING_ISIN":                    return t("securities.validation.isinRequired");
+    case "ISIN_ALREADY_IN_USE":             return t("securities.backendErrors.ISIN_ALREADY_IN_USE");
+    case "SECURITY_NAME_ALREADY_IN_USE":    return t("securities.backendErrors.SECURITY_NAME_ALREADY_IN_USE");
+    case "INVALID_STATUS":                  return t("securities.backendErrors.INVALID_STATUS");
+    case "INVALID_JSON":                    return t("securities.add.errors.invalidJson");
+    case "DB_ERROR":                        return t("securities.backendErrors.DB_ERROR");
+    case "NETWORK_ERROR":                   return t("securities.add.errors.network");
+    default:                                return t("securities.errors.unknown");
   }
 }
 

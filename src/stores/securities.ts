@@ -1,7 +1,15 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type { Security, CreateSecurityPayload, UpdateSecurityPayload } from "@/types/securities";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 type SecuritiesSortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "CreatedAt" | "UpdatedAt";
 type SecuritiesSortDirection = "asc" | "desc" | "none";
@@ -66,6 +74,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
 
   function buildQueryParams(params?: SecuritiesQueryParams) {
     return {
+      context_group_id: getActiveGroupIDOrThrow(),
       offset: params?.offset ?? 0,
       limit: params?.limit ?? 10,
       ...(params?.sort ? { sort: params.sort } : {}),
@@ -93,6 +102,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
       .get("/securities/list-all", {
         withCredentials: true,
         params: {
+          context_group_id: getActiveGroupIDOrThrow(),
           ...(params?.sort ? { sort: params.sort } : {}),
           ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
         },
@@ -112,7 +122,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
 
   async function fetchSecurityById(id: number | string): Promise<Security> {
     return axios
-      .get(`/securities/${id}`, { withCredentials: true })
+      .get(`/securities/${id}`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.security ?? response.data;
         const security = normalizeSecurity(rawItem);
@@ -130,6 +140,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
 
   async function addSecurity(payload: CreateSecurityPayload) {
     const securityDO = {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       Name: payload.Name,
       ISIN: payload.ISIN,
       WKN: payload.WKN,
@@ -147,6 +158,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
 
   async function updateSecurity(payload: UpdateSecurityPayload) {
     const securityDO = {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       Name: payload.Name,
       ISIN: payload.ISIN,
       WKN: payload.WKN,
@@ -162,10 +174,13 @@ export const useSecuritiesStore = defineStore("securities", () => {
       });
   }
 
-  async function deleteSecurity(payload: Pick<Security, "ID">) {
+  async function deleteSecurity(payload: Pick<Security, "ID">): Promise<string> {
     return axios
-      .post(`/securities/delete/${payload.ID}`, undefined, { withCredentials: true })
-      .then(() => fetchSecurities())
+      .post(`/securities/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
+      .then((response) => {
+        const code = String(response.data?.code ?? "SECURITY_DELETED");
+        return fetchSecurities().then(() => code);
+      })
       .catch((error: unknown) => {
         throw error;
       });

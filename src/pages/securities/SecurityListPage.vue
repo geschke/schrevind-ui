@@ -57,6 +57,7 @@
               <i class="bi bi-pencil"></i>
             </router-link>
             <button
+              v-if="isGroupAdmin"
               type="button"
               class="btn btn-outline-primary"
               @click="deleteItem(data.value)"
@@ -137,6 +138,7 @@
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useSecuritiesStore } from "@/stores/securities";
+import { usePermissions } from "@/composables/usePermissions";
 import { getErrorCode } from "@/helper/errorCode";
 import type { Security } from "@/types/securities";
 import { GTable } from "goar-components";
@@ -152,6 +154,7 @@ type SortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "Created
 type SortDirection = "asc" | "desc" | "none";
 
 const storeSecurities = useSecuritiesStore();
+const { isGroupAdmin } = usePermissions();
 const toast: any = ref(null);
 const loading = ref(false);
 const toBeDeleted = ref<Security | null>(null);

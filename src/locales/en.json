@@ -455,6 +455,20 @@
       "nameRequired": "Please enter a security name.",
       "isinRequired": "Please enter an ISIN for the security."
     },
+    "backendErrors": {
+      "UNAUTHORIZED": "No valid session. Please sign in again.",
+      "AUTH_NOT_CONFIGURED": "Authentication error on the server.",
+      "DB_NOT_INITIALIZED": "Database error on the server.",
+      "INVALID_GROUP_ID": "Invalid group ID. Please check the group context.",
+      "FORBIDDEN": "You do not have permission for this action.",
+      "INVALID_SECURITY_ID": "Invalid security ID.",
+      "ISIN_ALREADY_IN_USE": "This ISIN is already used in the group.",
+      "SECURITY_NAME_ALREADY_IN_USE": "This name is already used in the group.",
+      "INVALID_STATUS": "Invalid status value.",
+      "INVALID_STATUS_FILTER": "Invalid status filter.",
+      "INVALID_QUERY_PARAMS": "Invalid query parameters.",
+      "DB_ERROR": "A database error occurred while saving."
+    },
     "list": {
       "title": "Securities",
       "addButton": "Add security",
@@ -484,7 +498,9 @@
       },
       "toasts": {
         "deletedTitle": "Security deleted",
-        "deletedContent": "The security was removed from the database."
+        "deletedContent": "The security was removed from the database.",
+        "deactivatedTitle": "Security deactivated",
+        "deactivatedContent": "The security was deactivated instead of deleted because dividend entries still reference it."
       },
       "createdBannerWithName": "Security {name} was created successfully."
     },
