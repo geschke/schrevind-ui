@@ -539,7 +539,7 @@
       "backToList": "Back to withholding tax list"
     },
     "scope": {
-      "global": "Global",
+      "group": "Group",
       "depot": "Depot"
     },
     "form": {
@@ -610,6 +610,17 @@
       "toasts": {
         "updatedContent": "The withholding tax default was updated."
       }
+    },
+    "backendErrors": {
+      "DB_NOT_INITIALIZED": "Database connection is not initialized.",
+      "AUTH_NOT_CONFIGURED": "Authentication is not configured.",
+      "UNAUTHORIZED": "Unauthorized. Please log in again.",
+      "INVALID_WITHHOLDING_TAX_DEFAULT_ID": "Invalid withholding tax default ID.",
+      "INVALID_GROUP_ID": "Invalid group ID.",
+      "INVALID_DEPOT_ID": "Invalid depot ID.",
+      "FORBIDDEN": "Not authorized for this action.",
+      "FORBIDDEN_DEPOT": "Not authorized for this depot.",
+      "DB_ERROR": "Database error. Please try again."
     }
   },
   "overview": {

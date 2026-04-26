@@ -1,11 +1,19 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type {
   WithholdingTaxDefault,
   CreateWithholdingTaxDefaultPayload,
   UpdateWithholdingTaxDefaultPayload,
 } from "@/types/withholdingTaxDefaults";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 function normalizeWithholdingTaxDefault(item: unknown): WithholdingTaxDefault {
   const raw = (item ?? {}) as Record<string, unknown>;
@@ -45,7 +53,7 @@ export const useWithholdingTaxDefaultsStore = defineStore("withholdingTaxDefault
 
   async function fetchWithholdingTaxDefaults() {
     return axios
-      .get("/withholding-tax-defaults/list", { withCredentials: true })
+      .get("/withholding-tax-defaults/list", { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         withholdingTaxDefaults.value = normalizeItems(response.data);
         withholdingTaxDefaultsLoaded.value = true;
@@ -59,7 +67,7 @@ export const useWithholdingTaxDefaultsStore = defineStore("withholdingTaxDefault
 
   async function fetchWithholdingTaxDefaultById(id: number | string): Promise<WithholdingTaxDefault> {
     return axios
-      .get(`/withholding-tax-defaults/${id}`, { withCredentials: true })
+      .get(`/withholding-tax-defaults/${id}`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.withholdingTaxDefault ?? response.data;
         const item = normalizeWithholdingTaxDefault(rawItem);
@@ -80,6 +88,7 @@ export const useWithholdingTaxDefaultsStore = defineStore("withholdingTaxDefault
 
   async function addWithholdingTaxDefault(payload: CreateWithholdingTaxDefaultPayload) {
     const requestBody = {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       DepotID: payload.DepotID,
       CountryCode: payload.CountryCode,
       CountryName: payload.CountryName,
@@ -97,6 +106,7 @@ export const useWithholdingTaxDefaultsStore = defineStore("withholdingTaxDefault
 
   async function updateWithholdingTaxDefault(payload: UpdateWithholdingTaxDefaultPayload) {
     const requestBody = {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       DepotID: payload.DepotID,
       CountryCode: payload.CountryCode,
       CountryName: payload.CountryName,
@@ -114,7 +124,7 @@ export const useWithholdingTaxDefaultsStore = defineStore("withholdingTaxDefault
 
   async function deleteWithholdingTaxDefault(payload: Pick<WithholdingTaxDefault, "ID">) {
     return axios
-      .post(`/withholding-tax-defaults/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .post(`/withholding-tax-defaults/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => fetchWithholdingTaxDefaults())
       .catch((error: unknown) => {
         throw error;

@@ -17,7 +17,7 @@
           <label for="scope" class="col-sm-2 col-form-label">{{ t("withholdingTaxDefaults.common.scope") }}</label>
           <div class="col-sm-10">
             <select id="scope" v-model="scope" v-bind="scopeAttrs" class="form-select">
-              <option value="global">{{ t("withholdingTaxDefaults.scope.global") }}</option>
+              <option value="group">{{ t("withholdingTaxDefaults.scope.group") }}</option>
               <option value="depot">{{ t("withholdingTaxDefaults.scope.depot") }}</option>
             </select>
             <small class="text-danger" v-if="errors.scope">{{ errors.scope }}</small>
@@ -140,7 +140,7 @@ type SaveState = "idle" | "saving" | "success" | "error";
 const validationSchema = yup.object().shape({
   scope: yup
     .string()
-    .oneOf(["global", "depot"])
+    .oneOf(["group", "depot"])
     .required(() => t("withholdingTaxDefaults.validation.scopeRequired")),
   depotId: yup.string().when("scope", {
     is: "depot",
@@ -187,9 +187,9 @@ const [withholdingTaxPercentCreditDefault, withholdingTaxPercentCreditDefaultAtt
 const depotOptions = computed(() => storeDepots.getDepots);
 
 onMounted(() => {
-  scope.value = "global";
+  scope.value = "group";
   storeDepots.fetchDepots().catch(() => {
-    // Errors surface through submit and list flows; keep form usable for global scope.
+    // Errors surface through submit and list flows; keep form usable for group scope.
   });
 });
 
@@ -206,23 +206,20 @@ function dismissErrorMessage() {
 
 function errorContent(code: string) {
   switch (code) {
-    case "MISSING_COUNTRY_CODE":
-    case "COUNTRY_CODE_REQUIRED":
-      return t("withholdingTaxDefaults.validation.countryCodeRequired");
-    case "MISSING_COUNTRY_NAME":
-    case "COUNTRY_NAME_REQUIRED":
-      return t("withholdingTaxDefaults.validation.countryNameRequired");
-    case "MISSING_WITHHOLDING_TAX_PERCENT_DEFAULT":
-    case "WITHHOLDING_TAX_PERCENT_DEFAULT_REQUIRED":
-      return t("withholdingTaxDefaults.validation.percentDefaultRequired");
-    case "INVALID_JSON":
-      return t("withholdingTaxDefaults.add.errors.invalidJson");
-    case "NETWORK_ERROR":
-      return t("withholdingTaxDefaults.add.errors.network");
-    case "DB_ERROR":
-      return t("withholdingTaxDefaults.add.errors.dbError");
-    default:
-      return t("withholdingTaxDefaults.errors.unknown");
+    case "UNAUTHORIZED":                          return t("withholdingTaxDefaults.backendErrors.UNAUTHORIZED");
+    case "AUTH_NOT_CONFIGURED":                   return t("withholdingTaxDefaults.backendErrors.AUTH_NOT_CONFIGURED");
+    case "DB_NOT_INITIALIZED":                    return t("withholdingTaxDefaults.backendErrors.DB_NOT_INITIALIZED");
+    case "INVALID_GROUP_ID":                      return t("withholdingTaxDefaults.backendErrors.INVALID_GROUP_ID");
+    case "INVALID_DEPOT_ID":                      return t("withholdingTaxDefaults.backendErrors.INVALID_DEPOT_ID");
+    case "FORBIDDEN":                             return t("withholdingTaxDefaults.backendErrors.FORBIDDEN");
+    case "FORBIDDEN_DEPOT":                       return t("withholdingTaxDefaults.backendErrors.FORBIDDEN_DEPOT");
+    case "MISSING_COUNTRY_CODE":                  return t("withholdingTaxDefaults.validation.countryCodeRequired");
+    case "MISSING_COUNTRY_NAME":                  return t("withholdingTaxDefaults.validation.countryNameRequired");
+    case "MISSING_WITHHOLDING_TAX_PERCENT_DEFAULT": return t("withholdingTaxDefaults.validation.percentDefaultRequired");
+    case "INVALID_JSON":                          return t("withholdingTaxDefaults.add.errors.invalidJson");
+    case "NETWORK_ERROR":                         return t("withholdingTaxDefaults.add.errors.network");
+    case "DB_ERROR":                              return t("withholdingTaxDefaults.backendErrors.DB_ERROR");
+    default:                                      return t("withholdingTaxDefaults.errors.unknown");
   }
 }
 

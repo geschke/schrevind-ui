@@ -539,7 +539,7 @@
       "backToList": "Zur Quellensteuerliste"
     },
     "scope": {
-      "global": "Global",
+      "group": "Gruppe",
       "depot": "Depot"
     },
     "form": {
@@ -610,6 +610,17 @@
       "toasts": {
         "updatedContent": "Die Quellensteuer-Vorgabe wurde geändert."
       }
+    },
+    "backendErrors": {
+      "DB_NOT_INITIALIZED": "Datenbankverbindung nicht initialisiert.",
+      "AUTH_NOT_CONFIGURED": "Authentifizierung ist nicht konfiguriert.",
+      "UNAUTHORIZED": "Nicht autorisiert. Bitte neu einloggen.",
+      "INVALID_WITHHOLDING_TAX_DEFAULT_ID": "Ungültige ID der Quellensteuer-Vorgabe.",
+      "INVALID_GROUP_ID": "Ungültige Gruppen-ID.",
+      "INVALID_DEPOT_ID": "Ungültige Depot-ID.",
+      "FORBIDDEN": "Keine Berechtigung für diese Aktion.",
+      "FORBIDDEN_DEPOT": "Keine Berechtigung für dieses Depot.",
+      "DB_ERROR": "Datenbankfehler. Bitte versuchen Sie es erneut."
     }
   },
   "overview": {

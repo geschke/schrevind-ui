@@ -51,6 +51,7 @@
               <i class="bi bi-pencil"></i>
             </router-link>
             <button
+              v-if="isGroupAdmin"
               type="button"
               class="btn btn-outline-primary"
               @click="deleteItem(data.value)"
@@ -134,6 +135,7 @@
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useWithholdingTaxDefaultsStore } from "@/stores/withholdingTaxDefaults";
 import { useDepotsStore } from "@/stores/depots";
+import { usePermissions } from "@/composables/usePermissions";
 import { getErrorCode } from "@/helper/errorCode";
 import type { WithholdingTaxDefault } from "@/types/withholdingTaxDefaults";
 import { GTable } from "goar-components";
@@ -144,6 +146,7 @@ import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
+const { isGroupAdmin } = usePermissions();
 const CREATED_FLASH_KEY = "schrevind.withholdingTaxDefaults.createdCountry";
 
 const storeWithholdingTaxDefaults = useWithholdingTaxDefaultsStore();
@@ -233,12 +236,12 @@ function formatDate(unixTs: number): string {
 function getScopeLabel(depotId: number): string {
   return depotId > 0
     ? t("withholdingTaxDefaults.scope.depot")
-    : t("withholdingTaxDefaults.scope.global");
+    : t("withholdingTaxDefaults.scope.group");
 }
 
 function getDepotName(depotId: number): string {
   if (depotId <= 0) {
-    return t("withholdingTaxDefaults.scope.global");
+    return t("withholdingTaxDefaults.scope.group");
   }
 
   return depotNames.value[depotId] ?? String(depotId);
@@ -246,19 +249,22 @@ function getDepotName(depotId: number): string {
 
 function errorContent(errorCode: string) {
   switch (errorCode) {
-    case "NETWORK_ERROR":
-      return t("withholdingTaxDefaults.errors.loadFailed");
-    default:
-      return t("withholdingTaxDefaults.errors.unknown");
+    case "UNAUTHORIZED":                        return t("withholdingTaxDefaults.backendErrors.UNAUTHORIZED");
+    case "AUTH_NOT_CONFIGURED":                 return t("withholdingTaxDefaults.backendErrors.AUTH_NOT_CONFIGURED");
+    case "DB_NOT_INITIALIZED":                  return t("withholdingTaxDefaults.backendErrors.DB_NOT_INITIALIZED");
+    case "INVALID_GROUP_ID":                    return t("withholdingTaxDefaults.backendErrors.INVALID_GROUP_ID");
+    case "NETWORK_ERROR":                       return t("withholdingTaxDefaults.errors.loadFailed");
+    default:                                    return t("withholdingTaxDefaults.errors.unknown");
   }
 }
 
 function deleteErrorContent(errorCode: string) {
   switch (errorCode) {
-    case "WITHHOLDING_TAX_DEFAULT_NOT_FOUND":
-      return t("withholdingTaxDefaults.errors.itemNotFoundDelete");
-    default:
-      return errorContent(errorCode);
+    case "WITHHOLDING_TAX_DEFAULT_NOT_FOUND":   return t("withholdingTaxDefaults.errors.itemNotFoundDelete");
+    case "FORBIDDEN":                           return t("withholdingTaxDefaults.backendErrors.FORBIDDEN");
+    case "INVALID_WITHHOLDING_TAX_DEFAULT_ID":  return t("withholdingTaxDefaults.backendErrors.INVALID_WITHHOLDING_TAX_DEFAULT_ID");
+    case "DB_ERROR":                            return t("withholdingTaxDefaults.backendErrors.DB_ERROR");
+    default:                                    return errorContent(errorCode);
   }
 }
 
