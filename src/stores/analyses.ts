@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axios from "@/helper/axiosInstance";
+import { useUserAuthStore } from "@/stores/userauth";
 import type {
   AnalysisColumnAlign,
   AnalysisColumnDatatype,
@@ -19,6 +20,13 @@ const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-security-year";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month-security";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
+
+function getActiveGroupIDOrThrow(): number {
+  const storeUserAuth = useUserAuthStore();
+  const id = storeUserAuth.activeGroupID;
+  if (id == null) throw new Error("NO_ACTIVE_GROUP");
+  return id;
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -143,7 +151,7 @@ export const useAnalysesStore = defineStore("analyses", () => {
     analysisLoaded.value = false;
 
     return axios
-      .get(endpoint, { withCredentials: true })
+      .get(endpoint, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const analysis = normalizeAnalysisPayload(response.data);
 
@@ -178,6 +186,7 @@ export const useAnalysesStore = defineStore("analyses", () => {
   async function fetchDividendsByYearMonthChartData(depotIds?: number[]): Promise<DividendsByYearMonthChart> {
     currentMonthChartData.value = null;
     const params = new URLSearchParams();
+    params.append("context_group_id", String(getActiveGroupIDOrThrow()));
     if (depotIds && depotIds.length > 0) {
       depotIds.forEach((id) => params.append("depot_id", String(id)));
     }
@@ -197,6 +206,7 @@ export const useAnalysesStore = defineStore("analyses", () => {
   async function fetchDividendsByYearChartData(depotIds?: number[]): Promise<DividendsByYearChart> {
     currentChartData.value = null;
     const params = new URLSearchParams();
+    params.append("context_group_id", String(getActiveGroupIDOrThrow()));
     if (depotIds && depotIds.length > 0) {
       depotIds.forEach((id) => params.append("depot_id", String(id)));
     }
