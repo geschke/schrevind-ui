@@ -45,6 +45,17 @@
             <span v-else class="dropdown-item disabled">{{ t("layout.topbar.changeOwnPassword") }}</span>
           </li>
           <li>
+            <a
+              class="dropdown-item"
+              href="#"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasSettings"
+              @click.prevent
+            >
+              <i class="bi bi-sliders me-1"></i>{{ t("layout.topbar.settings") }}
+            </a>
+          </li>
+          <li>
             <hr class="dropdown-divider" />
           </li>
           <li><a class="dropdown-item" @click.prevent="signout" href="#!">{{ t("layout.topbar.logout") }}</a></li>
@@ -87,6 +98,35 @@
       <AboutModal />
     </div>
   </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSettings" aria-labelledby="offcanvasSettingsLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasSettingsLabel">{{ t("layout.settings.title") }}</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" :aria-label="t('layout.settings.close')"></button>
+    </div>
+    <div class="offcanvas-body">
+      <h6 class="mb-1">{{ t("layout.settings.appearance.title") }}</h6>
+      <p class="text-muted small mb-3">{{ t("layout.settings.appearance.paletteLabel") }}</p>
+      <div class="d-flex flex-column gap-2">
+        <button
+          v-for="name in PALETTE_ORDER"
+          :key="name"
+          type="button"
+          class="btn btn-sm d-flex align-items-center gap-3 text-start"
+          :class="storeSettings.palette === name ? 'btn-dark' : 'btn-outline-secondary'"
+          @click="storeSettings.setPalette(name)"
+        >
+          <div class="d-flex gap-1 flex-shrink-0">
+            <div :style="{ width: '16px', height: '16px', borderRadius: '3px', backgroundColor: CHART_PALETTES[name].gross }"></div>
+            <div :style="{ width: '16px', height: '16px', borderRadius: '3px', backgroundColor: CHART_PALETTES[name].afterWithholding }"></div>
+            <div :style="{ width: '16px', height: '16px', borderRadius: '3px', backgroundColor: CHART_PALETTES[name].net }"></div>
+          </div>
+          <span>{{ CHART_PALETTES[name].label }}</span>
+          <i v-if="storeSettings.palette === name" class="bi bi-check2 ms-auto"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -96,11 +136,13 @@ import LanguageSwitcher from "@/components/helper/LanguageSwitcher.vue";
 import GroupSwitcher from "@/components/GroupSwitcher.vue";
 
 import { useUserAuthStore } from "../stores/userauth";
+import { useSettingsStore, CHART_PALETTES, PALETTE_ORDER } from "../stores/settings";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 
 const storeUserAuth = useUserAuthStore();
+const storeSettings = useSettingsStore();
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();

@@ -1101,6 +1101,7 @@
       "searchAria": "Suche nach...",
       "editUser": "Benutzer bearbeiten",
       "changeOwnPassword": "Passwort ändern",
+      "settings": "Einstellungen",
       "logout": "Abmelden",
       "groupSwitcher": {
         "label": "Gruppe",
@@ -1120,6 +1121,14 @@
     "locale": {
       "de": "Deutsch",
       "en": "English"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "close": "Schließen",
+      "appearance": {
+        "title": "Darstellung",
+        "paletteLabel": "Farbschema für Charts"
+      }
     },
     "loggedInAs": "Angemeldet als:",
     "contentFallback": "Hauptbereich",

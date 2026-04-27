@@ -282,6 +282,7 @@ import { getErrorCode } from '@/helper/errorCode'
 import TheMainLayout from '@/layouts/TheMainLayout.vue'
 import { useAnalysesStore } from '@/stores/analyses'
 import { useDepotsStore } from '@/stores/depots'
+import { useSettingsStore } from '@/stores/settings'
 import { GToast, GToastDanger, GToastWarning } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -295,18 +296,13 @@ interface ChartRow {
   whtShare: number
 }
 
-// Sunset palette — terracotta / amber / olive
-const COLORS = {
-  gross: '#bf5f38',
-  afterWithholding: '#a07a1a',
-  net: '#5e8a28',
-} as const
+const storeSettings = useSettingsStore()
 
-const cssVars = {
-  '--c-gross': COLORS.gross,
-  '--c-after-wht': COLORS.afterWithholding,
-  '--c-net': COLORS.net,
-}
+const cssVars = computed(() => ({
+  '--c-gross': storeSettings.currentPalette.gross,
+  '--c-after-wht': storeSettings.currentPalette.afterWithholding,
+  '--c-net': storeSettings.currentPalette.net,
+}))
 
 const { t, locale } = useI18n()
 const storeAnalyses = useAnalysesStore()
@@ -506,13 +502,14 @@ const chartOption = computed<ECOption>(() => {
     })
   }
 
-  addBar('gross', t('analyses.dividends_by_year.columns.gross'), COLORS.gross, 'gross')
-  addBar('after_withholding', t('analyses.dividends_by_year.columns.after_withholding'), COLORS.afterWithholding, 'afterWithholding')
-  addBar('net', t('analyses.dividends_by_year.columns.net'), COLORS.net, 'net')
+  const pal = storeSettings.currentPalette
+  addBar('gross', t('analyses.dividends_by_year.columns.gross'), pal.gross, 'gross')
+  addBar('after_withholding', t('analyses.dividends_by_year.columns.after_withholding'), pal.afterWithholding, 'afterWithholding')
+  addBar('net', t('analyses.dividends_by_year.columns.net'), pal.net, 'net')
 
   if (showTrend.value && activeValues.value.length > 0) {
     const refKey = ['gross', 'after_withholding', 'net'].find((k) => activeValues.value.includes(k))!
-    const refColor = refKey === 'gross' ? COLORS.gross : refKey === 'after_withholding' ? COLORS.afterWithholding : COLORS.net
+    const refColor = refKey === 'gross' ? pal.gross : refKey === 'after_withholding' ? pal.afterWithholding : pal.net
     const dataKey: keyof ChartRow = refKey === 'after_withholding' ? 'afterWithholding' : (refKey as keyof ChartRow)
     series.push({
       name: 'Trend',

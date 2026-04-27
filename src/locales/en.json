@@ -1115,11 +1115,20 @@
       "searchAria": "Search for...",
       "editUser": "Edit user",
       "changeOwnPassword": "Change password",
+      "settings": "Settings",
       "logout": "Logout"
     },
     "locale": {
       "de": "German",
       "en": "English"
+    },
+    "settings": {
+      "title": "Settings",
+      "close": "Close",
+      "appearance": {
+        "title": "Appearance",
+        "paletteLabel": "Chart color scheme"
+      }
     },
     "loggedInAs": "Logged in as:",
     "contentFallback": "Main content",

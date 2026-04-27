@@ -266,25 +266,14 @@ import { GToast, GToastDanger, GToastWarning } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useSettingsStore } from '@/stores/settings'
 
 const ALL_MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-
-const YEAR_PALETTE = [
-  '#5b8db8',
-  '#6aaa6a',
-  '#c46b6b',
-  '#6ab0ad',
-  '#c9a84c',
-  '#9b78b5',
-  '#c47a8a',
-  '#7a9db0',
-  '#b09060',
-  '#8a8ab0',
-]
 
 const { t, locale } = useI18n()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
+const storeSettings = useSettingsStore()
 const toast = ref<InstanceType<typeof GToast> | null>(null)
 const chartRef = ref<InstanceType<typeof VChart> | null>(null)
 const loading = ref(false)
@@ -430,8 +419,9 @@ const filteredRows = computed(() => {
 
 // --- Year color ---
 function yearColor(year: string): string {
+  const colors = storeSettings.currentPalette.yearColors
   const idx = allYears.value.indexOf(year)
-  return YEAR_PALETTE[idx % YEAR_PALETTE.length]
+  return colors[idx % colors.length] ?? colors[0] ?? '#888888'
 }
 
 // --- Display options ---
