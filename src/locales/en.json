@@ -1100,7 +1100,17 @@
       "searchPlaceholder": "Search for...",
       "groupSwitcher": {
         "label": "Group",
-        "ariaLabel": "Switch active group"
+        "ariaLabel": "Switch active group",
+        "errors": {
+          "switchFailed": "Group context could not be saved on the server.",
+          "UNAUTHORIZED": "Session expired. Please log in again.",
+          "FORBIDDEN": "You are not a member of this group.",
+          "INVALID_GROUP_ID": "Invalid group ID.",
+          "DB_NOT_INITIALIZED": "Database connection is not initialized.",
+          "AUTH_NOT_CONFIGURED": "Authentication is not configured.",
+          "INVALID_JSON": "Invalid request sent to the server.",
+          "DB_ERROR": "Database error while saving the group context."
+        }
       },
       "searchAria": "Search for...",
       "editUser": "Edit user",

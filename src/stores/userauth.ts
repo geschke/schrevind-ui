@@ -18,6 +18,7 @@ type AuthMeResponse = {
   success?: boolean;
   message?: string;
   groups?: UserGroup[];
+  LastActiveGroupID?: number;
 };
 
 function parseGroups(raw: unknown): UserGroup[] {
@@ -80,6 +81,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     lastname: string | null;
     token: string | null;
     groups?: UserGroup[];
+    lastActiveGroupID?: number | null;
   }) {
     userId.value = payload.userId != null ? Number(payload.userId) : null;
     email.value = payload.email;
@@ -89,7 +91,12 @@ export const useUserAuthStore = defineStore("userauth", () => {
 
     if (payload.groups) {
       groups.value = payload.groups;
-      activeGroupID.value = restoreActiveGroupID(payload.groups);
+      const preferred = payload.lastActiveGroupID && payload.lastActiveGroupID > 0 ? payload.lastActiveGroupID : null;
+      if (preferred && payload.groups.some((g) => g.ID === preferred)) {
+        activeGroupID.value = preferred;
+      } else {
+        activeGroupID.value = restoreActiveGroupID(payload.groups);
+      }
       persistActiveGroupID(activeGroupID.value);
     }
   }
@@ -121,10 +128,15 @@ export const useUserAuthStore = defineStore("userauth", () => {
     }
   }
 
-  function setActiveGroup(id: number) {
+  async function setActiveGroup(id: number) {
     if (!groups.value.some((g) => g.ID === id)) return;
     activeGroupID.value = id;
     persistActiveGroupID(id);
+    return axios
+      .post("/users/active-group", { ContextGroupID: id }, { withCredentials: true })
+      .catch((error: unknown) => {
+        throw error;
+      });
   }
 
   async function initAuth() {
@@ -143,6 +155,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
             lastname: response.data.item.LastName,
             token: null,
             groups: parsedGroups,
+            lastActiveGroupID: response.data.LastActiveGroupID ?? null,
           });
         } else {
           resetCurrentUser();
@@ -179,6 +192,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
           lastname: response.data.lastname,
           token: response.data.session,
           groups: parsedGroups,
+          lastActiveGroupID: response.data.LastActiveGroupID ?? null,
         });
         authInitialized.value = true;
       })

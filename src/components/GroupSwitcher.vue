@@ -26,23 +26,47 @@
       </li>
     </ul>
   </li>
+  <GToast ref="toast" />
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useUserAuthStore } from "@/stores/userauth";
+import { getErrorCode } from "@/helper/errorCode";
+import { GToast, GToastWarning } from "goar-components";
+import type { GToastContent } from "goar-components";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const storeUserAuth = useUserAuthStore();
+const toast: any = ref(null);
 
 const groups = computed(() => storeUserAuth.getGroups);
 const activeGroupID = computed(() => storeUserAuth.activeGroupID);
 const activeGroup = computed(() => storeUserAuth.getActiveGroup);
 const hasMultipleGroups = computed(() => storeUserAuth.hasMultipleGroups);
 
+function errorContent(code: string): string {
+  switch (code) {
+    case "UNAUTHORIZED":        return t("layout.topbar.groupSwitcher.errors.UNAUTHORIZED");
+    case "FORBIDDEN":           return t("layout.topbar.groupSwitcher.errors.FORBIDDEN");
+    case "INVALID_GROUP_ID":    return t("layout.topbar.groupSwitcher.errors.INVALID_GROUP_ID");
+    case "DB_NOT_INITIALIZED":  return t("layout.topbar.groupSwitcher.errors.DB_NOT_INITIALIZED");
+    case "AUTH_NOT_CONFIGURED": return t("layout.topbar.groupSwitcher.errors.AUTH_NOT_CONFIGURED");
+    case "INVALID_JSON":        return t("layout.topbar.groupSwitcher.errors.INVALID_JSON");
+    case "DB_ERROR":            return t("layout.topbar.groupSwitcher.errors.DB_ERROR");
+    default:                    return t("layout.topbar.groupSwitcher.errors.switchFailed");
+  }
+}
+
 function switchGroup(id: number) {
   if (id === activeGroupID.value) return;
-  storeUserAuth.setActiveGroup(id);
+  storeUserAuth.setActiveGroup(id).catch((error: unknown) => {
+    toast.value?.addToast(<GToastContent>{
+      ...GToastWarning,
+      title: t("layout.topbar.groupSwitcher.label"),
+      content: errorContent(getErrorCode(error)),
+    });
+  });
 }
 </script>

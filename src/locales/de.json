@@ -1104,7 +1104,17 @@
       "logout": "Abmelden",
       "groupSwitcher": {
         "label": "Gruppe",
-        "ariaLabel": "Aktive Gruppe wechseln"
+        "ariaLabel": "Aktive Gruppe wechseln",
+        "errors": {
+          "switchFailed": "Gruppenkontext konnte nicht am Server gespeichert werden.",
+          "UNAUTHORIZED": "Sitzung abgelaufen. Bitte neu einloggen.",
+          "FORBIDDEN": "Sie sind kein Mitglied dieser Gruppe.",
+          "INVALID_GROUP_ID": "Ungültige Gruppen-ID.",
+          "DB_NOT_INITIALIZED": "Datenbankverbindung nicht initialisiert.",
+          "AUTH_NOT_CONFIGURED": "Authentifizierung ist nicht konfiguriert.",
+          "INVALID_JSON": "Ungültige Anfrage an den Server.",
+          "DB_ERROR": "Datenbankfehler beim Speichern des Gruppenkontexts."
+        }
       }
     },
     "locale": {
