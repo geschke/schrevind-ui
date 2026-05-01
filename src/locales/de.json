@@ -29,6 +29,9 @@
       "withholdingTaxAmountRefundableCurrency": "Währung erstattbar",
       "foreignFeesAmount": "Fremdspesen",
       "foreignFeesCurrency": "Fremdspesen-Währung",
+      "inlandTaxAmount": "Inländische Steuern gesamt",
+      "inlandTaxLegacyHint": "Es wurde nur ein Gesamtbetrag gespeichert, keine Einzelwerte.",
+      "inlandTaxLegacyDetailLabel": "Optional: Einzelwerte eingeben (überschreiben den Gesamtbetrag beim Speichern):",
       "note": "Notiz",
       "cancel": "Abbrechen",
       "backToList": "Zur Dividendeneintragsliste",
@@ -41,6 +44,7 @@
       "dividendData": "Dividendendaten",
       "fx": "FX",
       "withholdingTax": "Quellensteuer",
+      "inlandTax": "Inländische Steuern",
       "other": "Sonstiges"
     },
     "form": {
@@ -1128,6 +1132,20 @@
       "appearance": {
         "title": "Darstellung",
         "paletteLabel": "Farbschema für Charts"
+      },
+      "inlandTaxTemplate": {
+        "title": "Standard-Steuertemplate",
+        "label": "Vorlage für inländische Steuern bei neuen Dividendeneinträgen",
+        "noTemplate": "Kein Template"
+      },
+      "errors": {
+        "saveFailed": "Einstellungen konnten nicht am Server gespeichert werden.",
+        "UNAUTHORIZED": "Sitzung abgelaufen. Bitte neu einloggen.",
+        "INVALID_THEME": "Ungültiges Farbschema.",
+        "DB_NOT_INITIALIZED": "Datenbankverbindung nicht initialisiert.",
+        "AUTH_NOT_CONFIGURED": "Authentifizierung ist nicht konfiguriert.",
+        "INVALID_JSON": "Ungültige Anfrage an den Server.",
+        "DB_ERROR": "Datenbankfehler beim Speichern der Einstellungen."
       }
     },
     "loggedInAs": "Angemeldet als:",

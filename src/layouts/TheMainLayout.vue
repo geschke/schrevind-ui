@@ -99,6 +99,8 @@
     </div>
   </div>
 
+  <GToast ref="toast" />
+
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSettings" aria-labelledby="offcanvasSettingsLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasSettingsLabel">{{ t("layout.settings.title") }}</h5>
@@ -114,7 +116,7 @@
           type="button"
           class="btn btn-sm d-flex align-items-center gap-3 text-start"
           :class="storeSettings.palette === name ? 'btn-dark' : 'btn-outline-secondary'"
-          @click="storeSettings.setPalette(name)"
+          @click="onPaletteSelect(name)"
         >
           <div class="d-flex gap-1 flex-shrink-0">
             <div :style="{ width: '16px', height: '16px', borderRadius: '3px', backgroundColor: CHART_PALETTES[name].gross }"></div>
@@ -125,6 +127,18 @@
           <i v-if="storeSettings.palette === name" class="bi bi-check2 ms-auto"></i>
         </button>
       </div>
+      <h6 class="mt-4 mb-1">{{ t("layout.settings.inlandTaxTemplate.title") }}</h6>
+      <p class="text-muted small mb-3">{{ t("layout.settings.inlandTaxTemplate.label") }}</p>
+      <select
+        class="form-select form-select-sm"
+        :value="storeSettings.inlandTaxTemplate"
+        @change="onInlandTaxTemplateSelect"
+      >
+        <option value="">{{ t("layout.settings.inlandTaxTemplate.noTemplate") }}</option>
+        <option v-for="tpl in allInlandTaxTemplates" :key="tpl.Template" :value="tpl.Template">
+          {{ tpl.Label }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
@@ -137,15 +151,29 @@ import GroupSwitcher from "@/components/GroupSwitcher.vue";
 
 import { useUserAuthStore } from "../stores/userauth";
 import { useSettingsStore, CHART_PALETTES, PALETTE_ORDER } from "../stores/settings";
+import type { PaletteName } from "../stores/settings";
+import { useInlandTaxTemplatesStore } from "../stores/inlandTaxTemplates";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { getErrorCode } from "@/helper/errorCode";
+import { GToast, GToastWarning } from "goar-components";
+import type { GToastContent } from "goar-components";
 
 const storeUserAuth = useUserAuthStore();
 const storeSettings = useSettingsStore();
+const storeInlandTaxTemplates = useInlandTaxTemplatesStore();
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
+const toast = ref<InstanceType<typeof GToast> | null>(null);
+const allInlandTaxTemplates = computed(() => storeInlandTaxTemplates.allTemplates);
+
+onMounted(() => {
+  void storeInlandTaxTemplates.fetchAllTemplates().catch(() => {
+    // template list is non-critical; silently ignore
+  });
+});
 
 const menuPath = computed(() => {
   return route.meta.menuPath ? route.meta.menuPath : route.path;
@@ -155,6 +183,39 @@ const currentUserId = computed(() => {
   if (rawId == null) return null;
   return String(rawId);
 });
+
+function settingsErrorContent(code: string): string {
+  switch (code) {
+    case "UNAUTHORIZED":        return t("layout.settings.errors.UNAUTHORIZED");
+    case "INVALID_THEME":       return t("layout.settings.errors.INVALID_THEME");
+    case "DB_NOT_INITIALIZED":  return t("layout.settings.errors.DB_NOT_INITIALIZED");
+    case "AUTH_NOT_CONFIGURED": return t("layout.settings.errors.AUTH_NOT_CONFIGURED");
+    case "INVALID_JSON":        return t("layout.settings.errors.INVALID_JSON");
+    case "DB_ERROR":            return t("layout.settings.errors.DB_ERROR");
+    default:                    return t("layout.settings.errors.saveFailed");
+  }
+}
+
+function onPaletteSelect(name: PaletteName) {
+  storeSettings.setPalette(name).catch((error: unknown) => {
+    toast.value?.addToast(<GToastContent>{
+      ...GToastWarning,
+      title: t("layout.settings.title"),
+      content: settingsErrorContent(getErrorCode(error)),
+    });
+  });
+}
+
+function onInlandTaxTemplateSelect(event: Event) {
+  const value = (event.target as HTMLSelectElement).value;
+  storeSettings.setInlandTaxTemplate(value).catch((error: unknown) => {
+    toast.value?.addToast(<GToastContent>{
+      ...GToastWarning,
+      title: t("layout.settings.title"),
+      content: settingsErrorContent(getErrorCode(error)),
+    });
+  });
+}
 
 async function signout() {
   try {

@@ -411,6 +411,140 @@
             </div>
           </div>
 
+          <template v-if="showInlandTax">
+            <div class="row py-2 mb-0 mt-2">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-link p-0 text-decoration-none fw-semibold text-body d-flex align-items-center gap-1"
+                  @click="inlandTaxSectionExpanded = !inlandTaxSectionExpanded"
+                >
+                  <i :class="inlandTaxSectionExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+                  {{ t("dividendEntries.sections.inlandTax") }}
+                </button>
+              </div>
+            </div>
+
+            <Transition
+              @enter="collapseEnter"
+              @after-enter="collapseAfterEnter"
+              @leave="collapseLeave"
+              @after-leave="collapseAfterLeave"
+            >
+              <div v-if="inlandTaxSectionExpanded">
+                <!-- Legacy total mode: only a total amount is stored, no individual breakdown -->
+                <template v-if="isInlandTaxLegacyMode">
+                  <div class="row py-2 mb-2">
+                    <div class="col-sm-9 offset-sm-3">
+                      <p class="text-muted small mb-2">{{ t("dividendEntries.common.inlandTaxLegacyHint") }}</p>
+                    </div>
+                  </div>
+                  <div class="row py-2 mb-2 bg-body-tertiary">
+                    <label for="inlandTaxLegacyAmount" class="col-sm-3 col-form-label fw-semibold">
+                      {{ t("dividendEntries.common.inlandTaxAmount") }}
+                    </label>
+                    <div class="col-sm-9">
+                      <div class="row g-2">
+                        <div class="col-sm-4">
+                          <input
+                            id="inlandTaxLegacyAmount"
+                            type="text"
+                            v-model="inlandTaxLegacyAmount"
+                            class="form-control text-end"
+                          />
+                        </div>
+                        <div class="col-sm-3">
+                          <input
+                            id="inlandTaxLegacyCurrency"
+                            type="text"
+                            v-model="inlandTaxLegacyCurrency"
+                            class="form-control"
+                            :placeholder="t('currencies.common.currency')"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <template v-if="inlandTaxFields.length > 0 || inlandTaxTemplateLoading">
+                    <div class="row py-2 mb-0 mt-1">
+                      <div class="col-sm-9 offset-sm-3">
+                        <p class="text-muted small mb-0">{{ t("dividendEntries.common.inlandTaxLegacyDetailLabel") }}</p>
+                      </div>
+                    </div>
+                    <div v-if="inlandTaxTemplateLoading" class="row py-2 mb-2">
+                      <div class="col-sm-9 offset-sm-3">
+                        <span class="spinner-border spinner-border-sm me-2 text-secondary"></span>
+                        <span class="text-muted small">{{ t("common.loading") }}</span>
+                      </div>
+                    </div>
+                    <div
+                      v-for="(field, index) in inlandTaxFields"
+                      :key="field.code"
+                      class="row py-2 mb-2"
+                      :class="{ 'bg-body-tertiary': index % 2 === 0 }"
+                    >
+                      <label :for="`inlandTaxLegacy_${field.code}`" class="col-sm-3 col-form-label fw-semibold">
+                        {{ field.label }}
+                      </label>
+                      <div class="col-sm-9">
+                        <div class="row g-2">
+                          <div class="col-sm-4">
+                            <div class="input-group">
+                              <input
+                                :id="`inlandTaxLegacy_${field.code}`"
+                                type="text"
+                                v-model="field.amount"
+                                class="form-control text-end"
+                              />
+                              <span class="input-group-text">{{ field.currency }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </template>
+
+                <!-- Template / snapshot mode -->
+                <template v-else>
+                  <div v-if="inlandTaxTemplateLoading" class="row py-2 mb-2">
+                    <div class="col-sm-9 offset-sm-3">
+                      <span class="spinner-border spinner-border-sm me-2 text-secondary"></span>
+                      <span class="text-muted small">{{ t("common.loading") }}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    v-for="(field, index) in inlandTaxFields"
+                    :key="field.code"
+                    class="row py-2 mb-2"
+                    :class="{ 'bg-body-tertiary': index % 2 === 0 }"
+                  >
+                    <label :for="`inlandTax_${field.code}`" class="col-sm-3 col-form-label fw-semibold">
+                      {{ field.label }}
+                    </label>
+                    <div class="col-sm-9">
+                      <div class="row g-2">
+                        <div class="col-sm-4">
+                          <div class="input-group">
+                            <input
+                              :id="`inlandTax_${field.code}`"
+                              type="text"
+                              v-model="field.amount"
+                              class="form-control text-end"
+                            />
+                            <span class="input-group-text">{{ field.currency }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </Transition>
+          </template>
+
           <div class="row py-2 mb-2">
             <label for="foreignFeesAmount" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.foreignFeesAmount") }}</label>
             <div class="col-sm-9">
@@ -456,7 +590,7 @@
               <router-link v-if="isEditMode" type="button" class="btn btn-secondary" :to="{ name: 'dividendentries' }">
                 {{ t("dividendEntries.common.backToList") }}
               </router-link>
-              <button v-else type="button" @click="$router.go(-1)" class="btn btn-secondary">
+              <button v-else type="button" @click="router.go(-1)" class="btn btn-secondary">
                 {{ t("dividendEntries.common.cancel") }}
               </button>
 
@@ -523,6 +657,7 @@ import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { GToast, GToastSuccess, GToastDanger, GToastWarning } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -532,7 +667,9 @@ import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import { useWithholdingTaxDefaultsStore } from "@/stores/withholdingTaxDefaults";
-import type { DividendEntry } from "@/types/dividendEntries";
+import { useSettingsStore } from "@/stores/settings";
+import { useInlandTaxTemplatesStore } from "@/stores/inlandTaxTemplates";
+import type { DividendEntry, InlandTaxDetail } from "@/types/dividendEntries";
 import type { Security } from "@/types/securities";
 
 type SaveState = "idle" | "saving" | "success" | "error";
@@ -544,6 +681,26 @@ const storeDepots = useDepotsStore();
 const storeSecurities = useSecuritiesStore();
 const storeDividendEntries = useDividendEntriesStore();
 const storeWithholdingTaxDefaults = useWithholdingTaxDefaultsStore();
+const storeSettings = useSettingsStore();
+const router = useRouter();
+const storeInlandTaxTemplates = useInlandTaxTemplatesStore();
+
+type InlandTaxFieldState = {
+  code: string;
+  label: string;
+  currency: string;
+  amount: string;
+};
+
+const inlandTaxFields = ref<InlandTaxFieldState[]>([]);
+const inlandTaxTemplateLoading = ref(false);
+const inlandTaxSectionExpanded = ref(false);
+const inlandTaxLegacyAmount = ref("");
+const inlandTaxLegacyCurrency = ref("");
+const isInlandTaxLegacyMode = computed(() => inlandTaxLegacyAmount.value !== "");
+const showInlandTax = computed(
+  () => inlandTaxTemplateLoading.value || inlandTaxFields.value.length > 0 || isInlandTaxLegacyMode.value
+);
 const toast: any = ref(null);
 const saveState = ref<SaveState>("idle");
 const messageError = ref("");
@@ -794,6 +951,99 @@ const filteredSecurityOptions = computed(() => {
   return matches;
 });
 const saveDisabled = computed(() => saveState.value === "saving" || referenceDataLoading.value || referenceDataError.value !== "");
+
+function buildInlandTaxDetailsFromFields(): InlandTaxDetail[] {
+  return inlandTaxFields.value.map((f) => ({
+    Code: f.code,
+    Label: f.label,
+    Amount: f.amount.trim(),
+    Currency: f.currency,
+  }));
+}
+
+async function initInlandTaxSectionFromTemplate() {
+  const templateId = storeSettings.inlandTaxTemplate;
+  if (!templateId) return;
+
+  inlandTaxTemplateLoading.value = true;
+  try {
+    const template = await storeInlandTaxTemplates.fetchTemplate(templateId);
+    inlandTaxFields.value = template.Fields.map((f) => ({
+      code: f.Code,
+      label: f.Label,
+      currency: f.Currency,
+      amount: "",
+    }));
+  } catch {
+    // template unavailable — section stays hidden
+  } finally {
+    inlandTaxTemplateLoading.value = false;
+  }
+}
+
+function initInlandTaxSectionFromSnapshot(details: InlandTaxDetail[]) {
+  inlandTaxFields.value = details.map((d) => ({
+    code: d.Code,
+    label: d.Label,
+    currency: d.Currency,
+    amount: d.Amount,
+  }));
+  inlandTaxSectionExpanded.value = true;
+}
+
+function collapseEnter(el: Element) {
+  const div = el as HTMLElement;
+  div.style.overflow = "hidden";
+  div.style.height = "0";
+  requestAnimationFrame(() => {
+    div.style.transition = "height 0.25s ease";
+    div.style.height = `${div.scrollHeight}px`;
+  });
+}
+
+function collapseAfterEnter(el: Element) {
+  const div = el as HTMLElement;
+  div.style.height = "";
+  div.style.overflow = "";
+  div.style.transition = "";
+}
+
+function collapseLeave(el: Element) {
+  const div = el as HTMLElement;
+  div.style.height = `${div.scrollHeight}px`;
+  div.style.overflow = "hidden";
+  requestAnimationFrame(() => {
+    div.style.transition = "height 0.25s ease";
+    div.style.height = "0";
+  });
+}
+
+function collapseAfterLeave(el: Element) {
+  const div = el as HTMLElement;
+  div.style.height = "";
+  div.style.overflow = "";
+  div.style.transition = "";
+}
+
+async function initInlandTaxSection(entry?: DividendEntry) {
+  inlandTaxLegacyAmount.value = "";
+  inlandTaxLegacyCurrency.value = "";
+  if (entry && entry.InlandTaxDetails.length > 0) {
+    initInlandTaxSectionFromSnapshot(entry.InlandTaxDetails);
+  } else if (entry && entry.InlandTaxAmount !== "" && entry.InlandTaxAmount !== "0") {
+    inlandTaxLegacyAmount.value = entry.InlandTaxAmount;
+    inlandTaxLegacyCurrency.value = entry.InlandTaxCurrency;
+    inlandTaxSectionExpanded.value = true;
+    await initInlandTaxSectionFromTemplate();
+  } else {
+    await initInlandTaxSectionFromTemplate();
+    if (!entry) {
+      // Neuer Eintrag: aufgeklappt wenn Template geladen
+      inlandTaxSectionExpanded.value = inlandTaxFields.value.length > 0;
+    }
+    // Alter Eintrag ohne Daten: zugeklappt (Sektion vorhanden, aber nicht im Weg)
+  }
+}
 
 function dismissErrorMessage() {
   saveState.value = "idle";
@@ -1506,6 +1756,7 @@ function fillFormElements(entry: DividendEntry) {
   withholdingCountrySearchQuery.value = normalizeCountryCode(entry.WithholdingTaxCountryCode);
   autoFxRateLabel.value = entry.FXRateLabel;
   fxRateLabelManuallyChanged.value = entry.FXRateLabel !== "";
+  void initInlandTaxSection(entry);
 }
 
 async function loadDividendEntryForEdit() {
@@ -1560,8 +1811,23 @@ function buildSubmitPayload(values: typeof initialValues) {
     ForeignFeesAmount: normalizeOptionalString(values.foreignFeesAmount),
     ForeignFeesCurrency: normalizeCurrencyCode(values.foreignFeesCurrency),
     Note: normalizeOptionalString(values.note),
+    InlandTaxDetails: buildInlandTaxDetailsFromFields(),
+    ...(isInlandTaxLegacyMode.value && {
+      InlandTaxAmount: inlandTaxLegacyAmount.value.trim(),
+      InlandTaxCurrency: inlandTaxLegacyCurrency.value.trim(),
+    }),
   };
 }
+
+watch(
+  () => storeSettings.inlandTaxTemplate,
+  () => {
+    if (!isEditMode.value) {
+      inlandTaxFields.value = [];
+      void initInlandTaxSectionFromTemplate();
+    }
+  }
+);
 
 watch(securityId, (nextSecurityId) => {
   applySecuritySnapshot(nextSecurityId);
@@ -1624,6 +1890,8 @@ onMounted(() => {
     .then(async () => {
       if (isEditMode.value) {
         await loadDividendEntryForEdit();
+      } else {
+        await initInlandTaxSection();
       }
     })
     .catch(() => {
@@ -1666,7 +1934,7 @@ const onSubmit = handleSubmit((values) => {
     .then((updatedEntry) => {
       saveState.value = "success";
       if (isEditMode.value && updatedEntry) {
-        fillFormElements(updatedEntry);
+        fillFormElements(updatedEntry as DividendEntry);
       } else {
         resetForm({ values: { ...initialValues } });
         autoCurrencySeed.value = "";
@@ -1675,6 +1943,11 @@ const onSubmit = handleSubmit((values) => {
         securitySearchQuery.value = "";
         isSecurityPickerOpen.value = false;
         isSecurityFilterActive.value = false;
+        inlandTaxFields.value = [];
+        inlandTaxLegacyAmount.value = "";
+        inlandTaxLegacyCurrency.value = "";
+        inlandTaxSectionExpanded.value = false;
+        void initInlandTaxSection();
       }
       toast.value?.addToast(<GToastContent>{
         ...GToastSuccess,

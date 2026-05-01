@@ -1,3 +1,10 @@
+export type InlandTaxDetail = {
+  Code: string;
+  Label: string;
+  Amount: string;
+  Currency: string;
+};
+
 export type DividendEntry = {
   ID: number;
   UserID: number;
@@ -29,6 +36,9 @@ export type DividendEntry = {
   ForeignFeesAmount: string;
   ForeignFeesCurrency: string;
   Note: string;
+  InlandTaxAmount: string;
+  InlandTaxCurrency: string;
+  InlandTaxDetails: InlandTaxDetail[];
   CalcGrossAmountBase: string;
   CalcAfterWithholdingAmountBase: string;
   CreatedAt: number;
@@ -65,6 +75,9 @@ export type CreateDividendEntryPayload = {
   ForeignFeesAmount: string;
   ForeignFeesCurrency: string;
   Note: string;
+  InlandTaxDetails: InlandTaxDetail[];
+  InlandTaxAmount?: string;
+  InlandTaxCurrency?: string;
 };
 
 export type UpdateDividendEntryPayload = CreateDividendEntryPayload & {

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import axios from "@/helper/axiosInstance";
 import { useUserAuthStore } from "@/stores/userauth";
 import { computed, ref } from "vue";
-import type { CreateDividendEntryPayload, DividendEntry, UpdateDividendEntryPayload } from "@/types/dividendEntries";
+import type { CreateDividendEntryPayload, DividendEntry, InlandTaxDetail, UpdateDividendEntryPayload } from "@/types/dividendEntries";
 
 type DividendEntriesSortField = "PayDate" | "ExDate" | "SecurityName";
 type DividendEntriesSortDirection = "asc" | "desc" | "none";
@@ -33,6 +33,28 @@ function getActiveGroupIDOrThrow(): number {
   const id = storeUserAuth.activeGroupID;
   if (id == null) throw new Error("NO_ACTIVE_GROUP");
   return id;
+}
+
+function normalizeInlandTaxDetails(raw: unknown): InlandTaxDetail[] {
+  if (Array.isArray(raw)) {
+    return raw.map((entry) => {
+      const e = (entry ?? {}) as Record<string, unknown>;
+      return {
+        Code: String(e.Code ?? ""),
+        Label: String(e.Label ?? ""),
+        Amount: String(e.Amount ?? ""),
+        Currency: String(e.Currency ?? ""),
+      };
+    });
+  }
+  if (typeof raw === "string" && raw.trim() !== "") {
+    try {
+      return normalizeInlandTaxDetails(JSON.parse(raw));
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
 function normalizeDividendEntry(item: unknown): DividendEntry {
@@ -70,6 +92,9 @@ function normalizeDividendEntry(item: unknown): DividendEntry {
     ForeignFeesAmount: String(raw.ForeignFeesAmount ?? ""),
     ForeignFeesCurrency: String(raw.ForeignFeesCurrency ?? ""),
     Note: String(raw.Note ?? ""),
+    InlandTaxAmount: String(raw.InlandTaxAmount ?? ""),
+    InlandTaxCurrency: String(raw.InlandTaxCurrency ?? ""),
+    InlandTaxDetails: normalizeInlandTaxDetails(raw.InlandTaxDetails),
     CalcGrossAmountBase: String(raw.CalcGrossAmountBase ?? ""),
     CalcAfterWithholdingAmountBase: String(raw.CalcAfterWithholdingAmountBase ?? ""),
     CreatedAt: Number(raw.CreatedAt ?? 0),
@@ -145,6 +170,9 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       ForeignFeesAmount: payload.ForeignFeesAmount,
       ForeignFeesCurrency: payload.ForeignFeesCurrency,
       Note: payload.Note,
+      InlandTaxDetails: payload.InlandTaxDetails,
+      ...(payload.InlandTaxAmount !== undefined && { InlandTaxAmount: payload.InlandTaxAmount }),
+      ...(payload.InlandTaxCurrency !== undefined && { InlandTaxCurrency: payload.InlandTaxCurrency }),
     };
   }
 

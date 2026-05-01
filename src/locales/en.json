@@ -29,6 +29,9 @@
       "withholdingTaxAmountRefundableCurrency": "Refundable currency",
       "foreignFeesAmount": "Foreign fees",
       "foreignFeesCurrency": "Foreign fees currency",
+      "inlandTaxAmount": "Domestic taxes total",
+      "inlandTaxLegacyHint": "Only a total amount was saved, no individual breakdown available.",
+      "inlandTaxLegacyDetailLabel": "Optional: enter individual values (will override the total amount on save):",
       "note": "Note",
       "cancel": "Cancel",
       "backToList": "Back to dividend entry list",
@@ -41,6 +44,7 @@
       "dividendData": "Dividend data",
       "fx": "FX",
       "withholdingTax": "Withholding tax",
+      "inlandTax": "Domestic taxes",
       "other": "Other"
     },
     "form": {
@@ -1128,6 +1132,20 @@
       "appearance": {
         "title": "Appearance",
         "paletteLabel": "Chart color scheme"
+      },
+      "inlandTaxTemplate": {
+        "title": "Default tax template",
+        "label": "Template for domestic taxes on new dividend entries",
+        "noTemplate": "No template"
+      },
+      "errors": {
+        "saveFailed": "Settings could not be saved on the server.",
+        "UNAUTHORIZED": "Session expired. Please log in again.",
+        "INVALID_THEME": "Invalid color scheme.",
+        "DB_NOT_INITIALIZED": "Database connection is not initialized.",
+        "AUTH_NOT_CONFIGURED": "Authentication is not configured.",
+        "INVALID_JSON": "Invalid request sent to the server.",
+        "DB_ERROR": "Database error while saving settings."
       }
     },
     "loggedInAs": "Logged in as:",

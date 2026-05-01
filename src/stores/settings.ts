@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import axios from "@/helper/axiosInstance";
 
 export type PaletteName = "schrevind" | "nordic" | "vapor" | "forest2026" | "cyber";
 
@@ -9,6 +10,12 @@ export type ChartPalette = {
   afterWithholding: string;
   net: string;
   yearColors: readonly string[];
+};
+
+export type UserSettingsUpdate = {
+  LastActiveGroupID?: number;
+  Theme?: string;
+  InlandTaxTemplate?: string;
 };
 
 export const CHART_PALETTES: Record<PaletteName, ChartPalette> = {
@@ -54,18 +61,39 @@ export const PALETTE_ORDER: PaletteName[] = ["schrevind", "nordic", "vapor", "fo
 export const useSettingsStore = defineStore("settings", () => {
   const palette = ref<PaletteName>("schrevind");
   const currentPalette = computed(() => CHART_PALETTES[palette.value]);
+  const inlandTaxTemplate = ref<string>("");
 
-  function setPalette(name: PaletteName) {
-    palette.value = name;
+  async function saveSettings(partial: UserSettingsUpdate): Promise<void> {
+    await axios.post("/users/settings", partial, { withCredentials: true });
   }
 
-  // Prepared for future backend persistence:
-  // async function loadSettings() { ... }
-  // async function saveSettings() { ... }
+  function applyLoadedSettings(settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string } | null) {
+    if (!settings) return;
+    if (settings.Theme && (Object.keys(CHART_PALETTES) as string[]).includes(settings.Theme)) {
+      palette.value = settings.Theme as PaletteName;
+    }
+    if (typeof settings.InlandTaxTemplate === "string") {
+      inlandTaxTemplate.value = settings.InlandTaxTemplate;
+    }
+  }
+
+  async function setPalette(name: PaletteName): Promise<void> {
+    palette.value = name;
+    await saveSettings({ Theme: name });
+  }
+
+  async function setInlandTaxTemplate(template: string): Promise<void> {
+    inlandTaxTemplate.value = template;
+    await saveSettings({ InlandTaxTemplate: template });
+  }
 
   return {
     palette,
     currentPalette,
+    inlandTaxTemplate,
     setPalette,
+    setInlandTaxTemplate,
+    saveSettings,
+    applyLoadedSettings,
   };
 });

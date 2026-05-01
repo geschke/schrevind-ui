@@ -256,10 +256,10 @@ function loadListState(): ListState {
     const offset = Number(parsedState.offset ?? 0);
     const limit = Number(parsedState.limit ?? itemsPerPage);
     const sortField = isSupportedSortField(String(parsedState.sortField ?? ""))
-      ? parsedState.sortField
+      ? (parsedState.sortField as SortField)
       : "PayDate";
     const sortDirection = isSupportedSortDirection(String(parsedState.sortDirection ?? ""))
-      ? parsedState.sortDirection
+      ? (parsedState.sortDirection as SortDirection)
       : "none";
 
     return {
@@ -516,6 +516,24 @@ function buildDetailSections(item: DividendEntry): DetailSection[] {
             columnClass: "col-12 col-xl-4",
           },
         ],
+      ],
+    },
+    {
+      title: t("dividendEntries.sections.inlandTax"),
+      rows: [
+        [
+          {
+            label: t("dividendEntries.common.inlandTaxAmount"),
+            value: formatDetailAmount(item.InlandTaxAmount, item.InlandTaxCurrency),
+          },
+        ],
+        ...(item.InlandTaxDetails.length > 0
+          ? [item.InlandTaxDetails.map((d) => ({
+              label: d.Label,
+              value: formatDetailAmount(d.Amount, d.Currency),
+              columnClass: "col-12 col-md-6 col-xl-4",
+            }))]
+          : []),
       ],
     },
     {

@@ -3,6 +3,7 @@ import axios from '@/helper/axiosInstance';
 import { computed, ref } from "vue";
 import type { UserGroup } from "@/types/groups";
 import { SYSTEM_GROUP_ID } from "@/stores/groups";
+import { useSettingsStore } from "@/stores/settings";
 
 const ACTIVE_GROUP_SESSION_KEY = "schrevind.activeGroupID";
 
@@ -11,6 +12,7 @@ type AuthMeItem = {
   FirstName: string;
   LastName: string;
   Email: string;
+  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string };
 };
 
 type AuthMeResponse = {
@@ -18,7 +20,7 @@ type AuthMeResponse = {
   success?: boolean;
   message?: string;
   groups?: UserGroup[];
-  LastActiveGroupID?: number;
+  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string };
 };
 
 function parseGroups(raw: unknown): UserGroup[] {
@@ -132,11 +134,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     if (!groups.value.some((g) => g.ID === id)) return;
     activeGroupID.value = id;
     persistActiveGroupID(id);
-    return axios
-      .post("/users/active-group", { ContextGroupID: id }, { withCredentials: true })
-      .catch((error: unknown) => {
-        throw error;
-      });
+    return useSettingsStore().saveSettings({ LastActiveGroupID: id });
   }
 
   async function initAuth() {
@@ -147,16 +145,18 @@ export const useUserAuthStore = defineStore("userauth", () => {
       .get<AuthMeResponse>("/auth/me", { withCredentials: true })
       .then((response) => {
         if (response.data?.success === true && response.data.item) {
+          const item = response.data.item;
           const parsedGroups = parseGroups(response.data.groups);
           setUser({
-            userId: response.data.item.ID,
-            email: response.data.item.Email,
-            firstname: response.data.item.FirstName,
-            lastname: response.data.item.LastName,
+            userId: item.ID,
+            email: item.Email,
+            firstname: item.FirstName,
+            lastname: item.LastName,
             token: null,
             groups: parsedGroups,
-            lastActiveGroupID: response.data.LastActiveGroupID ?? null,
+            lastActiveGroupID: item.Settings?.LastActiveGroupID ?? null,
           });
+          useSettingsStore().applyLoadedSettings(item.Settings);
         } else {
           resetCurrentUser();
         }
@@ -192,8 +192,9 @@ export const useUserAuthStore = defineStore("userauth", () => {
           lastname: response.data.lastname,
           token: response.data.session,
           groups: parsedGroups,
-          lastActiveGroupID: response.data.LastActiveGroupID ?? null,
+          lastActiveGroupID: response.data.Settings?.LastActiveGroupID ?? null,
         });
+        useSettingsStore().applyLoadedSettings(response.data.Settings);
         authInitialized.value = true;
       })
       .catch((error: unknown) => {
