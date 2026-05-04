@@ -4,17 +4,16 @@ declare global {
   }
 }
 
-const isDev = import.meta.env.DEV;
-
 function normalizeBaseUrl(url?: string): string {
   const u = (url ?? "").trim();
   if (u === "" || u === "/") return "";
-  return u.replace(/\/+$/, ""); // drop trailing slash
+  return u.replace(/\/+$/, "");
 }
 
 export const config = {
+  // Priority: runtime config.js override → build-time .env variable → empty (= relative /api)
   apiUrl: normalizeBaseUrl(
-    (isDev ? import.meta.env.VITE_SCHREVIND_API_URL : window.__SCHREVIND_CONFIG__?.apiUrl)
+    window.__SCHREVIND_CONFIG__?.apiUrl
       ?? import.meta.env.VITE_SCHREVIND_API_URL
   ),
   apiPrefix: "/api",
