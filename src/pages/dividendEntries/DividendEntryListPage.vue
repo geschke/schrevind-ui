@@ -232,7 +232,13 @@ const headers = computed<GTableHeader[]>(() => [
 
 const dividendEntries = computed(() => storeDividendEntries.getDividendEntries);
 const dividendEntriesCount = computed(() => storeDividendEntries.getDividendEntriesCount);
-const currentPage = computed(() => Math.floor(currentOffset.value / currentLimit.value) + 1);
+// When count=0 (data not yet loaded), always report page 1 to GTable so its
+// internal offset (N.value) stays 0. Otherwise GTable corrupts the expand slot
+// item lookup: it uses t.items[N.value + localIndex] for the expand slot while
+// column slots use the correctly sorted display item.
+const currentPage = computed(() =>
+  dividendEntriesCount.value === 0 ? 1 : Math.floor(currentOffset.value / currentLimit.value) + 1
+);
 const depotNames = computed<Record<number, string>>(() =>
   Object.fromEntries(storeDepots.getDepots.map((item) => [item.ID, item.Name] as const))
 );
@@ -455,7 +461,8 @@ function formatTextValue(value: unknown): string {
   return normalized === "" ? "-" : normalized;
 }
 
-function buildDetailSections(item: DividendEntry): DetailSection[] {
+function buildDetailSections(item: DividendEntry | undefined): DetailSection[] {
+  if (!item) return [];
   const currencyFields: DetailField[] = [
     {
       label: t("dividendEntries.common.dividendPerUnitAmount"),
