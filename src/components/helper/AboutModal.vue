@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div ref="modalEl" class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -12,6 +12,18 @@
 
           <p class="small text-muted mb-0">{{ t("aboutModal.copyright") }}</p>
           <p class="small text-muted mb-3">{{ t("aboutModal.license") }}</p>
+
+          <div class="mb-3">
+            <p class="small fw-semibold mb-1">{{ t("aboutModal.versionTitle") }}</p>
+            <div v-if="versionLoading" class="small text-muted">
+              <span class="spinner-border spinner-border-sm me-1"></span>{{ t("common.loading") }}
+            </div>
+            <div v-else-if="versionError" class="small text-danger">{{ t("aboutModal.versionError") }}</div>
+            <div v-else class="small text-muted d-flex flex-column gap-1">
+              <span>{{ t("aboutModal.versionBackend") }}: {{ versionBackend }}</span>
+              <span>{{ t("aboutModal.versionFrontend") }}: {{ versionFrontend }}</span>
+            </div>
+          </div>
 
           <div class="d-flex flex-column gap-1 small">
             <a href="https://github.com/geschke/schrevind-ui" target="_blank" rel="noopener noreferrer">
@@ -37,9 +49,45 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
+import axios from "@/helper/axiosInstance";
 
 const { t } = useI18n();
+const modalEl = ref<HTMLElement | null>(null);
+
+const versionBackend = ref("");
+const versionFrontend = ref("");
+const versionLoading = ref(false);
+const versionError = ref(false);
+const versionFetched = ref(false);
+
+function fetchVersion() {
+  if (versionFetched.value) return;
+  versionLoading.value = true;
+  versionError.value = false;
+  axios
+    .get("/version")
+    .then((response) => {
+      versionBackend.value = String(response.data?.backend ?? "");
+      versionFrontend.value = String(response.data?.frontend ?? "");
+      versionFetched.value = true;
+    })
+    .catch(() => {
+      versionError.value = true;
+    })
+    .finally(() => {
+      versionLoading.value = false;
+    });
+}
+
+onMounted(() => {
+  modalEl.value?.addEventListener("show.bs.modal", fetchVersion);
+});
+
+onUnmounted(() => {
+  modalEl.value?.removeEventListener("show.bs.modal", fetchVersion);
+});
 </script>
 
 <style scoped></style>

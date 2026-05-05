@@ -466,6 +466,14 @@
                     </div>
                   </div>
 
+                  <div v-if="!inlandTaxTemplateLoading && inlandTaxFields.length === 0" class="row py-2 mb-0 mt-1">
+                    <div class="col-sm-9 offset-sm-3">
+                      <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle me-1"></i>{{ t("dividendEntries.common.inlandTaxNoTemplate") }}
+                      </p>
+                    </div>
+                  </div>
+
                   <template v-if="inlandTaxFields.length > 0 || inlandTaxTemplateLoading">
                     <div class="row py-2 mb-0 mt-1">
                       <div class="col-sm-9 offset-sm-3">
@@ -1038,10 +1046,10 @@ async function initInlandTaxSection(entry?: DividendEntry) {
   } else {
     await initInlandTaxSectionFromTemplate();
     if (!entry) {
-      // Neuer Eintrag: aufgeklappt wenn Template geladen
+      // New entry: expand if template fields were loaded
       inlandTaxSectionExpanded.value = inlandTaxFields.value.length > 0;
     }
-    // Alter Eintrag ohne Daten: zugeklappt (Sektion vorhanden, aber nicht im Weg)
+    // Existing entry with no inland tax data: keep collapsed
   }
 }
 

@@ -32,6 +32,7 @@
       "inlandTaxAmount": "Domestic taxes total",
       "inlandTaxLegacyHint": "Only a total amount was saved, no individual breakdown available.",
       "inlandTaxLegacyDetailLabel": "Optional: enter individual values (will override the total amount on save):",
+      "inlandTaxNoTemplate": "No default template configured – individual values cannot be entered. Set a template in settings.",
       "note": "Note",
       "cancel": "Cancel",
       "backToList": "Back to dividend entry list",
@@ -1245,6 +1246,10 @@
     "github": "GitHub Repository (schrevind-ui)",
     "website": "https://www.geschke.net",
     "blog": "https://www.kuerbis.org",
-    "close": "Close"
+    "close": "Close",
+    "versionTitle": "Version",
+    "versionBackend": "Backend",
+    "versionFrontend": "Frontend",
+    "versionError": "Version could not be loaded."
   }
 }
