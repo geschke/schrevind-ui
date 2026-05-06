@@ -830,6 +830,33 @@
       "groups": "Gruppen"
     }
   },
+  "totp": {
+    "setup": {
+      "step1Title": "QR-Code scannen",
+      "step1Instruction": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App (z. B. Google Authenticator, Authy).",
+      "secretLabel": "Oder Secret manuell eingeben:",
+      "nextButton": "Weiter",
+      "cancelButton": "Abbrechen",
+      "step2Title": "Bestätigungscode eingeben",
+      "step2Instruction": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein, um die Einrichtung abzuschließen.",
+      "codeLabel": "Authentifizierungscode",
+      "confirmButton": "Bestätigen",
+      "step3Title": "Backup-Codes",
+      "step3Instruction": "Bewahren Sie diese Backup-Codes an einem sicheren Ort auf. Jeder Code kann nur einmal verwendet werden, falls Sie keinen Zugriff auf Ihre Authenticator-App haben.",
+      "downloadButton": "Backup-Codes herunterladen",
+      "doneButton": "Fertig",
+      "errors": {
+        "setupFailed": "2FA-Einrichtung konnte nicht gestartet werden.",
+        "alreadyEnabled": "Zwei-Faktor-Authentifizierung ist bereits aktiviert.",
+        "confirmFailed": "Der Code konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.",
+        "invalidCode": "Ungültiger Authentifizierungscode."
+      },
+      "validation": {
+        "codeRequired": "Bitte geben Sie den Authentifizierungscode ein.",
+        "codeInvalid": "Der Code muss genau 6 Ziffern enthalten."
+      }
+    }
+  },
   "adminUsers": {
     "common": {
       "email": "E-Mail",
@@ -954,6 +981,24 @@
       },
       "alerts": {
         "saved": "Passwort wurde gespeichert."
+      }
+    },
+    "totp": {
+      "sectionTitle": "Zwei-Faktor-Authentifizierung",
+      "statusLabel": "Status:",
+      "status": {
+        "enabled": "Aktiv",
+        "disabled": "Nicht konfiguriert"
+      },
+      "setupButton": "2FA einrichten",
+      "disableButton": "2FA deaktivieren",
+      "disabledSuccess": "Zwei-Faktor-Authentifizierung wurde deaktiviert.",
+      "disableError": "Zwei-Faktor-Authentifizierung konnte nicht deaktiviert werden.",
+      "disableModal": {
+        "title": "Zwei-Faktor-Authentifizierung deaktivieren?",
+        "body": "Die Zwei-Faktor-Authentifizierung wird für Ihren Account deaktiviert. Sind Sie sicher?",
+        "confirm": "Deaktivieren",
+        "cancel": "Abbrechen"
       }
     }
   },
@@ -1218,6 +1263,30 @@
         "dbError": "Datenbankfehler beim Login.",
         "sessionSaveFailed": "Sitzung konnte nicht gespeichert werden.",
         "network": "Netzwerkfehler. Keine Verbindung zum Server.",
+        "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+      }
+    },
+    "totp": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "description": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.",
+      "codeLabel": "Authentifizierungscode",
+      "submit": "Bestätigen",
+      "useBackupCode": "Backup-Code verwenden",
+      "backToLogin": "Zurück zum Login",
+      "backupTitle": "Backup-Code verwenden",
+      "backupDescription": "Geben Sie einen Ihrer Backup-Codes ein.",
+      "backupCodeLabel": "Backup-Code",
+      "backupSubmit": "Bestätigen",
+      "useTotpCode": "Authenticator-App verwenden",
+      "validation": {
+        "codeRequired": "Bitte geben Sie Ihren Authentifizierungscode ein.",
+        "codeInvalid": "Der Code muss genau 6 Ziffern enthalten.",
+        "backupCodeRequired": "Bitte geben Sie Ihren Backup-Code ein."
+      },
+      "errors": {
+        "invalidCode": "Ungültiger Authentifizierungscode.",
+        "invalidBackupCode": "Ungültiger Backup-Code.",
+        "expired": "Ihre Sitzung ist abgelaufen. Bitte erneut einloggen.",
         "unknown": "Es ist ein unbekannter Fehler aufgetreten."
       }
     }

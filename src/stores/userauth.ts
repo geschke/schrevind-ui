@@ -12,7 +12,7 @@ type AuthMeItem = {
   FirstName: string;
   LastName: string;
   Email: string;
-  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string };
+  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string; TOTPEnabled?: boolean };
 };
 
 type AuthMeResponse = {
@@ -20,7 +20,7 @@ type AuthMeResponse = {
   success?: boolean;
   message?: string;
   groups?: UserGroup[];
-  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string };
+  Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string; TOTPEnabled?: boolean };
 };
 
 function parseGroups(raw: unknown): UserGroup[] {
@@ -56,6 +56,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
   const authInitialized = ref(false);
   const groups = ref<UserGroup[]>([]);
   const activeGroupID = ref<number | null>(null);
+  const totpEnabled = ref(false);
   let initPromise: Promise<void> | null = null;
 
   const getUserId = computed(() => userId.value);
@@ -75,6 +76,8 @@ export const useUserAuthStore = defineStore("userauth", () => {
 
   // True if the user is operating in the system group context.
   const isSystemContext = computed(() => activeGroupID.value === SYSTEM_GROUP_ID);
+
+  const getTOTPEnabled = computed(() => totpEnabled.value);
 
   function setUser(payload: {
     userId: number | string | null;
@@ -111,6 +114,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     token.value = null;
     groups.value = [];
     activeGroupID.value = null;
+    totpEnabled.value = false;
     try {
       sessionStorage.removeItem(ACTIVE_GROUP_SESSION_KEY);
     } catch {
@@ -156,6 +160,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
             groups: parsedGroups,
             lastActiveGroupID: item.Settings?.LastActiveGroupID ?? null,
           });
+          totpEnabled.value = item.Settings?.TOTPEnabled === true;
           useSettingsStore().applyLoadedSettings(item.Settings);
         } else {
           resetCurrentUser();
@@ -172,7 +177,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     return initPromise;
   }
 
-  async function signin(payload: { email: string; password: string }) {
+  async function signin(payload: { email: string; password: string }): Promise<{ twoFactorRequired: true } | void> {
     const signinDO = {
       email: payload.email,
       password: payload.password,
@@ -180,6 +185,35 @@ export const useUserAuthStore = defineStore("userauth", () => {
     };
     return await axios
       .post("/auth/login", signinDO, { withCredentials: true })
+      .then((response) => {
+        if (response.status === 202) {
+          return { twoFactorRequired: true as const };
+        }
+        if (response.data.success !== true) {
+          throw new Error(response.data.message || "UNKNOWN_FETCH_USER_ERROR");
+        }
+        const parsedGroups = parseGroups(response.data.groups);
+        setUser({
+          userId: response.data.id,
+          email: response.data.email,
+          firstname: response.data.firstname,
+          lastname: response.data.lastname,
+          token: response.data.session,
+          groups: parsedGroups,
+          lastActiveGroupID: response.data.Settings?.LastActiveGroupID ?? null,
+        });
+        totpEnabled.value = response.data.Settings?.TOTPEnabled === true;
+        useSettingsStore().applyLoadedSettings(response.data.Settings);
+        authInitialized.value = true;
+      })
+      .catch((error: unknown) => {
+        throw error;
+      });
+  }
+
+  async function verify2FA(payload: { Code: string } | { BackupCode: string }) {
+    return await axios
+      .post("/auth/2fa/verify", payload, { withCredentials: true })
       .then((response) => {
         if (response.data.success !== true) {
           throw new Error(response.data.message || "UNKNOWN_FETCH_USER_ERROR");
@@ -194,6 +228,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
           groups: parsedGroups,
           lastActiveGroupID: response.data.Settings?.LastActiveGroupID ?? null,
         });
+        totpEnabled.value = response.data.Settings?.TOTPEnabled === true;
         useSettingsStore().applyLoadedSettings(response.data.Settings);
         authInitialized.value = true;
       })
@@ -240,10 +275,12 @@ export const useUserAuthStore = defineStore("userauth", () => {
     getActiveGroup,
     activeGroupRole,
     isSystemContext,
+    getTOTPEnabled,
     setActiveGroup,
     initAuth,
     refreshAuth,
     signin,
+    verify2FA,
     signout,
   };
 });

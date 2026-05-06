@@ -62,7 +62,7 @@
 
         <div class="form-row mt-3">
           <div class="form-group col-md-8 offset-2">
-            <button type="button" @click="$router.go(-1)" class="btn btn-secondary">{{ t("adminUsers.common.cancel") }}</button>
+            <button type="button" @click="router.go(-1)" class="btn btn-secondary">{{ t("adminUsers.common.cancel") }}</button>
             <router-link type="button" class="btn btn-outline-primary ms-2" :to="{ name: 'adminuserpassword', params: { id: user.ID } }">
               {{ t("adminUsers.edit.changePassword") }}
             </router-link>
@@ -83,6 +83,61 @@
         </div>
       </div>
 
+      <template v-if="user && isSelf">
+        <hr class="my-4" />
+        <h4 class="mb-3">{{ t("adminUsers.totp.sectionTitle") }}</h4>
+
+        <div v-if="totpDisableSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ t("adminUsers.totp.disabledSuccess") }}
+          <button type="button" class="btn-close" @click="totpDisableSuccess = false"></button>
+        </div>
+        <div v-if="totpDisableError" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ totpDisableError }}
+          <button type="button" class="btn-close" @click="totpDisableError = ''"></button>
+        </div>
+
+        <div v-if="!showTotpSetup && !showTotpDisableConfirm">
+          <p class="mb-2">
+            {{ t("adminUsers.totp.statusLabel") }}
+            <span v-if="storeUserAuth.getTOTPEnabled" class="badge bg-success ms-2">
+              {{ t("adminUsers.totp.status.enabled") }}
+            </span>
+            <span v-else class="badge bg-secondary ms-2">
+              {{ t("adminUsers.totp.status.disabled") }}
+            </span>
+          </p>
+          <div class="d-flex gap-2 mt-3">
+            <button v-if="!storeUserAuth.getTOTPEnabled" type="button" class="btn btn-primary" @click="showTotpSetup = true">
+              {{ t("adminUsers.totp.setupButton") }}
+            </button>
+            <button v-else type="button" class="btn btn-danger" @click="showTotpDisableConfirm = true">
+              {{ t("adminUsers.totp.disableButton") }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="showTotpSetup" class="card p-3">
+          <TotpSetup
+            @completed="onTotpSetupCompleted"
+            @cancelled="showTotpSetup = false"
+          />
+        </div>
+
+        <div v-if="showTotpDisableConfirm" class="card p-3">
+          <h5 class="mb-2">{{ t("adminUsers.totp.disableModal.title") }}</h5>
+          <p>{{ t("adminUsers.totp.disableModal.body") }}</p>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger" @click="submitDisableTotp" :disabled="totpDisableLoading">
+              <span v-if="!totpDisableLoading">{{ t("adminUsers.totp.disableModal.confirm") }}</span>
+              <span v-else class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-secondary" @click="showTotpDisableConfirm = false">
+              {{ t("adminUsers.totp.disableModal.cancel") }}
+            </button>
+          </div>
+        </div>
+      </template>
+
       <GToast ref="toast"></GToast>
     </template>
   </TheMainLayout>
@@ -90,6 +145,7 @@
 
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
+import TotpSetup from "@/components/auth/TotpSetup.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useUsersStore } from "@/stores/users";
@@ -98,8 +154,10 @@ import { getErrorCode } from "@/helper/errorCode";
 import type { User } from "@/types/users";
 import { GToast, GToastSuccess, GToastDanger } from "goar-components";
 import type { GToastContent } from "goar-components";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import axios from "@/helper/axiosInstance";
 
 const { t } = useI18n();
 
@@ -137,9 +195,40 @@ const saveState = ref<SaveState>("idle");
 const messageSuccess = ref("");
 const messageError = ref("");
 
+const router = useRouter();
 const storeUsers = useUsersStore();
 const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
+
+const isSelf = computed(() => user.value != null && user.value.ID === storeUserAuth.userId);
+
+const showTotpSetup = ref(false);
+const showTotpDisableConfirm = ref(false);
+const totpDisableLoading = ref(false);
+const totpDisableSuccess = ref(false);
+const totpDisableError = ref("");
+
+function onTotpSetupCompleted() {
+  showTotpSetup.value = false;
+  storeUserAuth.refreshAuth();
+}
+
+function submitDisableTotp() {
+  totpDisableLoading.value = true;
+  totpDisableError.value = "";
+  axios
+    .post("/auth/2fa/disable", undefined, { withCredentials: true })
+    .then(() => {
+      totpDisableLoading.value = false;
+      showTotpDisableConfirm.value = false;
+      totpDisableSuccess.value = true;
+      storeUserAuth.refreshAuth();
+    })
+    .catch(() => {
+      totpDisableLoading.value = false;
+      totpDisableError.value = t("adminUsers.totp.disableError");
+    });
+}
 
 const { defineField, errors, handleSubmit } = useForm({ validationSchema });
 

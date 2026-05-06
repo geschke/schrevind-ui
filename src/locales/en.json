@@ -830,6 +830,33 @@
       "groups": "Groups"
     }
   },
+  "totp": {
+    "setup": {
+      "step1Title": "Scan QR code",
+      "step1Instruction": "Scan this QR code with your authenticator app (e.g. Google Authenticator, Authy).",
+      "secretLabel": "Or enter the secret manually:",
+      "nextButton": "Next",
+      "cancelButton": "Cancel",
+      "step2Title": "Enter confirmation code",
+      "step2Instruction": "Enter the 6-digit code shown in your authenticator app to confirm setup.",
+      "codeLabel": "Authentication code",
+      "confirmButton": "Confirm",
+      "step3Title": "Backup codes",
+      "step3Instruction": "Save these backup codes in a safe place. Each code can only be used once to sign in if you lose access to your authenticator app.",
+      "downloadButton": "Download backup codes",
+      "doneButton": "Done",
+      "errors": {
+        "setupFailed": "2FA setup could not be started.",
+        "alreadyEnabled": "Two-factor authentication is already enabled.",
+        "confirmFailed": "The code could not be confirmed. Please try again.",
+        "invalidCode": "Invalid authentication code."
+      },
+      "validation": {
+        "codeRequired": "Please enter the authentication code.",
+        "codeInvalid": "The code must be exactly 6 digits."
+      }
+    }
+  },
   "adminUsers": {
     "common": {
       "email": "Email",
@@ -954,6 +981,24 @@
       },
       "alerts": {
         "saved": "Password was saved."
+      }
+    },
+    "totp": {
+      "sectionTitle": "Two-factor authentication",
+      "statusLabel": "Status:",
+      "status": {
+        "enabled": "Active",
+        "disabled": "Not configured"
+      },
+      "setupButton": "Set up 2FA",
+      "disableButton": "Disable 2FA",
+      "disabledSuccess": "Two-factor authentication has been disabled.",
+      "disableError": "Two-factor authentication could not be disabled.",
+      "disableModal": {
+        "title": "Disable two-factor authentication?",
+        "body": "Two-factor authentication will be disabled for your account. Are you sure?",
+        "confirm": "Disable",
+        "cancel": "Cancel"
       }
     }
   },
@@ -1223,6 +1268,30 @@
         "dbError": "Database error during login.",
         "sessionSaveFailed": "Session could not be saved.",
         "network": "Network error. No response from server.",
+        "unknown": "An unknown error occurred."
+      }
+    },
+    "totp": {
+      "title": "Two-factor authentication",
+      "description": "Enter the 6-digit code from your authenticator app.",
+      "codeLabel": "Authentication code",
+      "submit": "Verify",
+      "useBackupCode": "Use backup code instead",
+      "backToLogin": "Back to sign in",
+      "backupTitle": "Use backup code",
+      "backupDescription": "Enter one of your backup codes.",
+      "backupCodeLabel": "Backup code",
+      "backupSubmit": "Verify",
+      "useTotpCode": "Use authenticator app instead",
+      "validation": {
+        "codeRequired": "Please enter your authentication code.",
+        "codeInvalid": "The code must be exactly 6 digits.",
+        "backupCodeRequired": "Please enter your backup code."
+      },
+      "errors": {
+        "invalidCode": "Invalid authentication code.",
+        "invalidBackupCode": "Invalid backup code.",
+        "expired": "Your session has expired. Please sign in again.",
         "unknown": "An unknown error occurred."
       }
     }
