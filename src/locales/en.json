@@ -83,6 +83,7 @@
       "securityIdRequired": "Please choose a security.",
       "payDateRequired": "Please enter the pay date.",
       "exDateRequired": "Please enter the ex date.",
+      "dateInvalid": "Please enter a valid date (year must be 4 digits).",
       "quantityRequired": "Please enter the quantity.",
       "dividendPerUnitAmountRequired": "Please enter the dividend per unit.",
       "dividendPerUnitCurrencyRequired": "Please enter the per-unit currency.",

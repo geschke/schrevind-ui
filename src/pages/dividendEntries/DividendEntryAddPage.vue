@@ -90,7 +90,7 @@
           <div class="row py-2 mb-2 bg-body-tertiary">
             <label for="payDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.payDate") }}</label>
             <div class="col-sm-3">
-                <input id="payDate" type="date" v-model="payDate" v-bind="payDateAttrs" class="form-control" />
+                <input id="payDate" type="date" v-model="payDate" v-bind="payDateAttrs" class="form-control" min="1900-01-01" max="9999-12-31" />
               <small class="text-danger" v-if="errors.payDate">{{ errors.payDate }}</small>
             </div>
             <div class="col-sm-1">
@@ -103,7 +103,7 @@
           <div class="row py-2 mb-2">
             <label for="exDate" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.exDate") }}</label>
             <div class="col-sm-3">
-                <input id="exDate" type="date" v-model="exDate" v-bind="exDateAttrs" class="form-control" />
+                <input id="exDate" type="date" v-model="exDate" v-bind="exDateAttrs" class="form-control" min="1900-01-01" max="9999-12-31" />
               <small class="text-danger" v-if="errors.exDate">{{ errors.exDate }}</small>
             </div>
             <div class="col-sm-1">
@@ -828,11 +828,13 @@ const validationSchema = yup.object().shape({
   payDate: yup
     .string()
     .transform((value) => value?.trim() ?? "")
-    .required(() => t("dividendEntries.validation.payDateRequired")),
+    .required(() => t("dividendEntries.validation.payDateRequired"))
+    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid")),
   exDate: yup
     .string()
     .transform((value) => value?.trim() ?? "")
-    .required(() => t("dividendEntries.validation.exDateRequired")),
+    .required(() => t("dividendEntries.validation.exDateRequired"))
+    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid")),
   quantity: yup
     .string()
     .transform((value) => value?.trim() ?? "")

@@ -83,6 +83,7 @@
       "securityIdRequired": "Bitte wählen Sie ein Wertpapier.",
       "payDateRequired": "Bitte geben Sie den Zahltag ein.",
       "exDateRequired": "Bitte geben Sie den Ex-Tag ein.",
+      "dateInvalid": "Bitte geben Sie ein gültiges Datum ein (Jahr muss 4 Ziffern haben).",
       "quantityRequired": "Bitte geben Sie die Stückzahl ein.",
       "dividendPerUnitAmountRequired": "Bitte geben Sie die Dividende je Einheit ein.",
       "dividendPerUnitCurrencyRequired": "Bitte geben Sie die Währung je Einheit ein.",
