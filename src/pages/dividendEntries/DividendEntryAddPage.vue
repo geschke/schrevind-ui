@@ -327,6 +327,16 @@
                   />
                   <small class="text-danger" v-if="errors.withholdingTaxCurrency">{{ errors.withholdingTaxCurrency }}</small>
                 </div>
+                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    @click="copyWithholdingToCredit"
+                    @keydown.space.prevent="copyWithholdingToCredit"
+                  >
+                    {{ t("dividendEntries.actions.copyWithholdingToCredit") }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -361,11 +371,6 @@
                     <small class="text-danger" v-if="errors.withholdingTaxAmountCreditCurrency">
                       {{ errors.withholdingTaxAmountCreditCurrency }}
                     </small>
-                </div>
-                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">todo!!
-                  <button type="button" class="btn btn-outline-secondary btn-sm" @click="copyWithholdingToCredit">
-                    {{ t("dividendEntries.actions.copyWithholdingToCredit") }}
-                  </button>
                 </div>
               </div>
             </div>
@@ -402,11 +407,11 @@
                       {{ errors.withholdingTaxAmountRefundableCurrency }}
                     </small>
                 </div>
-                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">
+                <!-- <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">
                   <button type="button" class="btn btn-outline-secondary btn-sm" @click="suggestRefundableWithholdingTax">
                     {{ t("dividendEntries.actions.suggestRefundableWithholdingTax") }}
                   </button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -1547,28 +1552,6 @@ function applyDepotCurrencyDefaults(depotKey: unknown) {
   autoCurrencySeed.value = baseCurrency;
 }
 
-function getDefaultWithholdingCurrency() {
-  if (payoutCurrency.value !== "") {
-    return normalizeCurrencyCode(payoutCurrency.value);
-  }
-
-  if (grossCurrency.value !== "") {
-    return normalizeCurrencyCode(grossCurrency.value);
-  }
-
-  return "";
-}
-
-function applyWithholdingCurrencyDefault() {
-  if (withholdingTaxAmount.value === "" || withholdingTaxCurrency.value !== "") {
-    return;
-  }
-
-  const currency = getDefaultWithholdingCurrency();
-  if (currency !== "") {
-    setFieldValue("withholdingTaxCurrency", currency);
-  }
-}
 
 function handleDocumentClick(event: MouseEvent) {
   const target = event.target as Node | null;
@@ -1587,10 +1570,9 @@ function copyWithholdingToCredit() {
     return;
   }
 
-  applyWithholdingCurrencyDefault();
   setFieldValue("withholdingTaxAmountCredit", withholdingTaxAmount.value);
 
-  if (withholdingTaxAmountCreditCurrency.value === "" && withholdingTaxCurrency.value !== "") {
+  if (withholdingTaxCurrency.value !== "") {
     setFieldValue("withholdingTaxAmountCreditCurrency", normalizeCurrencyCode(withholdingTaxCurrency.value));
   }
 }
@@ -1883,9 +1865,6 @@ watch(withholdingCountrySuggestions, (nextOptions) => {
   }
 });
 
-watch(withholdingTaxAmount, () => {
-  applyWithholdingCurrencyDefault();
-});
 
 onMounted(() => {
   document.addEventListener("click", handleDocumentClick);
