@@ -126,12 +126,24 @@
         <div v-if="showTotpDisableConfirm" class="card p-3">
           <h5 class="mb-2">{{ t("adminUsers.totp.disableModal.title") }}</h5>
           <p>{{ t("adminUsers.totp.disableModal.body") }}</p>
+          <div class="mb-3">
+            <label for="totpDisablePassword" class="form-label">{{ t("adminUsers.totp.disableModal.passwordLabel") }}</label>
+            <input
+              type="password"
+              class="form-control"
+              id="totpDisablePassword"
+              v-model="totpDisablePassword"
+              autocomplete="current-password"
+              style="max-width: 300px"
+            />
+            <small class="text-danger d-block mt-1" v-if="totpDisablePasswordError">{{ totpDisablePasswordError }}</small>
+          </div>
           <div class="d-flex gap-2">
             <button type="button" class="btn btn-danger" @click="submitDisableTotp" :disabled="totpDisableLoading">
               <span v-if="!totpDisableLoading">{{ t("adminUsers.totp.disableModal.confirm") }}</span>
               <span v-else class="spinner-border spinner-border-sm" aria-hidden="true"></span>
             </button>
-            <button type="button" class="btn btn-secondary" @click="showTotpDisableConfirm = false">
+            <button type="button" class="btn btn-secondary" @click="cancelDisableTotp">
               {{ t("adminUsers.totp.disableModal.cancel") }}
             </button>
           </div>
@@ -207,26 +219,48 @@ const showTotpDisableConfirm = ref(false);
 const totpDisableLoading = ref(false);
 const totpDisableSuccess = ref(false);
 const totpDisableError = ref("");
+const totpDisablePassword = ref("");
+const totpDisablePasswordError = ref("");
 
 function onTotpSetupCompleted() {
   showTotpSetup.value = false;
   storeUserAuth.refreshAuth();
 }
 
-function submitDisableTotp() {
-  totpDisableLoading.value = true;
+function cancelDisableTotp() {
+  showTotpDisableConfirm.value = false;
+  totpDisablePassword.value = "";
+  totpDisablePasswordError.value = "";
   totpDisableError.value = "";
+}
+
+function submitDisableTotp() {
+  totpDisablePasswordError.value = "";
+  totpDisableError.value = "";
+
+  if (!totpDisablePassword.value) {
+    totpDisablePasswordError.value = t("adminUsers.totp.disableModal.passwordRequired");
+    return;
+  }
+
+  totpDisableLoading.value = true;
   axios
-    .post("/auth/2fa/disable", undefined, { withCredentials: true })
+    .post("/auth/2fa/disable", { Password: totpDisablePassword.value }, { withCredentials: true })
     .then(() => {
       totpDisableLoading.value = false;
+      totpDisablePassword.value = "";
       showTotpDisableConfirm.value = false;
       totpDisableSuccess.value = true;
       storeUserAuth.refreshAuth();
     })
-    .catch(() => {
+    .catch((err: unknown) => {
       totpDisableLoading.value = false;
-      totpDisableError.value = t("adminUsers.totp.disableError");
+      const code = getErrorCode(err);
+      if (code === "INVALID_CREDENTIALS" || code === "INVALID_PASSWORD") {
+        totpDisablePasswordError.value = t("adminUsers.totp.disableModal.passwordInvalid");
+      } else {
+        totpDisableError.value = t("adminUsers.totp.disableError") + ` (${code})`;
+      }
     });
 }
 

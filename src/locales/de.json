@@ -849,7 +849,8 @@
         "setupFailed": "2FA-Einrichtung konnte nicht gestartet werden.",
         "alreadyEnabled": "Zwei-Faktor-Authentifizierung ist bereits aktiviert.",
         "confirmFailed": "Der Code konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.",
-        "invalidCode": "Ungültiger Authentifizierungscode."
+        "invalidCode": "Ungültiger Authentifizierungscode.",
+        "setupNotPending": "Keine aktive 2FA-Einrichtung gefunden. Bitte Einrichtung neu starten."
       },
       "validation": {
         "codeRequired": "Bitte geben Sie den Authentifizierungscode ein.",
@@ -997,6 +998,9 @@
       "disableModal": {
         "title": "Zwei-Faktor-Authentifizierung deaktivieren?",
         "body": "Die Zwei-Faktor-Authentifizierung wird für Ihren Account deaktiviert. Sind Sie sicher?",
+        "passwordLabel": "Mit aktuellem Passwort bestätigen",
+        "passwordRequired": "Bitte geben Sie Ihr Passwort ein.",
+        "passwordInvalid": "Das Passwort ist nicht korrekt.",
         "confirm": "Deaktivieren",
         "cancel": "Abbrechen"
       }

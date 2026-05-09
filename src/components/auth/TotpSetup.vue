@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- Step 1: QR code -->
+    <!-- Step 1: QR code + code entry combined -->
     <div v-if="step === 'setup'">
       <h5 class="mb-2">{{ t("totp.setup.step1Title") }}</h5>
       <div v-if="setupLoading" class="d-flex justify-content-center my-3">
@@ -11,16 +11,39 @@
       <div v-else-if="setupError" class="alert alert-danger">{{ setupError }}</div>
       <div v-else>
         <p class="mb-3">{{ t("totp.setup.step1Instruction") }}</p>
+
         <div class="mb-3">
           <img v-if="qrDataUrl" :src="qrDataUrl" alt="QR code" width="200" height="200" />
         </div>
-        <p class="small text-muted mb-3">
+
+        <p class="small text-muted mb-4">
           {{ t("totp.setup.secretLabel") }}<br />
           <code class="user-select-all">{{ secret }}</code>
         </p>
+
+        <div v-if="confirmError" class="alert alert-danger">{{ confirmError }}</div>
+
+        <div class="mb-3">
+          <label for="totpConfirmCode" class="form-label">{{ t("totp.setup.codeLabel") }}</label>
+          <input
+            ref="codeInputEl"
+            type="text"
+            class="form-control"
+            id="totpConfirmCode"
+            v-model="confirmCode"
+            inputmode="numeric"
+            maxlength="6"
+            autocomplete="one-time-code"
+            style="max-width: 180px"
+            @keydown.enter.prevent="submitConfirm"
+          />
+          <small class="text-danger d-block mt-1" v-if="confirmCodeError">{{ confirmCodeError }}</small>
+        </div>
+
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary" @click="step = 'confirm'">
-            {{ t("totp.setup.nextButton") }}
+          <button type="button" class="btn btn-primary" @click="submitConfirm" :disabled="confirmLoading">
+            <span v-if="!confirmLoading">{{ t("totp.setup.confirmButton") }}</span>
+            <span v-else class="spinner-border spinner-border-sm" aria-hidden="true"></span>
           </button>
           <button type="button" class="btn btn-secondary" @click="emit('cancelled')">
             {{ t("totp.setup.cancelButton") }}
@@ -29,37 +52,7 @@
       </div>
     </div>
 
-    <!-- Step 2: Confirm code -->
-    <div v-else-if="step === 'confirm'">
-      <h5 class="mb-2">{{ t("totp.setup.step2Title") }}</h5>
-      <p class="mb-3">{{ t("totp.setup.step2Instruction") }}</p>
-      <div v-if="confirmError" class="alert alert-danger">{{ confirmError }}</div>
-      <div class="mb-3">
-        <label for="totpConfirmCode" class="form-label">{{ t("totp.setup.codeLabel") }}</label>
-        <input
-          type="text"
-          class="form-control"
-          id="totpConfirmCode"
-          v-model="confirmCode"
-          inputmode="numeric"
-          maxlength="6"
-          autocomplete="one-time-code"
-          style="max-width: 180px"
-        />
-        <small class="text-danger d-block mt-1" v-if="confirmCodeError">{{ confirmCodeError }}</small>
-      </div>
-      <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary" @click="submitConfirm" :disabled="confirmLoading">
-          <span v-if="!confirmLoading">{{ t("totp.setup.confirmButton") }}</span>
-          <span v-else class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="btn btn-secondary" @click="emit('cancelled')">
-          {{ t("totp.setup.cancelButton") }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 3: Backup codes -->
+    <!-- Step 2: Backup codes -->
     <div v-else-if="step === 'backupCodes'">
       <h5 class="mb-2">{{ t("totp.setup.step3Title") }}</h5>
       <p class="mb-3">{{ t("totp.setup.step3Instruction") }}</p>
@@ -79,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import axios from "@/helper/axiosInstance";
 import QRCode from "qrcode";
@@ -92,7 +85,7 @@ const emit = defineEmits<{
   cancelled: [];
 }>();
 
-type SetupStep = "setup" | "confirm" | "backupCodes";
+type SetupStep = "setup" | "backupCodes";
 const step = ref<SetupStep>("setup");
 
 const qrDataUrl = ref("");
@@ -100,6 +93,7 @@ const secret = ref("");
 const setupLoading = ref(true);
 const setupError = ref("");
 
+const codeInputEl = ref<HTMLInputElement | null>(null);
 const confirmCode = ref("");
 const confirmCodeError = ref("");
 const confirmError = ref("");
@@ -135,6 +129,8 @@ function fetchSetup() {
         }
       }
       setupLoading.value = false;
+      await nextTick();
+      codeInputEl.value?.focus();
     })
     .catch((err: unknown) => {
       const code = getErrorCode(err);
@@ -162,7 +158,15 @@ function submitConfirm() {
 
   confirmLoading.value = true;
   axios
-    .post("/auth/2fa/confirm", { Code: confirmCode.value.trim() }, { withCredentials: true })
+    .post(
+      "/auth/2fa/confirm",
+      {
+        Code: confirmCode.value.trim(),
+        Secret: secret.value,
+        BackupCodes: backupCodes.value,
+      },
+      { withCredentials: true }
+    )
     .then((response) => {
       confirmLoading.value = false;
       if (response.data?.success !== true) {
@@ -173,12 +177,14 @@ function submitConfirm() {
     })
     .catch((err: unknown) => {
       const code = getErrorCode(err);
+      confirmLoading.value = false;
       if (code === "INVALID_2FA_CODE") {
         confirmError.value = t("totp.setup.errors.invalidCode");
+      } else if (code === "TOTP_SETUP_NOT_PENDING") {
+        confirmError.value = t("totp.setup.errors.setupNotPending");
       } else {
-        confirmError.value = t("totp.setup.errors.confirmFailed");
+        confirmError.value = t("totp.setup.errors.confirmFailed") + ` (${code})`;
       }
-      confirmLoading.value = false;
     });
 }
 

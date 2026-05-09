@@ -849,7 +849,8 @@
         "setupFailed": "2FA setup could not be started.",
         "alreadyEnabled": "Two-factor authentication is already enabled.",
         "confirmFailed": "The code could not be confirmed. Please try again.",
-        "invalidCode": "Invalid authentication code."
+        "invalidCode": "Invalid authentication code.",
+        "setupNotPending": "No active 2FA setup found. Please restart the setup."
       },
       "validation": {
         "codeRequired": "Please enter the authentication code.",
@@ -997,6 +998,9 @@
       "disableModal": {
         "title": "Disable two-factor authentication?",
         "body": "Two-factor authentication will be disabled for your account. Are you sure?",
+        "passwordLabel": "Confirm with your current password",
+        "passwordRequired": "Please enter your password.",
+        "passwordInvalid": "The password is incorrect.",
         "confirm": "Disable",
         "cancel": "Cancel"
       }
