@@ -73,6 +73,7 @@
     },
     "actions": {
       "copyWithholdingToCredit": "Copy to creditable",
+      "addNewSecurity": "Add new security",
       "suggestRefundableWithholdingTax": "Suggest refundable",
       "missingWithholdingAmount": "This action requires a withholding tax amount first.",
       "missingRefundableSource": "This action requires both withholding tax and creditable withholding tax.",

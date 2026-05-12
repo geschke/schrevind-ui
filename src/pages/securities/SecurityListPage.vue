@@ -252,19 +252,33 @@ function onSortChange({ field, direction }: { field: string; direction: SortDire
 
 function errorContent(errorCode: string) {
   switch (errorCode) {
-    case "NETWORK_ERROR":
-      return t("securities.errors.loadFailed");
-    default:
-      return t("securities.errors.unknown");
+    case "UNAUTHORIZED":              return t("securities.backendErrors.UNAUTHORIZED");
+    case "AUTH_NOT_CONFIGURED":       return t("securities.backendErrors.AUTH_NOT_CONFIGURED");
+    case "DB_NOT_INITIALIZED":        return t("securities.backendErrors.DB_NOT_INITIALIZED");
+    case "INVALID_GROUP_ID":          return t("securities.backendErrors.INVALID_GROUP_ID");
+    case "FORBIDDEN":                 return t("securities.backendErrors.FORBIDDEN");
+    case "INVALID_STATUS_FILTER":     return t("securities.backendErrors.INVALID_STATUS_FILTER");
+    case "INVALID_LIMIT":
+    case "INVALID_OFFSET":
+    case "INVALID_SORT":
+    case "INVALID_DIRECTION":         return t("securities.backendErrors.INVALID_QUERY_PARAMS");
+    case "DB_ERROR":                  return t("securities.backendErrors.DB_ERROR");
+    case "NETWORK_ERROR":             return t("securities.errors.loadFailed");
+    default:                          return t("securities.errors.unknown");
   }
 }
 
 function deleteErrorContent(errorCode: string) {
   switch (errorCode) {
-    case "SECURITY_NOT_FOUND":
-      return t("securities.errors.securityNotFoundDelete");
-    default:
-      return errorContent(errorCode);
+    case "SECURITY_NOT_FOUND":        return t("securities.errors.securityNotFoundDelete");
+    case "INVALID_SECURITY_ID":       return t("securities.backendErrors.INVALID_SECURITY_ID");
+    case "UNAUTHORIZED":
+    case "AUTH_NOT_CONFIGURED":
+    case "DB_NOT_INITIALIZED":
+    case "INVALID_GROUP_ID":
+    case "FORBIDDEN":
+    case "DB_ERROR":                  return errorContent(errorCode);
+    default:                          return errorContent(errorCode);
   }
 }
 
@@ -300,13 +314,21 @@ function deleteItemConfirm() {
 function deleteSecurity(item: Security) {
   storeSecurities
     .deleteSecurity(item)
-    .then(() => {
+    .then((code) => {
       void loadPage(currentOffset.value, itemsPerPage);
-      toast.value?.addToast(<GToastContent>{
-        ...GToastSuccess,
-        title: t("securities.list.toasts.deletedTitle"),
-        content: t("securities.list.toasts.deletedContent"),
-      });
+      if (code === "SECURITY_DEACTIVATED") {
+        toast.value?.addToast(<GToastContent>{
+          ...GToastWarning,
+          title: t("securities.list.toasts.deactivatedTitle"),
+          content: t("securities.list.toasts.deactivatedContent"),
+        });
+      } else {
+        toast.value?.addToast(<GToastContent>{
+          ...GToastSuccess,
+          title: t("securities.list.toasts.deletedTitle"),
+          content: t("securities.list.toasts.deletedContent"),
+        });
+      }
     })
     .catch((requestError: unknown) => {
       toast.value?.addToast(<GToastContent>{

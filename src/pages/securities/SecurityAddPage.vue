@@ -47,7 +47,7 @@
 
         <div class="form-row mt-3">
           <div class="form-group col-md-8 offset-2">
-            <button type="button" @click="$router.go(-1)" class="btn btn-secondary">{{ t("securities.common.cancel") }}</button>
+            <button type="button" @click="handleCancel" class="btn btn-secondary">{{ t("securities.common.cancel") }}</button>
             <button class="btn btn-primary ms-2" :disabled="saveState === 'saving'">
               <span v-if="saveState !== 'saving'">{{ t("securities.add.submit") }}</span>
               <span v-else class="spinner-border spinner-border-sm"></span>
@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import * as yup from "yup";
 import { useSecuritiesStore } from "@/stores/securities";
 import { getErrorCode } from "@/helper/errorCode";
@@ -96,6 +96,8 @@ const messageError = ref("");
 const storeSecurities = useSecuritiesStore();
 const toast: any = ref(null);
 const router = useRouter();
+const route = useRoute();
+const returnTo = route.query.returnTo as string | undefined;
 
 const { defineField, errors, handleSubmit } = useForm({
   validationSchema,
@@ -109,6 +111,14 @@ const [symbol, symbolAttrs] = defineField("symbol");
 function dismissErrorMessage() {
   saveState.value = "idle";
   messageError.value = "";
+}
+
+function handleCancel() {
+  if (returnTo) {
+    router.push({ name: returnTo, query: { restoreDraft: "1" } });
+  } else {
+    router.go(-1);
+  }
 }
 
 function errorContent(code: string) {
@@ -144,16 +154,18 @@ const onSubmit = handleSubmit((values) => {
       Symbol: values.symbol ?? "",
       Status: "active",
     })
-    .then(() => {
+    .then((newId) => {
       saveState.value = "success";
-      try {
-        sessionStorage.setItem(CREATED_SECURITY_FLASH_KEY, values.name ?? "");
-      } catch {
-        // Keep navigation flow even if storage is unavailable.
+      if (returnTo === "dividendentrynew") {
+        router.push({ name: returnTo, query: { preselectSecurity: String(newId) } });
+      } else {
+        try {
+          sessionStorage.setItem(CREATED_SECURITY_FLASH_KEY, values.name ?? "");
+        } catch {
+          // Keep navigation flow even if storage is unavailable.
+        }
+        router.push({ name: "securities" });
       }
-      router.push({
-        name: "securities",
-      });
     })
     .catch((requestError: unknown) => {
       const errorMessage = errorContent(getErrorCode(requestError));

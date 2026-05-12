@@ -49,39 +49,49 @@
           <div class="row py-2 mb-3" >
             <label for="securityId" class="col-sm-3 col-form-label fw-semibold">{{ t("dividendEntries.common.securityId") }}</label>
             <div class="col-sm-9 col-lg-7">
-              <div ref="securityPickerRef" class="position-relative">
-                <input
-                  id="securityId"
-                  v-model="securitySearchQuery"
-                  type="text"
-                  class="form-control"
-                  :placeholder="referenceDataLoading ? t('common.loading') : t('dividendEntries.form.chooseSecurity')"
-                  autocomplete="off"
-                  @focus="openSecurityPicker"
-                  @input="onSecurityInput"
-                  @keydown="onSecurityKeydown"
-                />
-                <input type="hidden" v-model="securityId" v-bind="securityIdAttrs" />
-                <div
-                  v-if="isSecurityPickerOpen"
-                  ref="securityPickerListRef"
-                  class="list-group position-absolute w-100 shadow-sm security-picker-list"
-                >
-                  <button
-                    v-for="(security, index) in filteredSecurityOptions"
-                    :key="security.ID"
-                    type="button"
-                    class="list-group-item list-group-item-action"
-                    :class="{ active: index === highlightedSecurityIndex }"
-                    @mousedown.prevent="selectSecurityOption(security)"
-                    @mousemove="highlightedSecurityIndex = index"
+              <div class="d-flex gap-2 align-items-start">
+                <div ref="securityPickerRef" class="position-relative flex-grow-1">
+                  <input
+                    id="securityId"
+                    v-model="securitySearchQuery"
+                    type="text"
+                    class="form-control"
+                    :placeholder="referenceDataLoading ? t('common.loading') : t('dividendEntries.form.chooseSecurity')"
+                    autocomplete="off"
+                    @focus="openSecurityPicker"
+                    @input="onSecurityInput"
+                    @keydown="onSecurityKeydown"
+                  />
+                  <input type="hidden" v-model="securityId" v-bind="securityIdAttrs" />
+                  <div
+                    v-if="isSecurityPickerOpen"
+                    ref="securityPickerListRef"
+                    class="list-group position-absolute w-100 shadow-sm security-picker-list"
                   >
-                    {{ formatSecurityLabel(security) }}
-                  </button>
-                  <div v-if="filteredSecurityOptions.length === 0" class="list-group-item text-muted">
-                    {{ t("dividendEntries.form.noSecurityResults") }}
+                    <button
+                      v-for="(security, index) in filteredSecurityOptions"
+                      :key="security.ID"
+                      type="button"
+                      class="list-group-item list-group-item-action"
+                      :class="{ active: index === highlightedSecurityIndex }"
+                      @mousedown.prevent="selectSecurityOption(security)"
+                      @mousemove="highlightedSecurityIndex = index"
+                    >
+                      {{ formatSecurityLabel(security) }}
+                    </button>
+                    <div v-if="filteredSecurityOptions.length === 0" class="list-group-item text-muted">
+                      {{ t("dividendEntries.form.noSecurityResults") }}
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary flex-shrink-0"
+                  @click="navigateToAddSecurity"
+                  :title="t('dividendEntries.actions.addNewSecurity')"
+                >
+                  <i class="bi bi-plus-circle"></i>
+                </button>
               </div>
               <small class="text-danger" v-if="errors.securityId">{{ errors.securityId }}</small>
             </div>
@@ -670,7 +680,7 @@ import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { GToast, GToastSuccess, GToastDanger, GToastWarning } from "goar-components";
 import type { GToastContent } from "goar-components";
@@ -696,6 +706,8 @@ const storeDividendEntries = useDividendEntriesStore();
 const storeWithholdingTaxDefaults = useWithholdingTaxDefaultsStore();
 const storeSettings = useSettingsStore();
 const router = useRouter();
+const route = useRoute();
+const SECURITY_RETURN_DRAFT_KEY = "schrevind.dividendentry.newdraft";
 const storeInlandTaxTemplates = useInlandTaxTemplatesStore();
 
 type InlandTaxFieldState = {
@@ -878,7 +890,7 @@ const validationSchema = yup.object().shape({
   securitySymbol: yup.string().transform((value) => value?.trim() ?? ""),
 });
 
-const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue } = useForm({
+const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue, values } = useForm({
   validationSchema,
   initialValues,
 });
@@ -1451,6 +1463,52 @@ function selectSecurityOption(security: Security) {
   isSecurityFilterActive.value = false;
 }
 
+function navigateToAddSecurity() {
+  try {
+    sessionStorage.setItem(
+      SECURITY_RETURN_DRAFT_KEY,
+      JSON.stringify({
+        formValues: { ...values },
+        securitySearchQuery: securitySearchQuery.value,
+        withholdingCountrySearchQuery: withholdingCountrySearchQuery.value,
+      })
+    );
+  } catch {
+    // sessionStorage unavailable — navigate anyway
+  }
+  router.push({ name: "securitynew", query: { returnTo: "dividendentrynew" } });
+}
+
+function restoreDraftOnReturn(preselectSecurityId: string) {
+  try {
+    const raw = sessionStorage.getItem(SECURITY_RETURN_DRAFT_KEY);
+    sessionStorage.removeItem(SECURITY_RETURN_DRAFT_KEY);
+    if (raw) {
+      const draft = JSON.parse(raw) as {
+        formValues?: Record<string, unknown>;
+        securitySearchQuery?: string;
+        withholdingCountrySearchQuery?: string;
+      };
+      if (draft.formValues) {
+        resetForm({ values: draft.formValues as typeof values });
+      }
+      if (draft.securitySearchQuery !== undefined) {
+        securitySearchQuery.value = draft.securitySearchQuery;
+      }
+      if (draft.withholdingCountrySearchQuery !== undefined) {
+        withholdingCountrySearchQuery.value = draft.withholdingCountrySearchQuery;
+      }
+    }
+  } catch {
+    // corrupt or unavailable draft — continue with clean form
+  }
+
+  const security = storeSecurities.getItem(preselectSecurityId);
+  if (security) {
+    selectSecurityOption(security);
+  }
+}
+
 function onSecurityInput() {
   isSecurityPickerOpen.value = true;
   isSecurityFilterActive.value = true;
@@ -1880,6 +1938,10 @@ onMounted(() => {
       if (isEditMode.value) {
         await loadDividendEntryForEdit();
       } else {
+        const preselectId = route.query.preselectSecurity;
+        if (preselectId || route.query.restoreDraft) {
+          restoreDraftOnReturn(preselectId ? String(preselectId) : "");
+        }
         await initInlandTaxSection();
       }
     })

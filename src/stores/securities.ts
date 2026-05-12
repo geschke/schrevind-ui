@@ -138,7 +138,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
       });
   }
 
-  async function addSecurity(payload: CreateSecurityPayload) {
+  async function addSecurity(payload: CreateSecurityPayload): Promise<number> {
     const securityDO = {
       ContextGroupID: getActiveGroupIDOrThrow(),
       Name: payload.Name,
@@ -150,7 +150,10 @@ export const useSecuritiesStore = defineStore("securities", () => {
 
     return axios
       .post("/securities/add", securityDO, { withCredentials: true })
-      .then(() => fetchSecurities())
+      .then((response) => {
+        const newId = Number(response.data?.item?.ID ?? 0);
+        return fetchSecurities().then(() => newId);
+      })
       .catch((error: unknown) => {
         throw error;
       });

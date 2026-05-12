@@ -73,6 +73,7 @@
     },
     "actions": {
       "copyWithholdingToCredit": "Als anrechenbar übernehmen",
+      "addNewSecurity": "Neues Wertpapier anlegen",
       "suggestRefundableWithholdingTax": "Erstattbar vorbelegen",
       "missingWithholdingAmount": "Für diese Aktion wird zunächst ein Quellensteuer-Betrag benötigt.",
       "missingRefundableSource": "Für diese Aktion werden Quellensteuer und anrechenbare Quellensteuer benötigt.",
