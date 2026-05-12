@@ -17,6 +17,8 @@
         :_showEmpty="false"
         :showLoading="true"
         :loading="loading"
+        :showPageFirstLast="true"
+        :showPageIcons="true"
       >
         <template #tmplLoading>
           <div class="col text-center">
