@@ -68,17 +68,48 @@
         </template>
 
         <template #tmplExpandDetails="data">
-          <div class="card card-body border-0 bg-body-tertiary">
-            <div v-for="section in buildDetailSections(data.item)" :key="section.title" class="mb-3">
-              <div class="fw-semibold mb-2">{{ section.title }}</div>
-              <div v-for="(fieldRow, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`" class="row g-2 mb-2">
-                <div v-for="field in fieldRow" :key="field.label" :class="field.columnClass ?? 'col-12 col-md-6 col-xl-4'">
-                  <div class="small text-body-secondary">{{ field.label }}</div>
-                  <div :class="{ 'detail-note': field.preserveLineBreaks }">{{ field.value }}</div>
+          <template v-for="sections in [buildDetailSections(data.item)]" :key="data.item?.ID ?? 0">
+            <div class="bg-body-tertiary">
+              <div class="row g-3 mb-2">
+                <div v-for="section in sections.slice(0, 3)" :key="section.title" class="col-12 col-md-4">
+                  <div class="card h-100">
+                    <div class="card-header py-1 px-2 small fw-semibold bg-secondary-subtle text-body-secondary">
+                      {{ section.title }}
+                    </div>
+                    <div class="card-body py-2 px-2">
+                      <dl class="row g-0 mb-0 small">
+                        <template v-for="field in section.rows.flat()" :key="field.label">
+                          <dt
+                            class="col-7 fw-normal text-body-secondary mb-1 pe-2 text-truncate"
+                            :title="field.label"
+                          >{{ field.label }}</dt>
+                          <dd class="col-5 mb-1">
+                            <span v-if="field.currency !== undefined" class="d-flex gap-1 align-items-baseline">
+                              <span class="flex-grow-1 text-end">{{ field.value }}</span>
+                              <span class="flex-shrink-0 text-body-secondary" style="min-width:2.8em">{{ field.currency }}</span>
+                            </span>
+                            <span v-else>{{ field.value }}</span>
+                          </dd>
+                        </template>
+                      </dl>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <dl v-if="sections.length > 3" class="row g-0 mb-0 small">
+                <template v-for="field in sections.slice(3).flatMap(s => s.rows.flat())" :key="field.label">
+                  <dt class="col-3 col-lg-2 fw-normal text-body-secondary mb-0 pe-2 text-truncate" :title="field.label">{{ field.label }}</dt>
+                  <dd class="col-9 col-lg-10 mb-0">
+                    <span v-if="field.currency !== undefined" class="d-flex gap-1 align-items-baseline" style="max-width:12rem">
+                      <span class="flex-grow-1 text-end">{{ field.value }}</span>
+                      <span class="flex-shrink-0 text-body-secondary" style="min-width:2.8em">{{ field.currency }}</span>
+                    </span>
+                    <span v-else :class="{ 'detail-note': field.preserveLineBreaks }">{{ field.value }}</span>
+                  </dd>
+                </template>
+              </dl>
             </div>
-          </div>
+          </template>
         </template>
 
         <template #tmplDividendEntryActions="data">
@@ -179,6 +210,7 @@ import { useI18n } from "vue-i18n";
 type DetailField = {
   label: string;
   value: string;
+  currency?: string;
   columnClass?: string;
   preserveLineBreaks?: boolean;
 };
@@ -435,15 +467,6 @@ function formatAmount(amount: string, currency: string): string {
   return `${normalizedAmount} ${normalizedCurrency}`;
 }
 
-function formatDetailAmount(amount: string, currency: string): string {
-  const normalizedAmount = String(amount ?? "").trim();
-  const normalizedCurrency = String(currency ?? "").trim();
-
-  if (normalizedAmount === "" && normalizedCurrency === "") return "-";
-  if (normalizedAmount === "") return normalizedCurrency;
-  if (normalizedCurrency === "") return `${normalizedAmount} (${t("dividendEntries.list.details.labels.missingCurrency")})`;
-  return `${normalizedAmount} ${normalizedCurrency}`;
-}
 
 function formatExchangeRate(label: string, rate: string): string {
   const normalizedLabel = String(label ?? "").trim();
@@ -461,26 +484,31 @@ function formatTextValue(value: unknown): string {
   return normalized === "" ? "-" : normalized;
 }
 
+function amountField(label: string, amount: string, currency: string, extra?: { columnClass?: string }): DetailField {
+  const a = String(amount ?? "").trim();
+  const c = String(currency ?? "").trim();
+  if (a === "" && c === "") return { label, value: "—", ...extra };
+  if (a === "") return { label, value: c, ...extra };
+  return { label, value: a, currency: c || undefined, ...extra };
+}
+
+function getDepotBaseCurrency(depotId: number): string {
+  return storeDepots.getItem(depotId)?.BaseCurrency ?? "";
+}
+
 function buildDetailSections(item: DividendEntry | undefined): DetailSection[] {
   if (!item) return [];
-  const currencyFields: DetailField[] = [
-    {
-      label: t("dividendEntries.common.dividendPerUnitAmount"),
-      value: formatDetailAmount(item.DividendPerUnitAmount, item.DividendPerUnitCurrency),
-    },
-    {
-      label: t("dividendEntries.list.details.labels.calcGrossAmountBase"),
-      value: formatTextValue(item.CalcGrossAmountBase),
-    },
-    {
-      label: t("dividendEntries.list.details.labels.calcAfterWithholdingAmountBase"),
-      value: formatTextValue(item.CalcAfterWithholdingAmountBase),
-    },
+  const baseCurrency = getDepotBaseCurrency(item.DepotID);
+
+  const extraFields: DetailField[] = [
+    amountField(t("dividendEntries.common.dividendPerUnitAmount"), item.DividendPerUnitAmount, item.DividendPerUnitCurrency),
+    amountField(t("dividendEntries.list.details.labels.calcGrossAmountBase"), item.CalcGrossAmountBase, baseCurrency),
+    amountField(t("dividendEntries.list.details.labels.calcAfterWithholdingAmountBase"), item.CalcAfterWithholdingAmountBase, baseCurrency),
   ];
 
   const exchangeRateValue = formatExchangeRate(item.FXRateLabel, item.FXRate);
   if (exchangeRateValue !== "") {
-    currencyFields.splice(1, 0, {
+    extraFields.splice(1, 0, {
       label: t("dividendEntries.common.exchangeRate"),
       value: exchangeRateValue,
     });
@@ -489,74 +517,37 @@ function buildDetailSections(item: DividendEntry | undefined): DetailSection[] {
   return [
     {
       title: t("dividendEntries.list.details.sections.currency"),
-      rows: [currencyFields],
+      rows: [extraFields],
     },
     {
       title: t("dividendEntries.sections.withholdingTax"),
       rows: [
         [
-          {
-            label: t("dividendEntries.common.withholdingTaxCountryCode"),
-            value: formatTextValue(item.WithholdingTaxCountryCode),
-            columnClass: "col-12 col-md-6",
-          },
-          {
-            label: t("dividendEntries.common.withholdingTaxPercent"),
-            value: formatTextValue(item.WithholdingTaxPercent),
-            columnClass: "col-12 col-md-6",
-          },
+          { label: t("dividendEntries.common.withholdingTaxCountryCode"), value: formatTextValue(item.WithholdingTaxCountryCode) },
+          { label: t("dividendEntries.common.withholdingTaxPercent"),      value: formatTextValue(item.WithholdingTaxPercent) },
         ],
         [
-          {
-            label: t("dividendEntries.common.withholdingTaxAmount"),
-            value: formatDetailAmount(item.WithholdingTaxAmount, item.WithholdingTaxCurrency),
-            columnClass: "col-12 col-xl-4",
-          },
-          {
-            label: t("dividendEntries.common.withholdingTaxAmountCredit"),
-            value: formatDetailAmount(item.WithholdingTaxAmountCredit, item.WithholdingTaxAmountCreditCurrency),
-            columnClass: "col-12 col-xl-4",
-          },
-          {
-            label: t("dividendEntries.common.withholdingTaxAmountRefundable"),
-            value: formatDetailAmount(item.WithholdingTaxAmountRefundable, item.WithholdingTaxAmountRefundableCurrency),
-            columnClass: "col-12 col-xl-4",
-          },
+          amountField(t("dividendEntries.common.withholdingTaxAmount"),         item.WithholdingTaxAmount,         item.WithholdingTaxCurrency),
+          amountField(t("dividendEntries.common.withholdingTaxAmountCredit"),    item.WithholdingTaxAmountCredit,   item.WithholdingTaxAmountCreditCurrency),
+          amountField(t("dividendEntries.common.withholdingTaxAmountRefundable"),item.WithholdingTaxAmountRefundable, item.WithholdingTaxAmountRefundableCurrency),
         ],
       ],
     },
     {
       title: t("dividendEntries.sections.inlandTax"),
       rows: [
-        [
-          {
-            label: t("dividendEntries.common.inlandTaxAmount"),
-            value: formatDetailAmount(item.InlandTaxAmount, item.InlandTaxCurrency),
-          },
-        ],
         ...(item.InlandTaxDetails.length > 0
-          ? [item.InlandTaxDetails.map((d) => ({
-              label: d.Label,
-              value: formatDetailAmount(d.Amount, d.Currency),
-              columnClass: "col-12 col-md-6 col-xl-4",
-            }))]
+          ? [item.InlandTaxDetails.map((d) => amountField(d.Label, d.Amount, d.Currency))]
           : []),
+        [amountField(t("dividendEntries.common.inlandTaxAmount"), item.InlandTaxAmount, item.InlandTaxCurrency)],
       ],
     },
     {
       title: t("dividendEntries.sections.other"),
       rows: [
         [
-          {
-            label: t("dividendEntries.common.foreignFeesAmount"),
-            value: formatDetailAmount(item.ForeignFeesAmount, item.ForeignFeesCurrency),
-          },
-          {
-            label: t("dividendEntries.common.note"),
-            value: formatTextValue(item.Note),
-            preserveLineBreaks: true,
-            columnClass: "col-12 col-xl-8",
-          },
+          amountField(t("dividendEntries.common.foreignFeesAmount"), item.ForeignFeesAmount, item.ForeignFeesCurrency),
+          { label: t("dividendEntries.common.note"), value: formatTextValue(item.Note), preserveLineBreaks: true },
         ],
       ],
     },

@@ -143,7 +143,7 @@
       "addButton": "Dividendeneintrag hinzufügen",
       "details": {
         "sections": {
-          "currency": "Währung"
+          "currency": "Weiteres"
         },
         "labels": {
           "userId": "Benutzer-ID",
@@ -152,8 +152,8 @@
           "securityWKN": "WKN",
           "securitySymbol": "Symbol",
           "updatedAt": "Aktualisiert",
-          "calcGrossAmountBase": "Berechnetes Brutto (Basis)",
-          "calcAfterWithholdingAmountBase": "Berechnet nach Quellensteuer (Basis)",
+          "calcGrossAmountBase": "Brutto (berechnet)",
+          "calcAfterWithholdingAmountBase": "Betrag nach QuSt. (berechnet)",
           "missingCurrency": "ohne Währung"
         }
       },
