@@ -75,6 +75,8 @@
       "copyWithholdingToCredit": "Copy to creditable",
       "addNewSecurity": "Add new security",
       "suggestRefundableWithholdingTax": "Suggest refundable",
+      "calculateRefund": "Calculate refund",
+      "refundCapped": "Amount was capped to the actual withholding tax.",
       "missingWithholdingAmount": "This action requires a withholding tax amount first.",
       "missingRefundableSource": "This action requires both withholding tax and creditable withholding tax.",
       "invalidRefundableSource": "The current values are not suitable for this action."
@@ -136,7 +138,17 @@
       "ERR_FX_RATE_ZERO": "The exchange rate must not be 0 when conversion is required.",
       "ERR_DEPOT_NOT_FOUND": "The specified depot was not found.",
       "ERR_BASE_CURRENCY_MISSING": "The depot has no base currency configured.",
-      "ERR_CALCULATION_FAILED": "An amount could not be processed internally."
+      "ERR_CALCULATION_FAILED": "An amount could not be processed internally.",
+      "MISSING_GROSS_AMOUNT": "Please enter the gross amount.",
+      "MISSING_WITHHOLDING_TAX_COUNTRY_CODE": "Please enter the withholding tax country code.",
+      "WITHHOLDING_TAX_DEFAULT_NOT_FOUND": "No withholding tax default was found for this country and depot.",
+      "MISSING_WITHHOLDING_TAX_AMOUNT": "Please enter the withholding tax amount.",
+      "MISSING_WITHHOLDING_TAX_CURRENCY": "Please enter the withholding tax currency.",
+      "WITHHOLDING_TAX_PERCENT_MISSING": "No withholding tax percentage is configured for this country.",
+      "INVALID_WITHHOLDING_TAX_PERCENT": "The configured withholding tax percentage is invalid.",
+      "WITHHOLDING_TAX_CREDIT_PERCENT_MISSING": "No creditable withholding tax percentage is configured for this country.",
+      "INVALID_WITHHOLDING_TAX_CREDIT_PERCENT": "The configured creditable withholding tax percentage is invalid.",
+      "FORBIDDEN": "You do not have permission for this action."
     },
     "list": {
       "title": "Dividend entries",

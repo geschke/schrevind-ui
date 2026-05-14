@@ -417,11 +417,18 @@
                       {{ errors.withholdingTaxAmountRefundableCurrency }}
                     </small>
                 </div>
-                <!-- <div class="col-sm-12 col-lg-4 d-grid d-lg-flex">
-                  <button type="button" class="btn btn-outline-secondary btn-sm" @click="suggestRefundableWithholdingTax">
-                    {{ t("dividendEntries.actions.suggestRefundableWithholdingTax") }}
+                <div class="col-sm-12 col-lg-4 d-grid d-lg-flex flex-column gap-1">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    :disabled="refundCalcLoading"
+                    @click="calculateWithholdingTaxRefund"
+                  >
+                    <span v-if="refundCalcLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    {{ t("dividendEntries.actions.calculateRefund") }}
                   </button>
-                </div> -->
+                  <small v-if="refundCalcError" class="text-danger">{{ refundCalcError }}</small>
+                </div>
               </div>
             </div>
           </div>
@@ -692,8 +699,11 @@ import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import { useWithholdingTaxDefaultsStore } from "@/stores/withholdingTaxDefaults";
 import { useSettingsStore } from "@/stores/settings";
 import { useInlandTaxTemplatesStore } from "@/stores/inlandTaxTemplates";
+import { useUserAuthStore } from "@/stores/userauth";
 import type { DividendEntry, InlandTaxDetail } from "@/types/dividendEntries";
 import type { Security } from "@/types/securities";
+import axios from "@/helper/axiosInstance";
+import type { AxiosResponse } from "axios";
 
 type SaveState = "idle" | "saving" | "success" | "error";
 
@@ -709,6 +719,7 @@ const router = useRouter();
 const route = useRoute();
 const SECURITY_RETURN_DRAFT_KEY = "schrevind.dividendentry.newdraft";
 const storeInlandTaxTemplates = useInlandTaxTemplatesStore();
+const storeUserAuth = useUserAuthStore();
 
 type InlandTaxFieldState = {
   code: string;
@@ -729,6 +740,8 @@ const showInlandTax = computed(
 const toast: any = ref(null);
 const saveState = ref<SaveState>("idle");
 const messageError = ref("");
+const refundCalcLoading = ref(false);
+const refundCalcError = ref("");
 const referenceDataLoading = ref(false);
 const referenceDataError = ref("");
 const autoCurrencySeed = ref("");
@@ -1405,31 +1418,6 @@ function normalizeIdentifier(value: unknown) {
   return Number.isInteger(normalized) ? normalized : 0;
 }
 
-function normalizeDecimalInput(value: unknown) {
-  return normalizeOptionalString(value).trim().replace(",", ".");
-}
-
-function countDecimalPlaces(value: string) {
-  const normalized = normalizeDecimalInput(value);
-  const parts = normalized.split(".");
-  return parts.length === 2 ? parts[1].length : 0;
-}
-
-function parseDecimal(value: unknown) {
-  const normalized = normalizeDecimalInput(value);
-  if (normalized === "") {
-    return null;
-  }
-
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function formatDecimalSuggestion(value: number, ...sources: Array<unknown>) {
-  const decimals = Math.max(0, ...sources.map((source) => countDecimalPlaces(normalizeOptionalString(source))));
-  return value.toFixed(decimals).replace(/\.?0+$/, "");
-}
-
 function applySecuritySnapshot(securityKey: unknown) {
   const security = storeSecurities.getItem(securityKey ?? "");
   setFieldValue("securityName", security?.Name ?? "");
@@ -1635,29 +1623,50 @@ function copyWithholdingToCredit() {
   }
 }
 
-function suggestRefundableWithholdingTax() {
-  const withholdingAmount = parseDecimal(withholdingTaxAmount.value);
-  const creditAmount = parseDecimal(withholdingTaxAmountCredit.value);
+function calculateWithholdingTaxRefund() {
+  refundCalcError.value = "";
+  refundCalcLoading.value = true;
 
-  if (withholdingAmount === null || creditAmount === null) {
-    showWarningToast(t("dividendEntries.actions.missingRefundableSource"));
-    return;
-  }
-
-  const refundableAmount = withholdingAmount - creditAmount;
-  if (!Number.isFinite(refundableAmount) || refundableAmount < 0) {
-    showWarningToast(t("dividendEntries.actions.invalidRefundableSource"));
-    return;
-  }
-
-  setFieldValue(
-    "withholdingTaxAmountRefundable",
-    formatDecimalSuggestion(refundableAmount, withholdingTaxAmount.value, withholdingTaxAmountCredit.value)
-  );
-
-  if (withholdingTaxAmountRefundableCurrency.value === "" && withholdingTaxCurrency.value !== "") {
-    setFieldValue("withholdingTaxAmountRefundableCurrency", normalizeCurrencyCode(withholdingTaxCurrency.value));
-  }
+  axios
+    .post(
+      "/dividend-entries/calculate-withholding-tax-refund",
+      {
+        ContextGroupID: storeUserAuth.activeGroupID ?? 0,
+        DepotID: normalizeIdentifier(values.depotId),
+        GrossAmount: values.grossAmount,
+        GrossCurrency: normalizeCurrencyCode(values.grossCurrency),
+        WithholdingTaxCountryCode: normalizeOptionalString(values.withholdingTaxCountryCode),
+        WithholdingTaxAmount: normalizeOptionalString(values.withholdingTaxAmount),
+        WithholdingTaxCurrency: normalizeCurrencyCode(values.withholdingTaxCurrency),
+        FXRateLabel: normalizeOptionalString(values.fxRateLabel),
+        FXRate: normalizeOptionalString(values.fxRate, "1"),
+      },
+      { withCredentials: true }
+    )
+    .then((response: AxiosResponse) => {
+      refundCalcLoading.value = false;
+      const data = response.data?.data;
+      setFieldValue("withholdingTaxAmountRefundable", String(data?.WithholdingTaxAmountRefundable ?? ""));
+      setFieldValue("withholdingTaxAmountRefundableCurrency", String(data?.WithholdingTaxAmountRefundableCurrency ?? ""));
+      if (response.data?.message === "WITHHOLDING_TAX_REFUND_CALCULATED_CAPPED") {
+        toast.value?.addToast(<GToastContent>{
+          ...GToastWarning,
+          title: t("dividendEntries.common.warningTitle"),
+          content: t("dividendEntries.actions.refundCapped"),
+        });
+      }
+    })
+    .catch((err: unknown) => {
+      refundCalcLoading.value = false;
+      const code = getErrorCode(err);
+      if (code === "VALIDATION_ERROR") {
+        const fieldErrors = getBackendFieldErrors(err);
+        const firstCode = Object.values(fieldErrors)[0] ?? "UNKNOWN_ERROR";
+        refundCalcError.value = translateBackendCode(firstCode);
+      } else {
+        refundCalcError.value = translateBackendCode(code);
+      }
+    });
 }
 
 const backendFieldMap: Record<string, string> = {

@@ -75,6 +75,8 @@
       "copyWithholdingToCredit": "Als anrechenbar übernehmen",
       "addNewSecurity": "Neues Wertpapier anlegen",
       "suggestRefundableWithholdingTax": "Erstattbar vorbelegen",
+      "calculateRefund": "Erstattung berechnen",
+      "refundCapped": "Betrag wurde auf die einbehaltene Quellensteuer begrenzt.",
       "missingWithholdingAmount": "Für diese Aktion wird zunächst ein Quellensteuer-Betrag benötigt.",
       "missingRefundableSource": "Für diese Aktion werden Quellensteuer und anrechenbare Quellensteuer benötigt.",
       "invalidRefundableSource": "Für diese Aktion ist die vorhandene Wertebasis nicht geeignet."
@@ -136,7 +138,17 @@
       "ERR_FX_RATE_ZERO": "Der Umrechnungskurs darf bei notwendiger Umrechnung nicht 0 sein.",
       "ERR_DEPOT_NOT_FOUND": "Das angegebene Depot wurde nicht gefunden.",
       "ERR_BASE_CURRENCY_MISSING": "Für das Depot ist keine Basiswährung hinterlegt.",
-      "ERR_CALCULATION_FAILED": "Ein Betrag konnte intern nicht verarbeitet werden."
+      "ERR_CALCULATION_FAILED": "Ein Betrag konnte intern nicht verarbeitet werden.",
+      "MISSING_GROSS_AMOUNT": "Bitte geben Sie den Bruttobetrag ein.",
+      "MISSING_WITHHOLDING_TAX_COUNTRY_CODE": "Bitte geben Sie den Quellensteuer-Ländercode ein.",
+      "WITHHOLDING_TAX_DEFAULT_NOT_FOUND": "Für dieses Land und Depot wurde keine Quellensteuer-Vorgabe gefunden.",
+      "MISSING_WITHHOLDING_TAX_AMOUNT": "Bitte geben Sie den Quellensteuer-Betrag ein.",
+      "MISSING_WITHHOLDING_TAX_CURRENCY": "Bitte geben Sie die Quellensteuer-Währung ein.",
+      "WITHHOLDING_TAX_PERCENT_MISSING": "Für dieses Land ist kein Quellensteuer-Prozentsatz hinterlegt.",
+      "INVALID_WITHHOLDING_TAX_PERCENT": "Der hinterlegte Quellensteuer-Prozentsatz ist ungültig.",
+      "WITHHOLDING_TAX_CREDIT_PERCENT_MISSING": "Für dieses Land ist kein anrechenbarer Quellensteuer-Prozentsatz hinterlegt.",
+      "INVALID_WITHHOLDING_TAX_CREDIT_PERCENT": "Der hinterlegte anrechenbare Quellensteuer-Prozentsatz ist ungültig.",
+      "FORBIDDEN": "Keine Berechtigung für diese Aktion."
     },
     "list": {
       "title": "Dividendeneinträge",
