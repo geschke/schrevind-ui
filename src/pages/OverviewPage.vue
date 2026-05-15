@@ -8,7 +8,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bar-chart-line"></i>
@@ -19,7 +19,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-primary" :to="{ name: 'analytics' }">
+            <router-link class="btn mt-auto btn-primary" :to="{ name: 'analytics' }">
               {{ t("overview.cards.analyses.action") }}
             </router-link>
           </div>
@@ -28,7 +28,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-info-subtle text-info">
                 <i class="bi bi-cash-coin"></i>
@@ -39,7 +39,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-outline-info" :to="{ name: 'dividendentrynew' }">
+            <router-link class="btn mt-auto btn-outline-info" :to="{ name: 'dividendentrynew' }">
               {{ t("overview.cards.dividendEntryAdd.action") }}
             </router-link>
           </div>
@@ -48,7 +48,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-info-subtle text-info">
                 <i class="bi bi-table"></i>
@@ -59,7 +59,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-info" :to="{ name: 'dividendentries' }">
+            <router-link class="btn mt-auto btn-info" :to="{ name: 'dividendentries' }">
               {{ t("overview.cards.dividendEntries.action") }}
             </router-link>
           </div>
@@ -68,7 +68,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bank"></i>
@@ -79,7 +79,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-primary" :to="{ name: 'depots' }">
+            <router-link class="btn mt-auto btn-primary" :to="{ name: 'depots' }">
               {{ t("overview.cards.depots.action") }}
             </router-link>
           </div>
@@ -88,7 +88,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-success-subtle text-success">
                 <i class="bi bi-graph-up-arrow"></i>
@@ -99,7 +99,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-success" :to="{ name: 'securities' }">
+            <router-link class="btn mt-auto btn-success" :to="{ name: 'securities' }">
               {{ t("overview.cards.securities.action") }}
             </router-link>
           </div>
@@ -108,7 +108,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-warning-subtle text-warning">
                 <i class="bi bi-percent"></i>
@@ -119,7 +119,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-warning" :to="{ name: 'withholdingtaxdefaults' }">
+            <router-link class="btn mt-auto btn-warning" :to="{ name: 'withholdingtaxdefaults' }">
               {{ t("overview.cards.withholdingTaxDefaults.action") }}
             </router-link>
           </div>
@@ -128,7 +128,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-dark-subtle text-dark">
                 <i class="bi bi-currency-exchange"></i>
@@ -139,7 +139,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-dark" :to="{ name: 'currencies' }">
+            <router-link class="btn mt-auto btn-dark" :to="{ name: 'currencies' }">
               {{ t("overview.cards.currencies.action") }}
             </router-link>
           </div>
@@ -148,7 +148,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="overview-icon bg-secondary-subtle text-secondary">
                 <i class="bi bi-people"></i>
@@ -159,7 +159,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-outline-secondary" :to="{ name: 'adminusers' }">
+            <router-link class="btn mt-auto btn-outline-secondary" :to="{ name: 'adminusers' }">
               {{ t("overview.cards.users.action") }}
             </router-link>
           </div>

@@ -8,7 +8,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-warning-subtle text-warning">
                 <i class="bi bi-bar-chart-line-fill"></i>
@@ -19,7 +19,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-warning" :to="{ name: 'analyticscharts' }">
+            <router-link class="btn mt-auto btn-warning" :to="{ name: 'analyticscharts' }">
               {{ t("analyses.charts.action") }}
             </router-link>
           </div>
@@ -28,7 +28,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-warning-subtle text-warning">
                 <i class="bi bi-bar-chart-fill"></i>
@@ -39,7 +39,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-warning" :to="{ name: 'analyticsmonthcharts' }">
+            <router-link class="btn mt-auto btn-warning" :to="{ name: 'analyticsmonthcharts' }">
               {{ t("analyses.charts.action") }}
             </router-link>
           </div>
@@ -48,7 +48,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-primary-subtle text-primary">
                 <i class="bi bi-bar-chart-line"></i>
@@ -59,7 +59,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-primary" :to="{ name: 'analysisyears' }">
+            <router-link class="btn mt-auto btn-primary" :to="{ name: 'analysisyears' }">
               {{ t("analyses.dividends_by_year.action") }}
             </router-link>
           </div>
@@ -68,7 +68,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-info-subtle text-info">
                 <i class="bi bi-calendar-month"></i>
@@ -79,7 +79,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-info" :to="{ name: 'analysismonths' }">
+            <router-link class="btn mt-auto btn-info" :to="{ name: 'analysismonths' }">
               {{ t("analyses.dividends_by_year_month.action") }}
             </router-link>
           </div>
@@ -88,7 +88,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-success-subtle text-success">
                 <i class="bi bi-graph-up"></i>
@@ -99,7 +99,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-success" :to="{ name: 'analysissecurityyears' }">
+            <router-link class="btn mt-auto btn-success" :to="{ name: 'analysissecurityyears' }">
               {{ t("analyses.dividends_by_security_year.action") }}
             </router-link>
           </div>
@@ -108,7 +108,7 @@
 
       <div class="col-xl-3 col-lg-6 mb-4">
         <div class="card h-100 shadow-sm">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column align-items-start">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="analysis-icon bg-secondary-subtle text-secondary">
                 <i class="bi bi-table"></i>
@@ -119,7 +119,7 @@
               </div>
             </div>
 
-            <router-link class="btn btn-secondary" :to="{ name: 'analysismonthsecurity' }">
+            <router-link class="btn mt-auto btn-secondary" :to="{ name: 'analysismonthsecurity' }">
               {{ t("analyses.dividends_by_year_month_security.action") }}
             </router-link>
           </div>
