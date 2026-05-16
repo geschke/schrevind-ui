@@ -198,6 +198,13 @@
         "deletedTitle": "Dividendeneintrag gelöscht",
         "deletedContent": "Der Dividendeneintrag wurde aus der Datenbank gelöscht."
       },
+      "filter": {
+        "title": "Filter",
+        "reset": "Filter zurücksetzen",
+        "searchPlaceholder": "Name, ISIN, WKN, Symbol",
+        "allYears": "Alle Jahre",
+        "allDepots": "Alle Depots"
+      },
       "errors": {
         "loadFailed": "Fehler beim Laden der Dividendeneinträge.",
         "unauthorized": "Keine Berechtigung für diese Aktion.",

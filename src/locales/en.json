@@ -203,6 +203,13 @@
         "unauthorized": "Not authorized for this action.",
         "dividendEntryNotFoundDelete": "Dividend entry was not found (possibly already deleted).",
         "forbiddenDepot": "Not authorized for the depot of this dividend entry."
+      },
+      "filter": {
+        "title": "Filter",
+        "reset": "Reset filters",
+        "searchPlaceholder": "Name, ISIN, WKN, symbol",
+        "allYears": "All years",
+        "allDepots": "All depots"
       }
     },
     "add": {

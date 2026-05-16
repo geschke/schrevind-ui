@@ -3,6 +3,54 @@
     <template #default>
       <h2>{{ t("dividendEntries.list.title") }}</h2>
 
+      <div class="mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <button
+            type="button"
+            class="btn btn-link p-0 text-decoration-none fw-semibold text-body d-flex align-items-center gap-1"
+            @click="filterExpanded = !filterExpanded"
+          >
+            <i :class="filterExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+            {{ t("dividendEntries.list.filter.title") }}
+          </button>
+          <button
+            v-if="hasActiveFilter"
+            type="button"
+            class="btn btn-sm btn-outline-secondary ms-auto"
+            @click="resetFilters"
+          >
+            <i class="bi bi-x-circle me-1"></i>{{ t("dividendEntries.list.filter.reset") }}
+          </button>
+        </div>
+
+        <div v-show="filterExpanded">
+          <div class="row g-2">
+            <div class="col-12 col-md-5">
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                v-model="filterSearch"
+                :placeholder="t('dividendEntries.list.filter.searchPlaceholder')"
+                maxlength="50"
+                @input="onSearchInput"
+              />
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+              <select class="form-select form-select-sm" v-model="filterYear" @change="onYearChange">
+                <option :value="null">{{ t("dividendEntries.list.filter.allYears") }}</option>
+                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-4 col-lg-5">
+              <select class="form-select form-select-sm" v-model="filterDepotId" @change="onDepotFilterChange">
+                <option :value="null">{{ t("dividendEntries.list.filter.allDepots") }}</option>
+                <option v-for="depot in storeDepots.getDepots" :key="depot.ID" :value="depot.ID">{{ depot.Name }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <GTable
         ref="dividendEntriesTable"
         :headers="headers"
@@ -204,7 +252,7 @@ import { GTable } from "goar-components";
 import type { GTableHeader, GToastContent } from "goar-components";
 import { GToast, GToastDanger, GToastSuccess, GToastWarning } from "goar-components";
 import { Modal } from "bootstrap";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 
 type DetailField = {
@@ -231,6 +279,9 @@ type ListState = {
   limit: number;
   sortField: SortField;
   sortDirection: SortDirection;
+  search: string;
+  year: number | null;
+  depotId: number | null;
 };
 
 const storeDividendEntries = useDividendEntriesStore();
@@ -244,6 +295,12 @@ const currentOffset = ref(initialListState.offset);
 const currentLimit = ref(initialListState.limit);
 const currentSortField = ref<SortField>(initialListState.sortField);
 const currentSortDirection = ref<SortDirection>(initialListState.sortDirection);
+const filterExpanded = ref(true);
+const filterSearch = ref(initialListState.search);
+const filterYear = ref<number | null>(initialListState.year);
+const filterDepotId = ref<number | null>(initialListState.depotId);
+const firstYear = ref(new Date().getFullYear());
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("dividendEntries.list.table.columns.id"), field: "ID" },
@@ -275,8 +332,21 @@ const depotNames = computed<Record<number, string>>(() =>
   Object.fromEntries(storeDepots.getDepots.map((item) => [item.ID, item.Name] as const))
 );
 
+const hasActiveFilter = computed(
+  () => filterSearch.value.trim() !== "" || filterYear.value !== null || filterDepotId.value !== null
+);
+
+const availableYears = computed(() => {
+  const current = new Date().getFullYear();
+  const start = Math.min(firstYear.value, current);
+  const years: number[] = [];
+  for (let y = current; y >= start; y--) years.push(y);
+  return years;
+});
+
 onMounted(() => {
   void loadPage(currentOffset.value, currentLimit.value);
+  void loadFirstYear();
 
   if (!storeDepots.depotsLoaded) {
     void storeDepots.fetchDepots().catch(() => {
@@ -299,12 +369,17 @@ function loadListState(): ListState {
     const sortDirection = isSupportedSortDirection(String(parsedState.sortDirection ?? ""))
       ? (parsedState.sortDirection as SortDirection)
       : "none";
+    const year = parsedState.year ? Number(parsedState.year) : null;
+    const depotId = parsedState.depotId ? Number(parsedState.depotId) : null;
 
     return {
       offset: Number.isInteger(offset) && offset >= 0 ? offset : 0,
       limit: Number.isInteger(limit) && limit > 0 ? limit : itemsPerPage,
       sortField,
       sortDirection,
+      search: String(parsedState.search ?? ""),
+      year: year && Number.isInteger(year) && year > 0 ? year : null,
+      depotId: depotId && Number.isInteger(depotId) && depotId > 0 ? depotId : null,
     };
   } catch {
     return defaultListState();
@@ -317,6 +392,9 @@ function defaultListState(): ListState {
     limit: itemsPerPage,
     sortField: "PayDate",
     sortDirection: "none",
+    search: "",
+    year: null,
+    depotId: null,
   };
 }
 
@@ -329,6 +407,9 @@ function saveListState() {
         limit: currentLimit.value,
         sortField: currentSortField.value,
         sortDirection: currentSortDirection.value,
+        search: filterSearch.value,
+        year: filterYear.value,
+        depotId: filterDepotId.value,
       } satisfies ListState)
     );
   } catch {
@@ -348,11 +429,11 @@ async function loadPage(offset: number, limit: number) {
       offset,
       limit,
       ...(currentSortDirection.value !== "none"
-        ? {
-            sort: currentSortField.value,
-            direction: currentSortDirection.value,
-          }
+        ? { sort: currentSortField.value, direction: currentSortDirection.value }
         : {}),
+      ...(filterSearch.value.trim() ? { search: filterSearch.value.trim() } : {}),
+      ...(filterYear.value ? { year: filterYear.value } : {}),
+      ...(filterDepotId.value ? { depot_id: filterDepotId.value } : {}),
     });
     collapseExpandedRows();
   } catch (requestError: unknown) {
@@ -381,6 +462,59 @@ function onSortChange({ field, direction }: { field: string; direction: SortDire
   collapseExpandedRows();
   currentSortField.value = field;
   currentSortDirection.value = direction;
+  currentOffset.value = 0;
+  currentLimit.value = itemsPerPage;
+  saveListState();
+  void loadPage(0, itemsPerPage);
+}
+
+async function loadFirstYear() {
+  try {
+    const year = await storeDividendEntries.fetchFirstYear(filterDepotId.value ?? undefined);
+    firstYear.value = year > 0 ? year : new Date().getFullYear();
+  } catch {
+    firstYear.value = new Date().getFullYear();
+  }
+}
+
+onBeforeUnmount(() => {
+  if (searchDebounceTimer !== null) clearTimeout(searchDebounceTimer);
+});
+
+function onSearchInput() {
+  if (searchDebounceTimer !== null) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    searchDebounceTimer = null;
+    currentOffset.value = 0;
+    currentLimit.value = itemsPerPage;
+    saveListState();
+    void loadPage(0, itemsPerPage);
+  }, 300);
+}
+
+function onYearChange() {
+  currentOffset.value = 0;
+  currentLimit.value = itemsPerPage;
+  saveListState();
+  void loadPage(0, itemsPerPage);
+}
+
+function onDepotFilterChange() {
+  currentOffset.value = 0;
+  currentLimit.value = itemsPerPage;
+  saveListState();
+  void loadPage(0, itemsPerPage);
+  void loadFirstYear();
+}
+
+function resetFilters() {
+  if (searchDebounceTimer !== null) {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = null;
+  }
+  filterSearch.value = "";
+  filterYear.value = null;
+  filterDepotId.value = null;
   currentOffset.value = 0;
   currentLimit.value = itemsPerPage;
   saveListState();

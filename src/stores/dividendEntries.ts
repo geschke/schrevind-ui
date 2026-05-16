@@ -14,6 +14,9 @@ type DividendEntriesQueryParams = {
   direction?: DividendEntriesSortDirection;
   from?: string;
   to?: string;
+  search?: string;
+  year?: number;
+  depot_id?: number;
 };
 
 function getCurrentUserIdOrThrow(): number {
@@ -135,6 +138,9 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
       ...(params?.from ? { from: params.from } : {}),
       ...(params?.to ? { to: params.to } : {}),
+      ...(params?.search ? { search: params.search } : {}),
+      ...(params?.year ? { year: params.year } : {}),
+      ...(params?.depot_id ? { depot_id: params.depot_id } : {}),
     };
   }
 
@@ -289,6 +295,18 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       });
   }
 
+  async function fetchFirstYear(depotId?: number): Promise<number> {
+    return axios
+      .get("/dividend-entries/first-year", {
+        withCredentials: true,
+        params: {
+          context_group_id: getActiveGroupIDOrThrow(),
+          ...(depotId ? { depot_id: depotId } : {}),
+        },
+      })
+      .then((response) => Number(response.data?.year ?? 0));
+  }
+
   async function deleteDividendEntry(payload: Pick<DividendEntry, "ID">) {
     return axios
       .post(`/dividend-entries/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
@@ -312,6 +330,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     fetchDividendEntriesByDepot,
     fetchDividendEntriesBySecurity,
     fetchDividendEntryById,
+    fetchFirstYear,
     addDividendEntry,
     updateDividendEntry,
     deleteDividendEntry,
