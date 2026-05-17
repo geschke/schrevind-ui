@@ -207,6 +207,7 @@
       "filter": {
         "title": "Filter",
         "reset": "Reset filters",
+        "clearSearch": "Clear search",
         "searchPlaceholder": "Name, ISIN, WKN, symbol",
         "allYears": "All years",
         "allDepots": "All depots"

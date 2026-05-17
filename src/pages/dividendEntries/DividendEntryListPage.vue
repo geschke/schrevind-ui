@@ -13,27 +13,30 @@
             <i :class="filterExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
             {{ t("dividendEntries.list.filter.title") }}
           </button>
-          <button
-            v-if="hasActiveFilter"
-            type="button"
-            class="btn btn-sm btn-outline-secondary ms-auto"
-            @click="resetFilters"
-          >
-            <i class="bi bi-x-circle me-1"></i>{{ t("dividendEntries.list.filter.reset") }}
-          </button>
         </div>
 
         <div v-show="filterExpanded">
           <div class="row g-2">
             <div class="col-12 col-md-5">
-              <input
-                type="text"
-                class="form-control form-control-sm"
-                v-model="filterSearch"
-                :placeholder="t('dividendEntries.list.filter.searchPlaceholder')"
-                maxlength="50"
-                @input="onSearchInput"
-              />
+              <div class="input-group input-group-sm">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="filterSearch"
+                  :placeholder="t('dividendEntries.list.filter.searchPlaceholder')"
+                  maxlength="50"
+                  @input="onSearchInput"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  :disabled="filterSearch === ''"
+                  @click="clearSearch"
+                  :aria-label="t('dividendEntries.list.filter.clearSearch')"
+                >
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
               <select class="form-select form-select-sm" v-model="filterYear" @change="onYearChange">
@@ -332,10 +335,6 @@ const depotNames = computed<Record<number, string>>(() =>
   Object.fromEntries(storeDepots.getDepots.map((item) => [item.ID, item.Name] as const))
 );
 
-const hasActiveFilter = computed(
-  () => filterSearch.value.trim() !== "" || filterYear.value !== null || filterDepotId.value !== null
-);
-
 const availableYears = computed(() => {
   const current = new Date().getFullYear();
   const start = Math.min(firstYear.value, current);
@@ -507,14 +506,12 @@ function onDepotFilterChange() {
   void loadFirstYear();
 }
 
-function resetFilters() {
+function clearSearch() {
   if (searchDebounceTimer !== null) {
     clearTimeout(searchDebounceTimer);
     searchDebounceTimer = null;
   }
   filterSearch.value = "";
-  filterYear.value = null;
-  filterDepotId.value = null;
   currentOffset.value = 0;
   currentLimit.value = itemsPerPage;
   saveListState();
