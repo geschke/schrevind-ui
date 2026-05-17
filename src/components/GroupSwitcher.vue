@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import { GToast, GToastWarning } from "goar-components";
@@ -38,6 +39,8 @@ import type { GToastContent } from "goar-components";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
 const storeUserAuth = useUserAuthStore();
 const toast: any = ref(null);
 
@@ -61,12 +64,19 @@ function errorContent(code: string): string {
 
 function switchGroup(id: number) {
   if (id === activeGroupID.value) return;
-  storeUserAuth.setActiveGroup(id).catch((error: unknown) => {
-    toast.value?.addToast(<GToastContent>{
-      ...GToastWarning,
-      title: t("layout.topbar.groupSwitcher.label"),
-      content: errorContent(getErrorCode(error)),
+  storeUserAuth
+    .setActiveGroup(id)
+    .then(() => {
+      if (route.meta.contextSensitive) {
+        void router.push(String(route.meta.menuPath));
+      }
+    })
+    .catch((error: unknown) => {
+      toast.value?.addToast(<GToastContent>{
+        ...GToastWarning,
+        title: t("layout.topbar.groupSwitcher.label"),
+        content: errorContent(getErrorCode(error)),
+      });
     });
-  });
 }
 </script>

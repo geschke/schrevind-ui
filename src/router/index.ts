@@ -12,6 +12,7 @@ declare module 'vue-router' {
   interface RouteMeta {
     menuPath?: string
     requiresAuth?: boolean
+    contextSensitive?: boolean
   }
 }
 
@@ -104,6 +105,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/depots",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -114,6 +116,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/depots",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -124,6 +127,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/depots",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -141,6 +145,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/securities",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -151,6 +156,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/securities",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -168,6 +174,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/withholding-tax-defaults",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -178,6 +185,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/withholding-tax-defaults",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -195,6 +203,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/currencies",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -205,6 +214,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/currencies",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {
@@ -232,6 +242,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/dividend-entries",
       requiresAuth: true,
+      contextSensitive: true,
     },
   },
   {

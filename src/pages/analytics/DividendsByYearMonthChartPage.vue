@@ -470,8 +470,10 @@ const chartOption = computed<ECOption>(() => {
   const years = filteredYears.value
 
   const series: BarSeriesOption[] = years.map((year) => ({
+    id: year,
     name: year,
     type: 'bar',
+    universalTransition: true,
     data: months.map((m) => {
       const row = filteredRows.value.find((r) => r.year === year && r.month === m)
       return row ? row[activeValue.value] : 0
@@ -483,7 +485,7 @@ const chartOption = computed<ECOption>(() => {
     label: {
       show: showLabels.value,
       position: 'top',
-      formatter: (p: { value: number }) => (p.value > 0 ? fmtShort(p.value) : ''),
+      formatter: (p: { value: unknown }) => ((p.value as number) > 0 ? fmtShort(p.value as number) : ''),
       fontSize: 10,
       color: '#495057',
     },
@@ -491,6 +493,7 @@ const chartOption = computed<ECOption>(() => {
 
   return {
     animationDuration: 400,
+    animationDurationUpdate: 400,
     grid: { left: 60, right: 16, top: 48, bottom: 40, containLabel: true },
     legend: {
       show: showLegend.value,

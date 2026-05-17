@@ -183,7 +183,7 @@
               </div>
             </div>
             <div class="card-body p-3">
-              <v-chart ref="chartRef" class="dividend-chart" :option="chartOption" autoresize />
+              <v-chart ref="chartRef" class="dividend-chart" :option="chartOption" :update-options="{ replaceMerge: ['series'] }" autoresize />
             </div>
           </div>
 
@@ -487,8 +487,10 @@ const chartOption = computed<ECOption>(() => {
   function addBar(key: string, name: string, color: string, dataKey: keyof ChartRow) {
     if (!activeValues.value.includes(key)) return
     series.push({
+      id: key,
       name,
       type: 'bar',
+      universalTransition: true,
       data: rows.map((r) => r[dataKey] as number),
       barMaxWidth: 48,
       itemStyle: { color, borderRadius: [3, 3, 0, 0] },
@@ -527,6 +529,7 @@ const chartOption = computed<ECOption>(() => {
 
   return {
     animationDuration: 400,
+    animationDurationUpdate: 400,
     grid: { left: 60, right: 16, top: 48, bottom: 40, containLabel: true },
     legend: {
       show: showLegend.value,
