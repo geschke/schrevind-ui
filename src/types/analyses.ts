@@ -48,3 +48,24 @@ export type MonthChartDataRow = {
 export type DividendsByYearMonthChart = {
   rows: MonthChartDataRow[];
 };
+
+export type SecurityYearRow = {
+  year: string;
+  quantity: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+  type: "detail" | "summary";
+};
+
+export type SecurityYearSecurityEntry = {
+  security_id: number;
+  security_name: string;
+  security_isin: string;
+  rows: SecurityYearRow[];
+};
+
+export type SecurityYearData = {
+  currency: string;
+  securities: SecurityYearSecurityEntry[];
+};

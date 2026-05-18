@@ -12,6 +12,9 @@ import type {
   DividendsByYearChart,
   DividendsByYearMonthChart,
   MonthChartDataRow,
+  SecurityYearData,
+  SecurityYearRow,
+  SecurityYearSecurityEntry,
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
@@ -20,6 +23,7 @@ const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-security-year";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month-security";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
+const DIVIDENDS_BY_SECURITY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-security-year-data";
 
 function getActiveGroupIDOrThrow(): number {
   const storeUserAuth = useUserAuthStore();
@@ -124,6 +128,40 @@ function normalizeDividendsByYearMonthChart(payload: unknown): DividendsByYearMo
   return { rows };
 }
 
+function normalizeSecurityYearRow(item: unknown): SecurityYearRow {
+  const raw = isRecord(item) ? item : {};
+  return {
+    year: String(raw.Year ?? ""),
+    quantity: String(raw.Quantity ?? ""),
+    gross: String(raw.Gross ?? ""),
+    after_withholding: String(raw.AfterWithholding ?? ""),
+    net: String(raw.Net ?? ""),
+    type: raw.Type === "summary" ? "summary" : "detail",
+  };
+}
+
+function normalizeSecurityYearEntry(item: unknown): SecurityYearSecurityEntry {
+  const raw = isRecord(item) ? item : {};
+  return {
+    security_id: typeof raw.SecurityID === "number" ? raw.SecurityID : 0,
+    security_name: String(raw.SecurityName ?? ""),
+    security_isin: String(raw.SecurityISIN ?? ""),
+    rows: Array.isArray(raw.Rows) ? raw.Rows.map(normalizeSecurityYearRow) : [],
+  };
+}
+
+function normalizeSecurityYearData(payload: unknown): SecurityYearData {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  return {
+    currency: String(raw.Currency ?? ""),
+    securities: Array.isArray(raw.Securities) ? raw.Securities.map(normalizeSecurityYearEntry) : [],
+  };
+}
+
 function normalizeDividendsByYearChart(payload: unknown): DividendsByYearChart {
   if (isRecord(payload) && payload.success === false) {
     throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
@@ -203,6 +241,23 @@ export const useAnalysesStore = defineStore("analyses", () => {
       });
   }
 
+  async function fetchDividendsBySecurityYearData(securityIds?: number[], depotIds?: number[]): Promise<SecurityYearData> {
+    const params = new URLSearchParams();
+    params.append("context_group_id", String(getActiveGroupIDOrThrow()));
+    if (depotIds && depotIds.length > 0) {
+      depotIds.forEach((id) => params.append("depot_id", String(id)));
+    }
+    if (securityIds && securityIds.length > 0) {
+      params.append("security_ids", securityIds.join(","));
+    }
+    return axios
+      .get(DIVIDENDS_BY_SECURITY_YEAR_DATA_ENDPOINT, { params, withCredentials: true })
+      .then((response) => normalizeSecurityYearData(response.data))
+      .catch((error: unknown) => {
+        throw error;
+      });
+  }
+
   async function fetchDividendsByYearChartData(depotIds?: number[]): Promise<DividendsByYearChart> {
     currentChartData.value = null;
     const params = new URLSearchParams();
@@ -234,5 +289,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     getCurrentMonthChartData,
     fetchDividendsByYearMonthChartData,
     fetchDividendsByYearChartData,
+    fetchDividendsBySecurityYearData,
   };
 });

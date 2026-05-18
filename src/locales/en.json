@@ -780,6 +780,7 @@
     },
     "dividends_by_security_year": {
       "title": "Securities / Years",
+      "titleAlt": "Securities / Years (legacy)",
       "description": "Dividends per security over the years.",
       "action": "Open analysis",
       "columns": {
@@ -789,6 +790,26 @@
         "gross": "Gross",
         "after_withholding": "After withholding tax",
         "net": "Net"
+      }
+    },
+    "dividends_by_security_year_data": {
+      "title": "Securities / Years",
+      "allSecurities": "All securities",
+      "nSecurities": "{n} security/ies",
+      "securitySearchPlaceholder": "Search security...",
+      "noSecurities": "No securities found.",
+      "removeSecurityFilter": "Remove filter",
+      "loadButton": "Refresh list",
+      "summary": "Total",
+      "columns": {
+        "year": "Year",
+        "quantity": "Quantity",
+        "gross": "Gross",
+        "after_withholding": "After WHT",
+        "net": "Net"
+      },
+      "errors": {
+        "loadFailed": "Failed to load data."
       }
     },
     "charts": {
