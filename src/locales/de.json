@@ -780,17 +780,8 @@
     },
     "dividends_by_security_year": {
       "title": "Wertpapiere / Jahre",
-      "titleAlt": "Wertpapiere / Jahre (alt)",
       "description": "Dividenden pro Wertpapier im Jahresverlauf.",
-      "action": "Analyse öffnen",
-      "columns": {
-        "security_name": "Wertpapier",
-        "security_isin": "ISIN",
-        "quantity": "Stückzahl",
-        "gross": "Brutto",
-        "after_withholding": "Nach Quellensteuer",
-        "net": "Netto"
-      }
+      "action": "Analyse öffnen"
     },
     "dividends_by_security_year_data": {
       "title": "Wertpapiere / Jahre",
@@ -807,9 +798,6 @@
         "gross": "Brutto",
         "after_withholding": "nach QuSt.",
         "net": "Netto"
-      },
-      "errors": {
-        "loadFailed": "Fehler beim Laden der Daten."
       }
     },
     "charts": {

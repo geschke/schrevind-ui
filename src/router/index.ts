@@ -67,14 +67,6 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/analytics/security-years",
-    name: "analysissecurityyears",
-    component: () => import("@/pages/analytics/AnalysisSecurityYearsPage.vue"),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
     path: "/analytics/month-charts",
     name: "analyticsmonthcharts",
     component: () => import("@/pages/analytics/DividendsByYearMonthChartPage.vue"),
@@ -91,8 +83,8 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/analytics/security-years-data",
-    name: "analysissecurityyearsdata",
+    path: "/analytics/security-years",
+    name: "analysissecurityyears",
     component: () => import("@/pages/analytics/AnalysisSecurityYearsV2Page.vue"),
     meta: {
       requiresAuth: true,
