@@ -122,13 +122,13 @@
         <!-- Table -->
         <div v-else-if="data" class="table-responsive">
           <table class="table table-sm table-bordered table-hover align-middle">
-            <thead class="table-light position-sticky top-0" style="z-index: 1;">
+            <thead class="table-light">
               <tr>
                 <th>{{ t("analyses.dividends_by_security_year_data.columns.year") }}</th>
                 <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.quantity") }}</th>
                 <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.gross") }} ({{ data.currency }})</th>
-                <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.after_withholding") }}</th>
-                <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.net") }}</th>
+                <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.after_withholding") }} ({{ data.currency }})</th>
+                <th class="text-end">{{ t("analyses.dividends_by_security_year_data.columns.net") }} ({{ data.currency }})</th>
               </tr>
             </thead>
             <tbody>
