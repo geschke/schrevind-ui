@@ -119,7 +119,7 @@
               </div>
             </div>
 
-            <router-link class="btn mt-auto btn-secondary" :to="{ name: 'analysismonthsecurityv2' }">
+            <router-link class="btn mt-auto btn-secondary" :to="{ name: 'analysismonthsecurity' }">
               {{ t("analyses.dividends_by_year_month_security_data.action") }}
             </router-link>
           </div>

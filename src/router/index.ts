@@ -75,8 +75,8 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/analytics/month-security-v2",
-    name: "analysismonthsecurityv2",
+    path: "/analytics/month-security",
+    name: "analysismonthsecurity",
     component: () => import("@/pages/analytics/AnalysisYearMonthSecurityV2Page.vue"),
     meta: {
       requiresAuth: true,
