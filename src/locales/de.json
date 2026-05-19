@@ -766,19 +766,6 @@
         "net": "Netto"
       }
     },
-    "dividends_by_year_month_security": {
-      "title": "Monate / Wertpapiere",
-      "titleAlt": "Monate / Wertpapiere (alt)",
-      "description": "Dividenden pro Monat und Wertpapier.",
-      "action": "Analyse öffnen",
-      "columns": {
-        "security_name": "Wertpapier",
-        "security_isin": "ISIN",
-        "gross": "Brutto",
-        "after_withholding": "Nach Quellensteuer",
-        "net": "Netto"
-      }
-    },
     "dividends_by_year_month_security_data": {
       "title": "Monate / Wertpapiere",
       "description": "Dividenden pro Monat und Wertpapier, mit Periodenfilter.",

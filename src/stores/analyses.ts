@@ -24,7 +24,6 @@ import type {
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
 const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
 const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
-const DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month-security";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-security-year-data";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_DATA_ENDPOINT = "/analyses/dividends-by-year-month-security-data";
@@ -251,10 +250,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
   }
 
-  async function fetchDividendsByYearMonthSecurityAnalysis(): Promise<AnalysisTable> {
-    return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT);
-  }
-
   async function fetchDividendsByYearMonthChartData(depotIds?: number[]): Promise<DividendsByYearMonthChart> {
     currentMonthChartData.value = null;
     const params = new URLSearchParams();
@@ -328,7 +323,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     getCurrentChartData,
     fetchDividendsByYearAnalysis,
     fetchDividendsByYearMonthAnalysis,
-    fetchDividendsByYearMonthSecurityAnalysis,
     getCurrentMonthChartData,
     fetchDividendsByYearMonthChartData,
     fetchDividendsByYearChartData,
