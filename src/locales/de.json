@@ -1355,7 +1355,7 @@
   },
   "aboutModal": {
     "title": "Schrevind UI",
-    "descriptionLine1": "Lightweight admin UI for Schrevind.",
+    "descriptionLine1": "Lightweight UI for Schrevind.",
     "descriptionLine2": "Depots, Wertpapiere, Quellensteuern, Benutzer und Anwendungsdaten verwalten.",
     "copyright": " © 2026 Ralf Geschke",
     "license": "License: MIT",

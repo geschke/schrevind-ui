@@ -469,8 +469,8 @@ function onSortChange({ field, direction }: { field: string; direction: SortDire
 
 async function loadFirstYear() {
   try {
-    const year = await storeDividendEntries.fetchFirstYear(filterDepotId.value ?? undefined);
-    firstYear.value = year > 0 ? year : new Date().getFullYear();
+    const range = await storeDividendEntries.fetchTimeRange(filterDepotId.value ?? undefined);
+    firstYear.value = range.first_year > 0 ? range.first_year : new Date().getFullYear();
   } catch {
     firstYear.value = new Date().getFullYear();
   }

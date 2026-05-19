@@ -305,18 +305,6 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       });
   }
 
-  async function fetchFirstYear(depotId?: number): Promise<number> {
-    return axios
-      .get("/dividend-entries/first-year", {
-        withCredentials: true,
-        params: {
-          context_group_id: getActiveGroupIDOrThrow(),
-          ...(depotId ? { depot_id: depotId } : {}),
-        },
-      })
-      .then((response) => Number(response.data?.year ?? 0));
-  }
-
   async function fetchTimeRange(depotId?: number): Promise<TimeRange> {
     return axios
       .get("/dividend-entries/time-range", {
@@ -363,7 +351,6 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     fetchDividendEntriesByDepot,
     fetchDividendEntriesBySecurity,
     fetchDividendEntryById,
-    fetchFirstYear,
     fetchTimeRange,
     addDividendEntry,
     updateDividendEntry,
