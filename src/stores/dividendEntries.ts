@@ -4,6 +4,16 @@ import { useUserAuthStore } from "@/stores/userauth";
 import { computed, ref } from "vue";
 import type { CreateDividendEntryPayload, DividendEntry, InlandTaxDetail, UpdateDividendEntryPayload } from "@/types/dividendEntries";
 
+export type TimeRange = {
+  first_year: number;
+  first_month: number;
+  last_year: number;
+  last_month: number;
+  current_year: number;
+  current_month: number;
+  current_date: string;
+};
+
 type DividendEntriesSortField = "PayDate" | "ExDate" | "SecurityName";
 type DividendEntriesSortDirection = "asc" | "desc" | "none";
 
@@ -307,6 +317,29 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
       .then((response) => Number(response.data?.year ?? 0));
   }
 
+  async function fetchTimeRange(depotId?: number): Promise<TimeRange> {
+    return axios
+      .get("/dividend-entries/time-range", {
+        withCredentials: true,
+        params: {
+          context_group_id: getActiveGroupIDOrThrow(),
+          ...(depotId != null ? { depot_id: depotId } : {}),
+        },
+      })
+      .then((response) => {
+        const raw = (response.data?.data ?? {}) as Record<string, unknown>;
+        return {
+          first_year: typeof raw.FirstYear === "number" ? raw.FirstYear : 0,
+          first_month: typeof raw.FirstMonth === "number" ? raw.FirstMonth : 0,
+          last_year: typeof raw.LastYear === "number" ? raw.LastYear : 0,
+          last_month: typeof raw.LastMonth === "number" ? raw.LastMonth : 0,
+          current_year: typeof raw.CurrentYear === "number" ? raw.CurrentYear : new Date().getFullYear(),
+          current_month: typeof raw.CurrentMonth === "number" ? raw.CurrentMonth : new Date().getMonth() + 1,
+          current_date: typeof raw.CurrentDate === "string" ? raw.CurrentDate : "",
+        };
+      });
+  }
+
   async function deleteDividendEntry(payload: Pick<DividendEntry, "ID">) {
     return axios
       .post(`/dividend-entries/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
@@ -331,6 +364,7 @@ export const useDividendEntriesStore = defineStore("dividendEntries", () => {
     fetchDividendEntriesBySecurity,
     fetchDividendEntryById,
     fetchFirstYear,
+    fetchTimeRange,
     addDividendEntry,
     updateDividendEntry,
     deleteDividendEntry,

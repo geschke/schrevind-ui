@@ -114,13 +114,13 @@
                 <i class="bi bi-table"></i>
               </div>
               <div>
-                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_year_month_security.title") }}</h3>
-                <p class="text-muted mb-0">{{ t("analyses.dividends_by_year_month_security.description") }}</p>
+                <h3 class="h5 mb-1">{{ t("analyses.dividends_by_year_month_security_data.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.dividends_by_year_month_security_data.description") }}</p>
               </div>
             </div>
 
-            <router-link class="btn mt-auto btn-secondary" :to="{ name: 'analysismonthsecurity' }">
-              {{ t("analyses.dividends_by_year_month_security.action") }}
+            <router-link class="btn mt-auto btn-secondary" :to="{ name: 'analysismonthsecurityv2' }">
+              {{ t("analyses.dividends_by_year_month_security_data.action") }}
             </router-link>
           </div>
         </div>

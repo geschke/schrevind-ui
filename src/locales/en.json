@@ -768,6 +768,7 @@
     },
     "dividends_by_year_month_security": {
       "title": "Months / Securities",
+      "titleAlt": "Months / Securities (legacy)",
       "description": "Dividends per month and security.",
       "action": "Open analysis",
       "columns": {
@@ -775,6 +776,22 @@
         "security_isin": "ISIN",
         "gross": "Gross",
         "after_withholding": "After withholding tax",
+        "net": "Net"
+      }
+    },
+    "dividends_by_year_month_security_data": {
+      "title": "Months / Securities",
+      "description": "Dividends per month and security, with period filter.",
+      "action": "Open analysis",
+      "allYears": "All years",
+      "filterYears": "Years",
+      "loadButton": "Refresh list",
+      "summary": "Month total",
+      "columns": {
+        "security_name": "Security",
+        "security_isin": "ISIN",
+        "gross": "Gross",
+        "after_withholding": "After WHT",
         "net": "Net"
       }
     },

@@ -15,6 +15,10 @@ import type {
   SecurityYearData,
   SecurityYearRow,
   SecurityYearSecurityEntry,
+  YearMonthPeriod,
+  YearMonthPeriodData,
+  YearMonthSecurityData,
+  YearMonthSecurityRow,
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
@@ -23,6 +27,7 @@ const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month-security";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-security-year-data";
+const DIVIDENDS_BY_YEAR_MONTH_SECURITY_DATA_ENDPOINT = "/analyses/dividends-by-year-month-security-data";
 
 function getActiveGroupIDOrThrow(): number {
   const storeUserAuth = useUserAuthStore();
@@ -149,6 +154,40 @@ function normalizeSecurityYearEntry(item: unknown): SecurityYearSecurityEntry {
   };
 }
 
+function normalizeYearMonthSecurityRow(item: unknown): YearMonthSecurityRow {
+  const raw = isRecord(item) ? item : {};
+  return {
+    security_id: typeof raw.SecurityID === "number" ? raw.SecurityID : 0,
+    security_name: String(raw.SecurityName ?? ""),
+    security_isin: String(raw.SecurityISIN ?? ""),
+    gross: String(raw.Gross ?? ""),
+    after_withholding: String(raw.AfterWithholding ?? ""),
+    net: String(raw.Net ?? ""),
+    type: raw.Type === "summary" ? "summary" : "detail",
+  };
+}
+
+function normalizeYearMonthPeriodData(item: unknown): YearMonthPeriodData {
+  const raw = isRecord(item) ? item : {};
+  return {
+    year: String(raw.Year ?? ""),
+    month: String(raw.Month ?? ""),
+    rows: Array.isArray(raw.Rows) ? raw.Rows.map(normalizeYearMonthSecurityRow) : [],
+  };
+}
+
+function normalizeYearMonthSecurityData(payload: unknown): YearMonthSecurityData {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  return {
+    currency: String(raw.Currency ?? ""),
+    periods: Array.isArray(raw.Periods) ? raw.Periods.map(normalizeYearMonthPeriodData) : [],
+  };
+}
+
 function normalizeSecurityYearData(payload: unknown): SecurityYearData {
   if (isRecord(payload) && payload.success === false) {
     throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
@@ -236,6 +275,16 @@ export const useAnalysesStore = defineStore("analyses", () => {
       });
   }
 
+  async function fetchDividendsByYearMonthSecurityData(periods?: YearMonthPeriod[], depotIds?: number[]): Promise<YearMonthSecurityData> {
+    const body: Record<string, unknown> = { ContextGroupID: getActiveGroupIDOrThrow() };
+    if (depotIds && depotIds.length > 0) body.DepotIDs = depotIds;
+    if (periods && periods.length > 0) body.Periods = periods.map((p) => ({ Year: p.year, Month: p.month }));
+    return axios
+      .post(DIVIDENDS_BY_YEAR_MONTH_SECURITY_DATA_ENDPOINT, body, { withCredentials: true })
+      .then((response) => normalizeYearMonthSecurityData(response.data))
+      .catch((error: unknown) => { throw error; });
+  }
+
   async function fetchDividendsBySecurityYearData(securityIds?: number[], depotIds?: number[]): Promise<SecurityYearData> {
     const params = new URLSearchParams();
     params.append("context_group_id", String(getActiveGroupIDOrThrow()));
@@ -284,5 +333,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     fetchDividendsByYearMonthChartData,
     fetchDividendsByYearChartData,
     fetchDividendsBySecurityYearData,
+    fetchDividendsByYearMonthSecurityData,
   };
 });

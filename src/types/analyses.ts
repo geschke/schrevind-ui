@@ -69,3 +69,29 @@ export type SecurityYearData = {
   currency: string;
   securities: SecurityYearSecurityEntry[];
 };
+
+export type YearMonthPeriod = {
+  year: string;
+  month: string;
+};
+
+export type YearMonthSecurityRow = {
+  security_id: number;
+  security_name: string;
+  security_isin: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+  type: "detail" | "summary";
+};
+
+export type YearMonthPeriodData = {
+  year: string;
+  month: string;
+  rows: YearMonthSecurityRow[];
+};
+
+export type YearMonthSecurityData = {
+  currency: string;
+  periods: YearMonthPeriodData[];
+};
