@@ -49,6 +49,29 @@
                 </select>
               </div>
 
+              <!-- Sort toggles -->
+              <div>
+                <div class="filter-label">{{ t("analyses.dividends_by_year_month_security_data.sortLabel") }}</div>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    @click="yearSortDesc = !yearSortDesc"
+                  >
+                    <i class="bi me-1" :class="yearSortDesc ? 'bi-sort-down' : 'bi-sort-up-alt'"></i>
+                    {{ t("analyses.dividends_by_year_month_security_data.sortYears") }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    @click="monthSortAsc = !monthSortAsc"
+                  >
+                    <i class="bi me-1" :class="monthSortAsc ? 'bi-sort-up-alt' : 'bi-sort-down'"></i>
+                    {{ t("analyses.dividends_by_year_month_security_data.sortMonths") }}
+                  </button>
+                </div>
+              </div>
+
               <!-- Reload button -->
               <div>
                 <div class="filter-label">&nbsp;</div>
@@ -173,6 +196,8 @@ const selectedYears = ref<number[]>([]);
 const selectedMonths = ref<number[]>([]);
 const multiSelectMode = ref(false);
 const selectedDepotId = ref<number | null>(null);
+const yearSortDesc = ref(true);
+const monthSortAsc = ref(true);
 
 const availableYears = computed<number[]>(() => {
   if (!timeRange.value || timeRange.value.first_year === 0) return [];
@@ -198,8 +223,13 @@ const computedPeriods = computed<YearMonthPeriod[]>(() => {
 const sortedPeriods = computed(() => {
   if (!data.value) return [];
   return [...data.value.periods].sort((a, b) => {
-    const yearDiff = Number(b.year) - Number(a.year);
-    return yearDiff !== 0 ? yearDiff : Number(b.month) - Number(a.month);
+    const yearDiff = yearSortDesc.value
+      ? Number(b.year) - Number(a.year)
+      : Number(a.year) - Number(b.year);
+    if (yearDiff !== 0) return yearDiff;
+    return monthSortAsc.value
+      ? Number(a.month) - Number(b.month)
+      : Number(b.month) - Number(a.month);
   });
 });
 

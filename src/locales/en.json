@@ -773,6 +773,9 @@
       "allYears": "All years",
       "filterYears": "Years",
       "loadButton": "Refresh list",
+      "sortLabel": "Sort",
+      "sortYears": "Years",
+      "sortMonths": "Months",
       "summary": "Month total",
       "columns": {
         "security_name": "Security",

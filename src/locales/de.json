@@ -773,6 +773,9 @@
       "allYears": "Alle Jahre",
       "filterYears": "Jahre",
       "loadButton": "Liste aktualisieren",
+      "sortLabel": "Sortierung",
+      "sortYears": "Jahre",
+      "sortMonths": "Monate",
       "summary": "Monat Ergebnis",
       "columns": {
         "security_name": "Wertpapier",
