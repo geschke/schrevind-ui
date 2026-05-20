@@ -23,7 +23,6 @@ import type {
   YearMonthSecurityRow,
 } from "@/types/analyses";
 
-const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
 const DIVIDENDS_BY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-year-data";
 const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
 const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
@@ -267,10 +266,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
       });
   }
 
-  async function fetchDividendsByYearAnalysis(): Promise<AnalysisTable> {
-    return fetchAnalysis(DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT);
-  }
-
   async function fetchDividendsByYearMonthAnalysis(): Promise<AnalysisTable> {
     return fetchAnalysis(DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT);
   }
@@ -360,7 +355,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     analysisLoaded,
     getCurrentAnalysis,
     getCurrentChartData,
-    fetchDividendsByYearAnalysis,
     fetchDividendsByYearData,
     fetchDividendsByYearMonthAnalysis,
     getCurrentMonthChartData,
