@@ -914,33 +914,57 @@ const [payDate, payDateAttrs] = defineField("payDate");
 const [exDate, exDateAttrs] = defineField("exDate");
 const [quantity, quantityAttrs] = defineField("quantity");
 const [dividendPerUnitAmount, dividendPerUnitAmountAttrs] = defineField("dividendPerUnitAmount");
-const [dividendPerUnitCurrency, dividendPerUnitCurrencyAttrs] = defineField("dividendPerUnitCurrency");
+const [dividendPerUnitCurrency, dividendPerUnitCurrencyAttrs] = defineField("dividendPerUnitCurrency", {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+});
 const [grossAmount, grossAmountAttrs] = defineField("grossAmount");
-const [grossCurrency, grossCurrencyAttrs] = defineField("grossCurrency");
+const [grossCurrency, grossCurrencyAttrs] = defineField("grossCurrency", {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+});
 const [payoutAmount, payoutAmountAttrs] = defineField("payoutAmount");
-const [payoutCurrency, payoutCurrencyAttrs] = defineField("payoutCurrency");
+const [payoutCurrency, payoutCurrencyAttrs] = defineField("payoutCurrency", {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+});
 const [fxRateLabel, fxRateLabelAttrs] = defineField("fxRateLabel", {
   validateOnModelUpdate: false,
 });
 const [fxRate, fxRateAttrs] = defineField("fxRate");
 const [withholdingTaxCountryCode, withholdingTaxCountryCodeAttrs] = defineField("withholdingTaxCountryCode", {
   validateOnModelUpdate: false,
+  validateOnInput: false,
 });
 const [withholdingTaxPercent, withholdingTaxPercentAttrs] = defineField("withholdingTaxPercent");
 const [withholdingTaxAmount, withholdingTaxAmountAttrs] = defineField("withholdingTaxAmount");
-const [withholdingTaxCurrency, withholdingTaxCurrencyAttrs] = defineField("withholdingTaxCurrency");
+const [withholdingTaxCurrency, withholdingTaxCurrencyAttrs] = defineField("withholdingTaxCurrency", {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+});
 const [withholdingTaxAmountCredit, withholdingTaxAmountCreditAttrs] = defineField("withholdingTaxAmountCredit");
 const [withholdingTaxAmountCreditCurrency, withholdingTaxAmountCreditCurrencyAttrs] = defineField(
-  "withholdingTaxAmountCreditCurrency"
+  "withholdingTaxAmountCreditCurrency",
+  {
+    validateOnModelUpdate: false,
+    validateOnInput: false,
+  }
 );
 const [withholdingTaxAmountRefundable, withholdingTaxAmountRefundableAttrs] = defineField(
   "withholdingTaxAmountRefundable"
 );
 const [withholdingTaxAmountRefundableCurrency, withholdingTaxAmountRefundableCurrencyAttrs] = defineField(
-  "withholdingTaxAmountRefundableCurrency"
+  "withholdingTaxAmountRefundableCurrency",
+  {
+    validateOnModelUpdate: false,
+    validateOnInput: false,
+  }
 );
 const [foreignFeesAmount, foreignFeesAmountAttrs] = defineField("foreignFeesAmount");
-const [foreignFeesCurrency, foreignFeesCurrencyAttrs] = defineField("foreignFeesCurrency");
+const [foreignFeesCurrency, foreignFeesCurrencyAttrs] = defineField("foreignFeesCurrency", {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+});
 const [note, noteAttrs] = defineField("note");
 
 const depotOptions = computed(() => storeDepots.getDepots);
