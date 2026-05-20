@@ -82,6 +82,21 @@ export type YearData = {
   rows: YearRow[];
 };
 
+export type YearMonthRow = {
+  level: "year" | "month";
+  year: string;
+  month: string;
+  period: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+};
+
+export type YearMonthData = {
+  currency: string;
+  rows: YearMonthRow[];
+};
+
 export type YearMonthPeriod = {
   year: string;
   month: string;
