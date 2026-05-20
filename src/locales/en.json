@@ -1285,9 +1285,8 @@
     }
   },
   "notFound": {
-    "title": "Not found",
-    "productTitle": "Product title",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus hic sapiente quo veritatis assumenda in doloribus doloremque molestiae minus cum corrupti dolorem minima, sed iste repellendus unde voluptatem, nihil facilis."
+    "description": "The requested page does not exist.",
+    "backHome": "Go to home"
   },
   "auth": {
     "login": {

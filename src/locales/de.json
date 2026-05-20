@@ -1357,5 +1357,9 @@
     "versionBackend": "Backend",
     "versionFrontend": "Frontend",
     "versionError": "Version konnte nicht geladen werden."
+  },
+  "notFound": {
+    "description": "Diese Seite existiert nicht.",
+    "backHome": "Zur Startseite"
   }
 }

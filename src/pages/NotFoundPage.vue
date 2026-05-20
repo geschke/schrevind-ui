@@ -1,51 +1,39 @@
 <template>
-  <TheMainLayout>
+  <TheMainLayout v-if="isAuthenticated">
     <template #default>
-      <div class="row">
-        <div class="col-12">
-          <h1 class="mt-4">
-            {{ t("notFound.title") }}
-
-          </h1>
-          <div class="card mt-4">
-            <div class="row no-gutters">
-              <div class="col-md-4">
-                <img
-                  src="https://dummyimage.com/600x400/34495e/fff"
-                  class="card-img"/>
-              </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-9">
-                      <h5 class="card-title mb-4">{{ t("notFound.productTitle") }}</h5>
-                    </div>
-                    <div class="col-3">
-                      <div class="d-grid">
-                        <button class="btn bg-vue2">15 €</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      {{ t("notFound.description") }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+        <i class="bi bi-compass text-secondary" style="font-size: 5rem;"></i>
+        <h1 class="display-4 fw-bold mt-4">404</h1>
+        <p class="lead text-secondary mt-2">{{ t("notFound.description") }}</p>
+        <router-link to="/" class="btn btn-primary mt-4">
+          {{ t("notFound.backHome") }}
+        </router-link>
       </div>
     </template>
   </TheMainLayout>
+
+  <TheLandingLayout v-else>
+    <template #mainContent>
+      <div class="d-flex flex-column align-items-center justify-content-center text-center" style="min-height: 80vh;">
+        <i class="bi bi-compass text-secondary" style="font-size: 5rem;"></i>
+        <h1 class="display-4 fw-bold mt-4">404</h1>
+        <p class="lead text-secondary mt-2">{{ t("notFound.description") }}</p>
+        <router-link to="/" class="btn btn-primary mt-4">
+          {{ t("notFound.backHome") }}
+        </router-link>
+      </div>
+    </template>
+  </TheLandingLayout>
 </template>
 
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
+import TheLandingLayout from "@/layouts/TheLandingLayout.vue";
+import { useUserAuthStore } from "@/stores/userauth";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const storeUserAuth = useUserAuthStore();
+const isAuthenticated = computed(() => storeUserAuth.isAuthenticated);
 </script>
-
-<style scoped></style>
