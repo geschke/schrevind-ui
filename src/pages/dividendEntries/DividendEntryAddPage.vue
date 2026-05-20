@@ -269,7 +269,7 @@
                     <div
                       v-if="isWithholdingCountryPickerOpen"
                       ref="withholdingCountryPickerListRef"
-                      class="list-group position-absolute w-100 shadow-sm security-picker-list"
+                      class="list-group position-absolute shadow-sm security-picker-list country-picker-list"
                     >
                       <button
                         v-for="(item, index) in withholdingCountrySuggestions"
@@ -2040,5 +2040,9 @@ const onSubmit = handleSubmit((values) => {
   z-index: 1050;
   max-height: 18rem;
   overflow-y: auto;
+}
+
+.country-picker-list {
+  min-width: 250px;
 }
 </style>
