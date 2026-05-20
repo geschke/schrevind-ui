@@ -10,7 +10,7 @@
             <div class="d-flex flex-wrap align-items-end gap-3">
               <!-- Year multi-select -->
               <div>
-                <div class="filter-label">{{ t("analyses.dividends_by_year_month_security_data.filterYears") }}</div>
+                <div class="form-label text-secondary small mb-1 text-uppercase fw-semibold">{{ t("analyses.dividends_by_year_month_security_data.filterYears") }}</div>
                 <div ref="yearDropdownRef" class="position-relative">
                   <div class="input-group input-group-sm">
                     <button type="button" class="btn btn-outline-secondary" @click.stop="toggleYearDropdown">
@@ -39,7 +39,7 @@
 
               <!-- Depot filter -->
               <div>
-                <div class="filter-label">{{ t("analyses.charts.common.depots") }}</div>
+                <div class="form-label text-secondary small mb-1 text-uppercase fw-semibold">{{ t("analyses.charts.common.depots") }}</div>
                 <select class="form-select form-select-sm" v-model="selectedDepotId" @change="onDepotChange">
                   <option :value="null">{{ t("analyses.charts.common.allDepots") }}</option>
                   <option v-for="depot in storeDepots.getDepots" :key="depot.ID" :value="depot.ID">
@@ -238,13 +238,3 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
-.filter-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--bs-secondary-color, #6c757d);
-  margin-bottom: 4px;
-}
-</style>
