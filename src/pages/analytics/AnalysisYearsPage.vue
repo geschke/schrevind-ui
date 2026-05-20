@@ -2,77 +2,120 @@
   <TheMainLayout>
     <template #default>
       <div class="col-12">
-        <h2>{{ pageTitle }}</h2>
+        <h2>{{ t("analyses.dividends_by_year.title") }}</h2>
 
+        <!-- Filter card -->
+        <div class="card mb-3">
+          <div class="card-body py-2">
+            <div class="d-flex flex-wrap align-items-end gap-3">
+              <!-- Depot filter -->
+              <div>
+                <div class="filter-label">{{ t("analyses.charts.common.depots") }}</div>
+                <select class="form-select form-select-sm" v-model="selectedDepotId" @change="loadData">
+                  <option :value="null">{{ t("analyses.charts.common.allDepots") }}</option>
+                  <option v-for="depot in storeDepots.getDepots" :key="depot.ID" :value="depot.ID">
+                    {{ depot.Name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading -->
         <div v-if="loading" class="text-center py-4">
           <div class="spinner-border" role="status">
             <span class="visually-hidden">{{ t("common.loading") }}</span>
           </div>
         </div>
 
-        <div v-else-if="analysis" class="card">
-          <div class="card-body">
-            <AnalysisTable :analysis="analysis" />
-          </div>
+        <!-- Error -->
+        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">
+          {{ errorMsg }}
         </div>
 
-        <div v-else class="alert alert-warning" role="alert">
-          {{ t("analyses.errors.loadFailed") }}
+        <!-- Empty -->
+        <div v-else-if="data && data.rows.length === 0" class="alert alert-info" role="alert">
+          {{ t("analyses.common.empty") }}
+        </div>
+
+        <!-- Table -->
+        <div v-else-if="data" class="table-responsive">
+          <table class="table table-sm table-bordered table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>{{ t("analyses.common.year") }}</th>
+                <th class="text-end">{{ t("analyses.dividends_by_year.columns.gross") }} ({{ data.currency }})</th>
+                <th class="text-end">{{ t("analyses.dividends_by_year.columns.after_withholding") }} ({{ data.currency }})</th>
+                <th class="text-end">{{ t("analyses.dividends_by_year.columns.net") }} ({{ data.currency }})</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, idx) in data.rows" :key="idx">
+                <td>{{ row.year }}</td>
+                <td class="text-end">{{ row.gross }}</td>
+                <td class="text-end">{{ row.after_withholding }}</td>
+                <td class="text-end">{{ row.net }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
     </template>
   </TheMainLayout>
 </template>
 
 <script setup lang="ts">
-import AnalysisTable from "@/components/analyses/AnalysisTable.vue";
-import { getErrorCode } from "@/helper/errorCode";
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useAnalysesStore } from "@/stores/analyses";
-import { GToast, GToastDanger } from "goar-components";
-import type { GToastContent } from "goar-components";
-import { computed, onMounted, ref } from "vue";
+import { useDepotsStore } from "@/stores/depots";
+import type { YearData } from "@/types/analyses";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const storeAnalyses = useAnalysesStore();
-const toast: any = ref(null);
-const loading = ref(false);
-const analysis = computed(() => storeAnalyses.getCurrentAnalysis);
-const pageTitle = computed(() => {
-  return analysis.value?.title_key ? t(analysis.value.title_key) : t("analyses.dividends_by_year.title");
-});
+const storeDepots = useDepotsStore();
 
-onMounted(() => {
+const loading = ref(false);
+const errorMsg = ref<string | null>(null);
+const data = ref<YearData | null>(null);
+const selectedDepotId = ref<number | null>(null);
+
+function loadData() {
   loading.value = true;
+  errorMsg.value = null;
+  const depotIds = selectedDepotId.value != null ? [selectedDepotId.value] : undefined;
   storeAnalyses
-    .fetchDividendsByYearAnalysis()
-    .catch((requestError: unknown) => {
-      toast.value?.addToast(<GToastContent>{
-        ...GToastDanger,
-        title: t("analyses.common.errorTitle"),
-        content: errorContent(getErrorCode(requestError)),
-      });
+    .fetchDividendsByYearData(depotIds)
+    .then((result) => {
+      data.value = result;
+    })
+    .catch(() => {
+      errorMsg.value = t("analyses.errors.loadFailed");
     })
     .finally(() => {
       loading.value = false;
     });
-});
-
-function errorContent(errorCode: string) {
-  switch (errorCode) {
-    case "UNSUPPORTED_ANALYSIS_TYPE":
-      return t("analyses.errors.unsupportedType");
-    case "UNAUTHORIZED":
-    case "AUTH_NOT_CONFIGURED":
-    case "NETWORK_ERROR":
-    case "DB_ERROR":
-    case "DB_NOT_INITIALIZED":
-      return t("analyses.errors.loadFailed");
-    default:
-      return t("analyses.errors.unknown");
-  }
 }
+
+onMounted(() => {
+  storeDepots
+    .fetchDepots()
+    .then(() => loadData())
+    .catch(() => {
+      errorMsg.value = t("analyses.errors.loadFailed");
+    });
+});
 </script>
+
+<style scoped>
+.filter-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color, #6c757d);
+  margin-bottom: 4px;
+}
+</style>

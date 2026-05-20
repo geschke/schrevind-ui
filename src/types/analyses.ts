@@ -70,6 +70,18 @@ export type SecurityYearData = {
   securities: SecurityYearSecurityEntry[];
 };
 
+export type YearRow = {
+  year: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+};
+
+export type YearData = {
+  currency: string;
+  rows: YearRow[];
+};
+
 export type YearMonthPeriod = {
   year: string;
   month: string;

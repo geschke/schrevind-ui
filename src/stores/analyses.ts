@@ -15,6 +15,8 @@ import type {
   SecurityYearData,
   SecurityYearRow,
   SecurityYearSecurityEntry,
+  YearData,
+  YearRow,
   YearMonthPeriod,
   YearMonthPeriodData,
   YearMonthSecurityData,
@@ -22,6 +24,7 @@ import type {
 } from "@/types/analyses";
 
 const DIVIDENDS_BY_YEAR_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year";
+const DIVIDENDS_BY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-year-data";
 const DIVIDENDS_BY_YEAR_MONTH_ANALYSIS_ENDPOINT = "/analyses/dividends-by-year-month";
 const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
@@ -199,6 +202,28 @@ function normalizeSecurityYearData(payload: unknown): SecurityYearData {
   };
 }
 
+function normalizeYearRow(item: unknown): YearRow {
+  const raw = isRecord(item) ? item : {};
+  return {
+    year: String(raw.Year ?? ""),
+    gross: String(raw.Gross ?? ""),
+    after_withholding: String(raw.AfterWithholding ?? ""),
+    net: String(raw.Net ?? ""),
+  };
+}
+
+function normalizeYearData(payload: unknown): YearData {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  return {
+    currency: String(raw.Currency ?? ""),
+    rows: Array.isArray(raw.Rows) ? raw.Rows.map(normalizeYearRow) : [],
+  };
+}
+
 function normalizeDividendsByYearChart(payload: unknown): DividendsByYearChart {
   if (isRecord(payload) && payload.success === false) {
     throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
@@ -317,11 +342,26 @@ export const useAnalysesStore = defineStore("analyses", () => {
       });
   }
 
+  async function fetchDividendsByYearData(depotIds?: number[]): Promise<YearData> {
+    const params = new URLSearchParams();
+    params.append("context_group_id", String(getActiveGroupIDOrThrow()));
+    if (depotIds && depotIds.length > 0) {
+      depotIds.forEach((id) => params.append("depot_id", String(id)));
+    }
+    return axios
+      .get(DIVIDENDS_BY_YEAR_DATA_ENDPOINT, { params, withCredentials: true })
+      .then((response) => normalizeYearData(response.data))
+      .catch((error: unknown) => {
+        throw error;
+      });
+  }
+
   return {
     analysisLoaded,
     getCurrentAnalysis,
     getCurrentChartData,
     fetchDividendsByYearAnalysis,
+    fetchDividendsByYearData,
     fetchDividendsByYearMonthAnalysis,
     getCurrentMonthChartData,
     fetchDividendsByYearMonthChartData,
