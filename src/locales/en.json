@@ -69,7 +69,14 @@
       "dialogBody": "There is no withholding tax entry for this country code yet. Do you want to create it globally?",
       "createConfirm": "Create",
       "createError": "The withholding tax entry could not be created.",
-      "createdHint": "Withholding tax was created. You can adjust the data later under “Withholding taxes”, especially the creditable %."
+      "createdHint": "Withholding tax was created. You can adjust the data later under \"Withholding taxes\", especially the creditable %."
+    },
+    "dateWarnings": {
+      "title": "Possible date issues",
+      "intro": "The following issues were detected. You can still save the entry as entered.",
+      "confirm": "Save anyway",
+      "exDateAfterPayDate": "The ex-date is after the pay date — this is unusual.",
+      "differentYear": "Pay date and ex-date are in different years (difference > 90 days)."
     },
     "actions": {
       "copyWithholdingToCredit": "Copy to creditable",

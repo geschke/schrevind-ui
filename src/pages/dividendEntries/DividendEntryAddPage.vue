@@ -676,6 +676,32 @@
       </div>
       <div v-if="showWithholdingTaxCreateDialog" class="modal-backdrop fade show"></div>
 
+      <div v-if="showDateWarningModal" class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">{{ t("dividendEntries.dateWarnings.title") }}</h1>
+              <button type="button" class="btn-close" :aria-label="t('dividendEntries.common.cancel')" @click="cancelDateWarningModal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="mb-3">{{ t("dividendEntries.dateWarnings.intro") }}</p>
+              <ul class="mb-0">
+                <li v-for="(warning, index) in dateWarnings" :key="index">{{ warning }}</li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="cancelDateWarningModal">
+                {{ t("dividendEntries.common.cancel") }}
+              </button>
+              <button type="button" class="btn btn-warning" @click="confirmDateWarningModal">
+                {{ t("dividendEntries.dateWarnings.confirm") }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="showDateWarningModal" class="modal-backdrop fade show"></div>
+
       <GToast ref="toast"></GToast>
     </template>
   </TheMainLayout>
@@ -765,6 +791,9 @@ const newWithholdingTaxCountryCode = ref("");
 const newWithholdingTaxCountryName = ref("");
 const newWithholdingTaxPercentDefault = ref("");
 const withholdingTaxCreateCountryCodeRef = ref<HTMLInputElement | null>(null);
+const showDateWarningModal = ref(false);
+const dateWarnings = ref<string[]>([]);
+let pendingDateWarningPayload: ReturnType<typeof buildSubmitPayload> | null = null;
 const editingDividendEntry = ref<DividendEntry | null>(null);
 const isEditMode = computed(() => String(props.id ?? "").trim() !== "");
 const editEntryId = computed(() => Number(props.id ?? 0));
@@ -1995,18 +2024,27 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", handleDocumentClick);
 });
 
-const onSubmit = handleSubmit((values) => {
-  saveState.value = "saving";
-  messageError.value = "";
-  clearBackendFieldErrors();
-  const payload = buildSubmitPayload(values);
+function checkDatePlausibility(payDateStr: string, exDateStr: string): string[] {
+  const warnings: string[] = [];
+  const pay = new Date(payDateStr);
+  const ex = new Date(exDateStr);
 
-  if (isEditMode.value && (!Number.isInteger(editEntryId.value) || editEntryId.value <= 0)) {
-    saveState.value = "error";
-    messageError.value = t("dividendEntries.edit.errors.loadFailed");
-    return;
+  if (ex > pay) {
+    warnings.push(t("dividendEntries.dateWarnings.exDateAfterPayDate"));
   }
 
+  if (pay.getFullYear() !== ex.getFullYear()) {
+    const diffDays = Math.abs(pay.getTime() - ex.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays > 90) {
+      warnings.push(t("dividendEntries.dateWarnings.differentYear"));
+    }
+  }
+
+  return warnings;
+}
+
+function doSubmit(payload: ReturnType<typeof buildSubmitPayload>) {
+  saveState.value = "saving";
   const saveRequest = isEditMode.value
     ? storeDividendEntries.updateDividendEntry({
         ID: editEntryId.value,
@@ -2038,24 +2076,65 @@ const onSubmit = handleSubmit((values) => {
         title: t("dividendEntries.common.okTitle"),
         content: successMessage.value,
       });
-      })
-      .catch((requestError: unknown) => {
-        const errorCode = getErrorCode(requestError);
-        const fieldErrors = getBackendFieldErrors(requestError);
-        const errorMessage = errorContent(errorCode);
+    })
+    .catch((requestError: unknown) => {
+      const errorCode = getErrorCode(requestError);
+      const fieldErrors = getBackendFieldErrors(requestError);
+      const errorMessage = errorContent(errorCode);
 
-        if (errorCode === "VALIDATION_ERROR") {
-          applyBackendFieldErrors(fieldErrors);
-        }
+      if (errorCode === "VALIDATION_ERROR") {
+        applyBackendFieldErrors(fieldErrors);
+      }
 
-        saveState.value = "error";
-        messageError.value = errorMessage;
-        toast.value?.addToast(<GToastContent>{
+      saveState.value = "error";
+      messageError.value = errorMessage;
+      toast.value?.addToast(<GToastContent>{
         ...GToastDanger,
         title: t("dividendEntries.common.errorTitle"),
         content: errorMessage,
       });
     });
+}
+
+function cancelDateWarningModal() {
+  showDateWarningModal.value = false;
+  dateWarnings.value = [];
+  pendingDateWarningPayload = null;
+  saveState.value = "idle";
+}
+
+function confirmDateWarningModal() {
+  showDateWarningModal.value = false;
+  dateWarnings.value = [];
+  const payload = pendingDateWarningPayload;
+  pendingDateWarningPayload = null;
+  if (payload) {
+    doSubmit(payload);
+  }
+}
+
+const onSubmit = handleSubmit((values) => {
+  saveState.value = "saving";
+  messageError.value = "";
+  clearBackendFieldErrors();
+
+  if (isEditMode.value && (!Number.isInteger(editEntryId.value) || editEntryId.value <= 0)) {
+    saveState.value = "error";
+    messageError.value = t("dividendEntries.edit.errors.loadFailed");
+    return;
+  }
+
+  const payload = buildSubmitPayload(values);
+  const warnings = checkDatePlausibility(values.payDate, values.exDate);
+  if (warnings.length > 0) {
+    saveState.value = "idle";
+    dateWarnings.value = warnings;
+    pendingDateWarningPayload = payload;
+    showDateWarningModal.value = true;
+    return;
+  }
+
+  doSubmit(payload);
 });
 </script>
 

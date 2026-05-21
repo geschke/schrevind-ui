@@ -69,7 +69,14 @@
       "dialogBody": "Für diesen Ländercode existiert noch kein Quellensteuer-Eintrag. Möchten Sie ihn global anlegen?",
       "createConfirm": "Anlegen",
       "createError": "Der Quellensteuer-Eintrag konnte nicht angelegt werden.",
-      "createdHint": "Quellensteuer wurde angelegt. Sie können die Daten später unter „Quellensteuern“ weiter pflegen, insbesondere die anrechenbaren %."
+      "createdHint": "Quellensteuer wurde angelegt. Sie können die Daten später unter \"Quellensteuern\" weiter pflegen, insbesondere die anrechenbaren %."
+    },
+    "dateWarnings": {
+      "title": "Mögliche Datumsauffälligkeiten",
+      "intro": "Folgende Auffälligkeiten wurden festgestellt. Die Eingabe kann trotzdem so gespeichert werden.",
+      "confirm": "Trotzdem speichern",
+      "exDateAfterPayDate": "Der Ex-Tag liegt nach dem Zahltag — das ist unüblich.",
+      "differentYear": "Zahltag und Ex-Tag liegen in unterschiedlichen Jahren (Differenz > 90 Tage)."
     },
     "actions": {
       "copyWithholdingToCredit": "Als anrechenbar übernehmen",
