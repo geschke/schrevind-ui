@@ -227,7 +227,9 @@
                         <strong>{{ year }}</strong>
                       </td>
                       <td v-for="m in selectedMonths" :key="m" class="text-end font-monospace">
-                        {{ tableCell(year, m) }}
+                        <router-link :to="{ name: 'analysismonthsecurity', query: { year, month: Number(m) } }">
+                          {{ tableCell(year, m) }}
+                        </router-link>
                       </td>
                       <td class="text-end font-monospace th-avg">{{ tableAvg(year) }}</td>
                     </tr>

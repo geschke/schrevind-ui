@@ -85,7 +85,13 @@
                 :key="idx"
                 :class="{ 'table-secondary fw-semibold': row.level === 'year' }"
               >
-                <td>{{ formatPeriod(row) }}</td>
+                <td>
+                  <router-link
+                    v-if="row.level === 'month'"
+                    :to="{ name: 'analysismonthsecurity', query: { year: row.year, month: row.month } }"
+                  >{{ formatPeriod(row) }}</router-link>
+                  <span v-else>{{ formatPeriod(row) }}</span>
+                </td>
                 <td class="text-end">{{ row.gross }}</td>
                 <td class="text-end">{{ row.after_withholding }}</td>
                 <td class="text-end">{{ row.net }}</td>

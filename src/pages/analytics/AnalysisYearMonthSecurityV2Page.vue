@@ -179,8 +179,10 @@ import type { TimeRange } from "@/stores/dividendEntries";
 import type { YearMonthPeriod, YearMonthSecurityData } from "@/types/analyses";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const { t, locale } = useI18n();
+const route = useRoute();
 const storeAnalyses = useAnalysesStore();
 const storeDepots = useDepotsStore();
 const storeDividendEntries = useDividendEntriesStore();
@@ -335,7 +337,15 @@ onMounted(() => {
   Promise.all([storeDepots.fetchDepots(), storeDividendEntries.fetchTimeRange()])
     .then(([, range]) => {
       timeRange.value = range;
-      setDefaultPeriods(range);
+      const qYear = Number(route.query.year);
+      const qMonth = Number(route.query.month);
+      if (qYear && qMonth) {
+        selectedYears.value = [qYear];
+        selectedMonths.value = [qMonth];
+        multiSelectMode.value = false;
+      } else {
+        setDefaultPeriods(range);
+      }
       loadData();
     })
     .catch(() => {
