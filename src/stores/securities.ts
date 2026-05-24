@@ -19,6 +19,7 @@ type SecuritiesQueryParams = {
   limit?: number;
   sort?: SecuritiesSortField;
   direction?: SecuritiesSortDirection;
+  search?: string;
 };
 
 function normalizeSecurity(item: unknown): Security {
@@ -79,6 +80,7 @@ export const useSecuritiesStore = defineStore("securities", () => {
       limit: params?.limit ?? 10,
       ...(params?.sort ? { sort: params.sort } : {}),
       ...(params?.direction && params.direction !== "none" ? { direction: params.direction } : {}),
+      ...(params?.search ? { search: params.search } : {}),
     };
   }
 

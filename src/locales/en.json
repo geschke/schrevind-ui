@@ -502,6 +502,7 @@
       "INVALID_STATUS": "Invalid status value.",
       "INVALID_STATUS_FILTER": "Invalid status filter.",
       "INVALID_QUERY_PARAMS": "Invalid query parameters.",
+      "INVALID_SEARCH": "Invalid search query (max. 50 characters, only allowed characters).",
       "DB_ERROR": "A database error occurred while saving."
     },
     "list": {
@@ -537,7 +538,12 @@
         "deactivatedTitle": "Security deactivated",
         "deactivatedContent": "The security was deactivated instead of deleted because dividend entries still reference it."
       },
-      "createdBannerWithName": "Security {name} was created successfully."
+      "createdBannerWithName": "Security {name} was created successfully.",
+      "filter": {
+        "title": "Filter",
+        "searchPlaceholder": "Name, ISIN, WKN, Symbol ...",
+        "clearSearch": "Clear search"
+      }
     },
     "add": {
       "title": "Create security",

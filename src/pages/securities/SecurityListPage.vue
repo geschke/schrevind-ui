@@ -8,6 +8,45 @@
         <button type="button" class="btn-close" aria-label="Close" @click="createdBannerVisible = false"></button>
       </div>
 
+      <div class="mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <button
+            type="button"
+            class="btn btn-link p-0 text-decoration-none fw-semibold text-body d-flex align-items-center gap-1"
+            @click="filterExpanded = !filterExpanded"
+          >
+            <i :class="filterExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+            {{ t("securities.list.filter.title") }}
+          </button>
+        </div>
+
+        <div v-show="filterExpanded">
+          <div class="row g-2">
+            <div class="col-12 col-md-5">
+              <div class="input-group input-group-sm">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="filterSearch"
+                  :placeholder="t('securities.list.filter.searchPlaceholder')"
+                  maxlength="50"
+                  @input="onSearchInput"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  :disabled="filterSearch === ''"
+                  @click="clearSearch"
+                  :aria-label="t('securities.list.filter.clearSearch')"
+                >
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <GTable
         :key="pageSize"
         :headers="headers"
@@ -176,6 +215,9 @@ const createdBannerMessage = ref("");
 const currentOffset = ref(0);
 const currentSortField = ref<SortField>("ID");
 const currentSortDirection = ref<SortDirection>("none");
+const filterSearch = ref("");
+const filterExpanded = ref(true);
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 const headers = computed<GTableHeader[]>(() => [
   { title: t("securities.list.table.columns.id"), field: "ID", sortable: true },
@@ -238,6 +280,7 @@ async function loadPage(offset: number, limit: number) {
             direction: currentSortDirection.value,
           }
         : {}),
+      ...(filterSearch.value.trim() ? { search: filterSearch.value.trim() } : {}),
     });
   } catch (requestError: unknown) {
     toast.value?.addToast(<GToastContent>{
@@ -248,6 +291,18 @@ async function loadPage(offset: number, limit: number) {
   } finally {
     loading.value = false;
   }
+}
+
+function onSearchInput() {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    void loadPage(0, pageSize.value);
+  }, 400);
+}
+
+function clearSearch() {
+  filterSearch.value = "";
+  void loadPage(0, pageSize.value);
 }
 
 function onPageChange({ offset, limit }: { page: number; offset: number; limit: number }) {
@@ -278,7 +333,8 @@ function errorContent(errorCode: string) {
     case "INVALID_LIMIT":
     case "INVALID_OFFSET":
     case "INVALID_SORT":
-    case "INVALID_DIRECTION":         return t("securities.backendErrors.INVALID_QUERY_PARAMS");
+    case "INVALID_DIRECTION":
+    case "INVALID_SEARCH":            return t("securities.backendErrors.INVALID_QUERY_PARAMS");
     case "DB_ERROR":                  return t("securities.backendErrors.DB_ERROR");
     case "NETWORK_ERROR":             return t("securities.errors.loadFailed");
     default:                          return t("securities.errors.unknown");

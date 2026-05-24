@@ -502,6 +502,7 @@
       "INVALID_STATUS": "Ungültiger Status-Wert.",
       "INVALID_STATUS_FILTER": "Ungültiger Status-Filter.",
       "INVALID_QUERY_PARAMS": "Ungültige Abfrageparameter.",
+      "INVALID_SEARCH": "Ungültige Suchanfrage (max. 50 Zeichen, nur erlaubte Zeichen).",
       "DB_ERROR": "Datenbankfehler beim Speichern."
     },
     "list": {
@@ -537,7 +538,12 @@
         "deactivatedTitle": "Wertpapier deaktiviert",
         "deactivatedContent": "Das Wertpapier wurde deaktiviert (statt gelöscht), da noch Dividendeneinträge darauf verweisen."
       },
-      "createdBannerWithName": "Wertpapier {name} wurde erfolgreich angelegt."
+      "createdBannerWithName": "Wertpapier {name} wurde erfolgreich angelegt.",
+      "filter": {
+        "title": "Filter",
+        "searchPlaceholder": "Name, ISIN, WKN, Symbol ...",
+        "clearSearch": "Suche löschen"
+      }
     },
     "add": {
       "title": "Wertpapier anlegen",
