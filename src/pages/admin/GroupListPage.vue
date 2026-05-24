@@ -9,10 +9,12 @@
       </div>
 
       <GTable
+        :key="pageSize"
         :headers="headers"
         :items="groups"
         classes="table-striped table-hover"
         headClasses="table-secondary"
+        :items-per-page="pageSize"
         :_showEmpty="false"
         :showLoading="true"
         :loading="loading"
@@ -63,6 +65,13 @@
           </div>
         </template>
       </GTable>
+
+      <div class="d-flex justify-content-start align-items-center gap-2 mt-1">
+        <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+        <select class="form-select form-select-sm w-auto" v-model.number="pageSize">
+          <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+        </select>
+      </div>
 
       <div class="row">
         <div class="col-12">
@@ -134,8 +143,10 @@ import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-compone
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePageSize } from "@/composables/usePageSize";
 
 const { t } = useI18n();
+const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("adminGroups");
 const CREATED_GROUP_FLASH_KEY = "schrevind.adminGroups.createdName";
 
 const headers = computed<GTableHeader[]>(() => [

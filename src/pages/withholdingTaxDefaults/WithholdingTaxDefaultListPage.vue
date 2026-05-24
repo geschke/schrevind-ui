@@ -9,17 +9,29 @@
       </div>
 
       <GTable
+        :key="pageSize"
         :headers="headers"
         :items="items"
         classes="table-striped table-hover"
         _bodyClasses="table-group-divider"
         headClasses="table-secondary"
+        :items-per-page="pageSize"
         :_showEmpty="false"
         :showLoading="true"
         :loading="loading"
         :showPageFirstLast="true"
         :showPageIcons="true"
+        paginationAlignment="justify-content-between"
       >
+        <template #pagination-before>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+            <select class="form-select form-select-sm w-auto" v-model.number="pageSize">
+              <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </template>
+
         <template #tmplLoading>
           <div class="col text-center">
             <div class="spinner-border" role="status">
@@ -145,9 +157,11 @@ import type { GTableHeader, GToastContent } from "goar-components";
 import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-components";
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
+import { usePageSize } from "@/composables/usePageSize";
 import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
+const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("withholdingTaxDefaults");
 const { isGroupAdmin } = usePermissions();
 const CREATED_FLASH_KEY = "schrevind.withholdingTaxDefaults.createdCountry";
 

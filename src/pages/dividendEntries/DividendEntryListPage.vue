@@ -55,11 +55,12 @@
       </div>
 
       <GTable
+        :key="pageSize"
         ref="dividendEntriesTable"
         :headers="headers"
         :items="dividendEntries"
         :count="dividendEntriesCount"
-        :items-per-page="itemsPerPage"
+        :items-per-page="pageSize"
         :current-page="currentPage"
         :sort-field="currentSortField"
         :sort-direction="currentSortDirection"
@@ -71,9 +72,19 @@
         :loading="loading"
         :showPageFirstLast="true"
         :showPageIcons="true"
+        paginationAlignment="justify-content-between"
         @pageChange="onPageChange"
         @sortChange="onSortChange"
       >
+        <template #pagination-before>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+            <select class="form-select form-select-sm w-auto" v-model.number="pageSize" @change="onPageSizeChange">
+              <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </template>
+
         <template #tmplLoading>
           <div class="col text-center">
             <div class="spinner-border" role="status">
@@ -257,6 +268,7 @@ import { GToast, GToastDanger, GToastSuccess, GToastWarning } from "goar-compone
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePageSize } from "@/composables/usePageSize";
 
 type DetailField = {
   label: string;
@@ -272,7 +284,7 @@ type DetailSection = {
 };
 
 const { t, locale } = useI18n();
-const itemsPerPage = 20;
+const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("dividendEntries");
 const LIST_STATE_SESSION_KEY = "schrevind.dividendEntries.listState";
 type SortField = "PayDate" | "ExDate" | "SecurityName";
 type SortDirection = "asc" | "desc" | "none";
@@ -361,7 +373,6 @@ function loadListState(): ListState {
 
     const parsedState = JSON.parse(rawState) as Partial<ListState>;
     const offset = Number(parsedState.offset ?? 0);
-    const limit = Number(parsedState.limit ?? itemsPerPage);
     const sortField = isSupportedSortField(String(parsedState.sortField ?? ""))
       ? (parsedState.sortField as SortField)
       : "PayDate";
@@ -373,7 +384,7 @@ function loadListState(): ListState {
 
     return {
       offset: Number.isInteger(offset) && offset >= 0 ? offset : 0,
-      limit: Number.isInteger(limit) && limit > 0 ? limit : itemsPerPage,
+      limit: pageSize.value,
       sortField,
       sortDirection,
       search: String(parsedState.search ?? ""),
@@ -388,13 +399,20 @@ function loadListState(): ListState {
 function defaultListState(): ListState {
   return {
     offset: 0,
-    limit: itemsPerPage,
+    limit: pageSize.value,
     sortField: "PayDate",
     sortDirection: "none",
     search: "",
     year: null,
     depotId: null,
   };
+}
+
+function onPageSizeChange() {
+  currentOffset.value = 0;
+  currentLimit.value = pageSize.value;
+  saveListState();
+  void loadPage(0, pageSize.value);
 }
 
 function saveListState() {
@@ -462,9 +480,9 @@ function onSortChange({ field, direction }: { field: string; direction: SortDire
   currentSortField.value = field;
   currentSortDirection.value = direction;
   currentOffset.value = 0;
-  currentLimit.value = itemsPerPage;
+  currentLimit.value = pageSize.value;
   saveListState();
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
 }
 
 async function loadFirstYear() {
@@ -485,24 +503,24 @@ function onSearchInput() {
   searchDebounceTimer = setTimeout(() => {
     searchDebounceTimer = null;
     currentOffset.value = 0;
-    currentLimit.value = itemsPerPage;
+    currentLimit.value = pageSize.value;
     saveListState();
-    void loadPage(0, itemsPerPage);
+    void loadPage(0, pageSize.value);
   }, 300);
 }
 
 function onYearChange() {
   currentOffset.value = 0;
-  currentLimit.value = itemsPerPage;
+  currentLimit.value = pageSize.value;
   saveListState();
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
 }
 
 function onDepotFilterChange() {
   currentOffset.value = 0;
-  currentLimit.value = itemsPerPage;
+  currentLimit.value = pageSize.value;
   saveListState();
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
   void loadFirstYear();
 }
 
@@ -513,9 +531,9 @@ function clearSearch() {
   }
   filterSearch.value = "";
   currentOffset.value = 0;
-  currentLimit.value = itemsPerPage;
+  currentLimit.value = pageSize.value;
   saveListState();
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
 }
 
 function errorContent(errorCode: string) {

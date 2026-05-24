@@ -1,7 +1,8 @@
 ﻿{
   "common": {
     "loading": "Loading...",
-    "today": "Today"
+    "today": "Today",
+    "rowsPerPage": "Rows per page"
   },
   "dividendEntries": {
     "common": {

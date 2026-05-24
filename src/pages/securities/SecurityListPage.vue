@@ -9,10 +9,11 @@
       </div>
 
       <GTable
+        :key="pageSize"
         :headers="headers"
         :items="securities"
         :count="securitiesCount"
-        :items-per-page="itemsPerPage"
+        :items-per-page="pageSize"
         classes="table-striped table-hover"
         _bodyClasses="table-group-divider"
         headClasses="table-secondary"
@@ -21,9 +22,19 @@
         :loading="loading"
         :showPageFirstLast="true"
         :showPageIcons="true"
+        paginationAlignment="justify-content-between"
         @pageChange="onPageChange"
         @sortChange="onSortChange"
       >
+        <template #pagination-before>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+            <select class="form-select form-select-sm w-auto" v-model.number="pageSize" @change="onPageSizeChange">
+              <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </template>
+
         <template #tmplLoading>
           <div class="col text-center">
             <div class="spinner-border" role="status">
@@ -147,8 +158,10 @@ import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-compone
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePageSize } from "@/composables/usePageSize";
 
 const { t, locale } = useI18n();
+const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("securities");
 const CREATED_SECURITY_FLASH_KEY = "schrevind.securities.createdName";
 type SortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "CreatedAt" | "UpdatedAt";
 type SortDirection = "asc" | "desc" | "none";
@@ -160,7 +173,6 @@ const loading = ref(false);
 const toBeDeleted = ref<Security | null>(null);
 const createdBannerVisible = ref(false);
 const createdBannerMessage = ref("");
-const itemsPerPage = 10;
 const currentOffset = ref(0);
 const currentSortField = ref<SortField>("ID");
 const currentSortDirection = ref<SortDirection>("none");
@@ -182,7 +194,7 @@ const securitiesCount = computed(() => storeSecurities.getSecuritiesCount);
 
 onMounted(() => {
   showCreateSuccessBannerFromFlash();
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
 });
 
 function showCreateSuccessBannerFromFlash() {
@@ -242,12 +254,17 @@ function onPageChange({ offset, limit }: { page: number; offset: number; limit: 
   void loadPage(offset, limit);
 }
 
+function onPageSizeChange() {
+  currentOffset.value = 0;
+  void loadPage(0, pageSize.value);
+}
+
 function onSortChange({ field, direction }: { field: string; direction: SortDirection }) {
   if (!isSupportedSortField(field)) return;
 
   currentSortField.value = field;
   currentSortDirection.value = direction;
-  void loadPage(0, itemsPerPage);
+  void loadPage(0, pageSize.value);
 }
 
 function errorContent(errorCode: string) {
@@ -315,7 +332,7 @@ function deleteSecurity(item: Security) {
   storeSecurities
     .deleteSecurity(item)
     .then((code) => {
-      void loadPage(currentOffset.value, itemsPerPage);
+      void loadPage(currentOffset.value, pageSize.value);
       if (code === "SECURITY_DEACTIVATED") {
         toast.value?.addToast(<GToastContent>{
           ...GToastWarning,

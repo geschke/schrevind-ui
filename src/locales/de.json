@@ -1,7 +1,8 @@
 ﻿{
   "common": {
     "loading": "Laden...",
-    "today": "Heute"
+    "today": "Heute",
+    "rowsPerPage": "Zeilen pro Seite"
   },
   "dividendEntries": {
     "common": {

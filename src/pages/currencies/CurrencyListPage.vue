@@ -9,17 +9,29 @@
       </div>
 
       <GTable
+        :key="pageSize"
         :headers="headers"
         :items="currencies"
         classes="table-striped table-hover"
         _bodyClasses="table-group-divider"
         headClasses="table-secondary"
+        :items-per-page="pageSize"
         :_showEmpty="false"
         :showLoading="true"
         :loading="loading"
         :showPageFirstLast="true"
         :showPageIcons="true"
+        paginationAlignment="justify-content-between"
       >
+        <template #pagination-before>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+            <select class="form-select form-select-sm w-auto" v-model.number="pageSize">
+              <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </template>
+
         <template #tmplLoading>
           <div class="col text-center">
             <div class="spinner-border" role="status">
@@ -127,8 +139,10 @@ import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-compone
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePageSize } from "@/composables/usePageSize";
 
 const { t, locale } = useI18n();
+const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("currencies");
 const CREATED_CURRENCY_FLASH_KEY = "schrevind.currencies.createdCurrency";
 
 const storeCurrencies = useCurrenciesStore();
