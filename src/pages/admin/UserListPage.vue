@@ -21,7 +21,17 @@
         :loading="loading"
         :showPageFirstLast="true"
         :showPageIcons="true"
+        paginationAlignment="justify-content-between"
       >
+        <template #pagination-before>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
+            <select class="form-select form-select-sm w-auto" v-model.number="pageSize">
+              <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
+        </template>
+
         <template #tmplLoading>
           <div class="col text-center">
             <div class="spinner-border" role="status">
@@ -77,13 +87,6 @@
           </div>
         </template>
       </GTable>
-
-      <div class="d-flex justify-content-start align-items-center gap-2 mt-1">
-        <span class="text-secondary small">{{ t("common.rowsPerPage") }}</span>
-        <select class="form-select form-select-sm w-auto" v-model.number="pageSize">
-          <option v-for="opt in PAGE_SIZE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option>
-        </select>
-      </div>
 
       <div class="row">
         <div class="col-12">
