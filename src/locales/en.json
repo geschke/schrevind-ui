@@ -813,6 +813,7 @@
       "removeSecurityFilter": "Remove filter",
       "loadButton": "Refresh list",
       "summary": "Total",
+      "paymentCount": "1 payment in {year} | {count} payments in {year}",
       "columns": {
         "year": "Year",
         "quantity": "Quantity",

@@ -146,7 +146,13 @@
                   :key="idx"
                   :class="{ 'fw-bold': row.type === 'summary' }"
                 >
-                  <td>{{ row.type === "summary" ? t("analyses.dividends_by_security_year_data.summary") : row.year }}</td>
+                  <td>
+                    <template v-if="row.type === 'summary'">{{ t("analyses.dividends_by_security_year_data.summary") }}</template>
+                    <template v-else>
+                      {{ row.year }}
+                      <span v-if="row.payment_count > 0" class="badge text-bg-secondary ms-2" style="font-size: 0.7em;" :title="t('analyses.dividends_by_security_year_data.paymentCount', { count: row.payment_count, year: row.year })">{{ row.payment_count }}×</span>
+                    </template>
+                  </td>
                   <td class="text-end">{{ row.quantity }}</td>
                   <td class="text-end">{{ row.gross }}</td>
                   <td class="text-end">{{ row.after_withholding }}</td>

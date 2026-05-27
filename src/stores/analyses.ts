@@ -144,6 +144,7 @@ function normalizeSecurityYearRow(item: unknown): SecurityYearRow {
     after_withholding: String(raw.AfterWithholding ?? ""),
     net: String(raw.Net ?? ""),
     type: raw.Type === "summary" ? "summary" : "detail",
+    payment_count: typeof raw.PaymentCount === "number" ? raw.PaymentCount : 0,
   };
 }
 

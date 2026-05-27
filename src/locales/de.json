@@ -813,6 +813,7 @@
       "removeSecurityFilter": "Filter entfernen",
       "loadButton": "Liste aktualisieren",
       "summary": "Gesamt",
+      "paymentCount": "1 Zahlung in {year} | {count} Zahlungen in {year}",
       "columns": {
         "year": "Jahr",
         "quantity": "Stückzahl",

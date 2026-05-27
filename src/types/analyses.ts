@@ -56,6 +56,7 @@ export type SecurityYearRow = {
   after_withholding: string;
   net: string;
   type: "detail" | "summary";
+  payment_count: number;
 };
 
 export type SecurityYearSecurityEntry = {
