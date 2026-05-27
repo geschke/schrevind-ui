@@ -52,7 +52,9 @@
             </thead>
             <tbody>
               <tr v-for="(row, idx) in data.rows" :key="idx">
-                <td>{{ row.year }}</td>
+                <td>
+                  <router-link :to="{ name: 'analysismonths', query: { year: row.year } }">{{ row.year }}</router-link>
+                </td>
                 <td class="text-end">{{ row.gross }}</td>
                 <td class="text-end">{{ row.after_withholding }}</td>
                 <td class="text-end">{{ row.net }}</td>

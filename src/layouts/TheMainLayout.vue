@@ -3,7 +3,7 @@
   <nav class="sb-topnav navbar navbar-expand navbar-dark _fixed-top bg-dark">
     <!-- Navbar Brand-->
     <router-link to="/overview" class="navbar-brand ps-3"><img src="/img/logo_dark_02.png" width="32" height="32" class="me-3"
-        alt="Schrevind UI"> Schrevind UI</router-link>
+        alt="Schrevind"> Schrevind</router-link>
 
     <!-- Sidebar Toggle-->
     <button @click="toggleSidebar" class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"

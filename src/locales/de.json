@@ -1359,13 +1359,13 @@
     "title": "Dies ist eine Info-Seite"
   },
   "aboutModal": {
-    "title": "Schrevind UI",
+    "title": "Schrevind",
     "descriptionLine1": "Lightweight UI for Schrevind.",
     "descriptionLine2": "Depots, Wertpapiere, Quellensteuern, Benutzer und Anwendungsdaten verwalten.",
-    "copyright": " © 2026 Ralf Geschke",
+    "copyright": "© 2026 Ralf Geschke",
     "license": "License: MIT",
     "github": "GitHub Repository (schrevind-ui)",
-    "website": "https://www.geschke.net",
+    "website": "https://www.schrevind.com",
     "blog": "https://www.kuerbis.org",
     "close": "Schließen",
     "versionTitle": "Version",
