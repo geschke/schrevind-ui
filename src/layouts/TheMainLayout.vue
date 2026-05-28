@@ -1,29 +1,53 @@
 <template>
   <!-- navbar top -->
-  <nav class="sb-topnav navbar navbar-expand navbar-dark _fixed-top bg-dark">
+  <nav class="sb-topnav navbar navbar-expand _fixed-top bg-body-secondary border-bottom shadow-sm">
     <!-- Navbar Brand-->
-    <router-link to="/overview" class="navbar-brand ps-3"><img src="/img/logo_dark_02.png" width="32" height="32" class="me-3"
+    <router-link to="/overview" class="navbar-brand ps-3"><img :src="logoSrc" width="32" height="32" class="me-3"
         alt="Schrevind"> Schrevind</router-link>
 
     <!-- Sidebar Toggle-->
     <button @click="toggleSidebar" class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"
-      href="#!"><i class="bi bi-list" style="font-size: 1.5rem; color: white;"></i>
+      href="#!"><i class="bi bi-list" style="font-size: 1.5rem;"></i>
     </button>
-    <!-- Navbar-->
-    <ul class="navbar-nav ms-auto me-3 me-lg-4">
+
+    <!-- Links: fachlicher Kontext -->
+    <ul class="navbar-nav ms-3">
       <GroupSwitcher />
+    </ul>
+
+    <!-- Rechts: persönliche Einstellungen -->
+    <ul class="navbar-nav ms-auto me-3 me-lg-4">
       <li class="nav-item me-2">
         <LanguageSwitcher
           id-prefix="navbarLocaleDropdown"
           :animate="false"
-          toggle-class="nav-link dropdown-toggle d-flex align-items-center gap-1 border-0 bg-transparent text-white"
+          toggle-class="nav-link dropdown-toggle d-flex align-items-center gap-1 border-0 bg-transparent"
           menu-class="dropdown-menu dropdown-menu-end"
         />
+      </li>
+      <li class="nav-item me-1">
+        <a
+          class="nav-link"
+          href="#"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSettings"
+          :title="t('layout.topbar.settings')"
+          @click.prevent
+        >
+          <i class="bi bi-sliders"></i>
+        </a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
           aria-expanded="false"><i class="bi bi-person-fill"></i></a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+          <li>
+            <span class="dropdown-header d-flex align-items-center gap-2">
+              <i class="bi bi-person-circle"></i>
+              {{ storeUserAuth.firstname }} {{ storeUserAuth.lastname }}
+            </span>
+          </li>
+          <li><hr class="dropdown-divider" /></li>
           <li>
             <router-link
               v-if="currentUserId !== null"
@@ -44,20 +68,7 @@
             </router-link>
             <span v-else class="dropdown-item disabled">{{ t("layout.topbar.changeOwnPassword") }}</span>
           </li>
-          <li>
-            <a
-              class="dropdown-item"
-              href="#"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#offcanvasSettings"
-              @click.prevent
-            >
-              <i class="bi bi-sliders me-1"></i>{{ t("layout.topbar.settings") }}
-            </a>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
+          <li><hr class="dropdown-divider" /></li>
           <li><a class="dropdown-item" @click.prevent="signout" href="#!">{{ t("layout.topbar.logout") }}</a></li>
         </ul>
       </li>
@@ -127,6 +138,22 @@
           <i v-if="storeSettings.palette === name" class="bi bi-check2 ms-auto"></i>
         </button>
       </div>
+      <h6 class="mt-4 mb-1">{{ t("layout.settings.uiMode.title") }}</h6>
+      <div class="d-flex gap-2 mt-2">
+        <button
+          v-for="mode in (['light', 'dark'] as UIMode[])"
+          :key="mode"
+          type="button"
+          class="btn btn-sm d-flex align-items-center gap-2"
+          :class="storeSettings.uiMode === mode ? 'btn-dark' : 'btn-outline-secondary'"
+          @click="onUIModeSelect(mode)"
+        >
+          <i class="bi" :class="mode === 'dark' ? 'bi-moon-stars' : 'bi-sun'"></i>
+          {{ t(`layout.settings.uiMode.${mode}`) }}
+          <i v-if="storeSettings.uiMode === mode" class="bi bi-check2 ms-auto"></i>
+        </button>
+      </div>
+
       <h6 class="mt-4 mb-1">{{ t("layout.settings.inlandTaxTemplate.title") }}</h6>
       <p class="text-muted small mb-3">{{ t("layout.settings.inlandTaxTemplate.label") }}</p>
       <select
@@ -151,7 +178,7 @@ import GroupSwitcher from "@/components/GroupSwitcher.vue";
 
 import { useUserAuthStore } from "../stores/userauth";
 import { useSettingsStore, CHART_PALETTES, PALETTE_ORDER } from "../stores/settings";
-import type { PaletteName } from "../stores/settings";
+import type { PaletteName, UIMode } from "../stores/settings";
 import { useInlandTaxTemplatesStore } from "../stores/inlandTaxTemplates";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from 'vue-router';
@@ -178,6 +205,11 @@ onMounted(() => {
 const menuPath = computed(() => {
   return route.meta.menuPath ? route.meta.menuPath : route.path;
 });
+
+const logoSrc = computed(() =>
+  storeSettings.uiMode === "dark" ? "/img/logo_dark_02.png" : "/img/logo_01.png"
+);
+
 const currentUserId = computed(() => {
   const rawId = storeUserAuth.getUserId;
   if (rawId == null) return null;
@@ -194,6 +226,16 @@ function settingsErrorContent(code: string): string {
     case "DB_ERROR":            return t("layout.settings.errors.DB_ERROR");
     default:                    return t("layout.settings.errors.saveFailed");
   }
+}
+
+function onUIModeSelect(mode: UIMode) {
+  storeSettings.setUIMode(mode).catch((error: unknown) => {
+    toast.value?.addToast(<GToastContent>{
+      ...GToastWarning,
+      title: t("layout.settings.title"),
+      content: settingsErrorContent(getErrorCode(error)),
+    });
+  });
 }
 
 function onPaletteSelect(name: PaletteName) {

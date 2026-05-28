@@ -12,9 +12,12 @@ export type ChartPalette = {
   yearColors: readonly string[];
 };
 
+export type UIMode = "light" | "dark";
+
 export type UserSettingsUpdate = {
   LastActiveGroupID?: number;
   Theme?: string;
+  UIMode?: string;
   InlandTaxTemplate?: string;
 };
 
@@ -62,15 +65,20 @@ export const useSettingsStore = defineStore("settings", () => {
   const palette = ref<PaletteName>("schrevind");
   const currentPalette = computed(() => CHART_PALETTES[palette.value]);
   const inlandTaxTemplate = ref<string>("");
+  const uiMode = ref<UIMode>("light");
 
   async function saveSettings(partial: UserSettingsUpdate): Promise<void> {
     await axios.post("/users/settings", partial, { withCredentials: true });
   }
 
-  function applyLoadedSettings(settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string } | null) {
+  function applyLoadedSettings(settings?: { LastActiveGroupID?: number; Theme?: string; UIMode?: string; InlandTaxTemplate?: string } | null) {
     if (!settings) return;
     if (settings.Theme && (Object.keys(CHART_PALETTES) as string[]).includes(settings.Theme)) {
       palette.value = settings.Theme as PaletteName;
+    }
+    if (settings.UIMode === "dark" || settings.UIMode === "light") {
+      uiMode.value = settings.UIMode;
+      document.documentElement.setAttribute("data-bs-theme", settings.UIMode);
     }
     if (typeof settings.InlandTaxTemplate === "string") {
       inlandTaxTemplate.value = settings.InlandTaxTemplate;
@@ -82,6 +90,12 @@ export const useSettingsStore = defineStore("settings", () => {
     await saveSettings({ Theme: name });
   }
 
+  async function setUIMode(mode: UIMode): Promise<void> {
+    uiMode.value = mode;
+    document.documentElement.setAttribute("data-bs-theme", mode);
+    await saveSettings({ UIMode: mode });
+  }
+
   async function setInlandTaxTemplate(template: string): Promise<void> {
     inlandTaxTemplate.value = template;
     await saveSettings({ InlandTaxTemplate: template });
@@ -91,7 +105,9 @@ export const useSettingsStore = defineStore("settings", () => {
     palette,
     currentPalette,
     inlandTaxTemplate,
+    uiMode,
     setPalette,
+    setUIMode,
     setInlandTaxTemplate,
     saveSettings,
     applyLoadedSettings,

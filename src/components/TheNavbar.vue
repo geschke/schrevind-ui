@@ -1,6 +1,6 @@
 <template>
   <div id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+    <nav class="sb-sidenav" id="sidenavAccordion">
       <div class="sb-sidenav-menu">
         <div class="nav">
           <div v-for="item in sidebarMenu">
@@ -11,10 +11,6 @@
         </div>
       </div>
 
-      <div class="sb-sidenav-footer">
-        <div class="small">{{ t("layout.loggedInAs") }}</div>
-        {{ storeUserAuth.firstname }} {{ storeUserAuth.lastname }}
-      </div>
     </nav>
   </div>
 </template>
@@ -23,10 +19,8 @@
 import TheNavbarItem from "@/components/TheNavbarItem.vue";
 import type { SidebarItem } from "@/types/navigation";
 import { usePermissions } from "@/composables/usePermissions";
-import { useUserAuthStore } from "../stores/userauth";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-import { useI18n } from "vue-i18n";
 
 interface Props {
   menuPath?: string,
@@ -36,10 +30,8 @@ const props = withDefaults(defineProps<Props>(), {
   menuPath: '',
 });
 
-const storeUserAuth = useUserAuthStore();
 const { canManageUsers } = usePermissions();
 const route = useRoute();
-const { t } = useI18n();
 
 const activeMenuPath = computed(() => (props.menuPath != '' ? props.menuPath : route.path));
 const menuPath = () => activeMenuPath.value;

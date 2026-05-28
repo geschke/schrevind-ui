@@ -1236,6 +1236,11 @@
         "title": "Appearance",
         "paletteLabel": "Chart color scheme"
       },
+      "uiMode": {
+        "title": "Appearance",
+        "light": "Light",
+        "dark": "Dark"
+      },
       "inlandTaxTemplate": {
         "title": "Default tax template",
         "label": "Template for domestic taxes on new dividend entries",

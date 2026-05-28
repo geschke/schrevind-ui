@@ -11,7 +11,7 @@
       <i class="bi bi-people-fill"></i>
       <span class="d-none d-md-inline">{{ activeGroup?.Name ?? t('layout.topbar.groupSwitcher.label') }}</span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-end">
+    <ul class="dropdown-menu">
       <li v-for="group in groups" :key="group.ID">
         <button
           class="dropdown-item d-flex align-items-center gap-2"

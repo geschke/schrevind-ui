@@ -1236,6 +1236,11 @@
         "title": "Darstellung",
         "paletteLabel": "Farbschema für Charts"
       },
+      "uiMode": {
+        "title": "Erscheinungsbild",
+        "light": "Hell",
+        "dark": "Dunkel"
+      },
       "inlandTaxTemplate": {
         "title": "Standard-Steuertemplate",
         "label": "Vorlage für inländische Steuern bei neuen Dividendeneinträgen",
