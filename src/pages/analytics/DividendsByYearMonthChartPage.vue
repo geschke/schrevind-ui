@@ -276,6 +276,18 @@ const { t, locale } = useI18n()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
 const storeSettings = useSettingsStore()
+
+const chartColors = computed(() => {
+  const dark = storeSettings.uiMode === 'dark'
+  return {
+    label:     dark ? '#adb5bd' : '#495057',
+    axisLabel: dark ? '#adb5bd' : '#495057',
+    yLabel:    dark ? '#868e96' : '#6c757d',
+    axisLine:  dark ? '#6c757d' : '#ced4da',
+    splitLine: dark ? '#343a40' : '#eceff3',
+  }
+})
+
 const toast = ref<InstanceType<typeof GToast> | null>(null)
 const chartRef = ref<InstanceType<typeof VChart> | null>(null)
 const loading = ref(false)
@@ -489,7 +501,7 @@ const chartOption = computed<ECOption>(() => {
       position: 'top',
       formatter: (p: { value: unknown }) => ((p.value as number) > 0 ? fmtShort(p.value as number) : ''),
       fontSize: 10,
-      color: '#495057',
+      color: chartColors.value.label,
     },
   }))
 
@@ -504,7 +516,7 @@ const chartOption = computed<ECOption>(() => {
       icon: 'roundRect',
       itemWidth: 12,
       itemHeight: 12,
-      textStyle: { color: '#495057', fontSize: 12 },
+      textStyle: { color: chartColors.value.label, fontSize: 12 },
     },
     tooltip: {
       trigger: 'axis',
@@ -535,15 +547,15 @@ const chartOption = computed<ECOption>(() => {
     xAxis: {
       type: 'category',
       data: months.map((m) => monthName(m)),
-      axisLine: { lineStyle: { color: '#ced4da' } },
+      axisLine: { lineStyle: { color: chartColors.value.axisLine } },
       axisTick: { show: false },
-      axisLabel: { color: '#495057', fontSize: 12 },
+      axisLabel: { color: chartColors.value.axisLabel, fontSize: 12 },
     },
     yAxis: {
       type: 'value',
-      splitLine: { show: showGrid.value, lineStyle: { color: '#eceff3' } },
+      splitLine: { show: showGrid.value, lineStyle: { color: chartColors.value.splitLine } },
       axisLabel: {
-        color: '#6c757d',
+        color: chartColors.value.yLabel,
         fontSize: 11,
         formatter: (v: number) => fmtShort(v),
       },

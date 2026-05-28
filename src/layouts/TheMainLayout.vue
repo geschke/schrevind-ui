@@ -83,7 +83,7 @@
 
     <div id="layoutSidenav_content">
       <main>
-        <div class="container-fluid px-4 mt-2">
+        <div class="container-fluid px-4 mt-2 mb-4">
          
           <div class="row">
             <slot>
@@ -95,7 +95,7 @@
 
         </div>
       </main>
-      <footer class="py-4 bg-light mt-auto">
+      <footer class="py-4 bg-body-secondary mt-auto">
         <div class="container-fluid px-4">
           <div class="d-flex align-items-center justify-content-end small">
             <div>
