@@ -747,6 +747,7 @@
       "year": "Year",
       "month": "Month",
       "period": "Period",
+      "total": "Total",
       "empty": "No data available.",
       "errorTitle": "Error"
     },
@@ -840,6 +841,22 @@
         "chartTitle": "Dividends per Year",
         "tableTitle": "Table · Dividends per Year"
       },
+      "dividends_share_by_month": {
+        "title": "Monthly Shares",
+        "description": "Percentage share of each security in a month's dividends.",
+        "chartTitle": "Dividend Shares",
+        "tableTitle": "Overview",
+        "tableColSecurity": "Security",
+        "tableColAmount": "Amount",
+        "tableColShare": "Share",
+        "centerTotal": "Total",
+        "noData": "No data for the selected period.",
+        "action": "Open chart",
+        "loadButton": "Reload",
+        "linkTitle": "View shares",
+        "filterYear": "Year",
+        "filterMonth": "Month"
+      },
       "common": {
         "baseCurrency": "Base currency",
         "export": "Export",
@@ -863,6 +880,7 @@
         "display": "Display",
         "gridLines": "Grid lines",
         "valueLabels": "Value labels",
+        "valueAmounts": "Amounts",
         "legend": "Legend",
         "syncWithChart": "in sync with chart",
         "whtShare": "WHT share",
@@ -919,6 +937,9 @@
       "firstname": "First name",
       "lastname": "Last name",
       "locale": "Locale",
+      "localeNone": "– (not set)",
+      "localeCustom": "Other (manual input)",
+      "localePlaceholder": "e.g. de-DE",
       "group": "Group",
       "cancel": "Cancel",
       "save": "Save",
@@ -947,7 +968,7 @@
       "firstnameMin": "Minimum length is two characters.",
       "lastnameRequired": "Please enter your last name.",
       "lastnameMin": "Minimum length is two characters.",
-      "localeInvalid": "Please enter the locale in the format xx-XX."
+      "localeInvalid": "Please enter a valid BCP-47 locale (e.g. de-DE, en-US)."
     },
     "list": {
       "title": "Users",

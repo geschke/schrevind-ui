@@ -83,6 +83,15 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/analytics/month-security-share",
+    name: "analysismonthshare",
+    component: () => import("@/pages/analytics/DividendShareByMonthChartPage.vue"),
+    meta: {
+      requiresAuth: true,
+      menuPath: "/analytics",
+    },
+  },
+  {
     path: "/analytics/security-years",
     name: "analysissecurityyears",
     component: () => import("@/pages/analytics/AnalysisSecurityYearsV2Page.vue"),

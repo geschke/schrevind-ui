@@ -123,3 +123,29 @@ export type YearMonthSecurityData = {
   currency: string;
   periods: YearMonthPeriodData[];
 };
+
+export type ShareByMonthChartRow = {
+  security_id: number;
+  security_name: string;
+  security_isin: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+  gross_pct: number;
+  after_withholding_pct: number;
+  net_pct: number;
+};
+
+export type ShareByMonthChartTotals = {
+  gross: string;
+  after_withholding: string;
+  net: string;
+};
+
+export type ShareByMonthChartData = {
+  currency: string;
+  year: string;
+  month: string;
+  totals: ShareByMonthChartTotals;
+  rows: ShareByMonthChartRow[];
+};

@@ -86,10 +86,14 @@
                 :class="{ 'table-secondary fw-semibold': row.level === 'year' }"
               >
                 <td>
-                  <router-link
-                    v-if="row.level === 'month'"
-                    :to="{ name: 'analysismonthsecurity', query: { year: row.year, month: row.month } }"
-                  >{{ formatPeriod(row) }}</router-link>
+                  <template v-if="row.level === 'month'">
+                    <router-link :to="{ name: 'analysismonthsecurity', query: { year: row.year, month: row.month } }">{{ formatPeriod(row) }}</router-link>
+                    <router-link
+                      :to="{ name: 'analysismonthshare', query: { year: row.year, month: row.month } }"
+                      class="ms-2 text-muted"
+                      :title="t('analyses.charts.dividends_share_by_month.linkTitle')"
+                    ><i class="bi bi-pie-chart"></i></router-link>
+                  </template>
                   <span v-else>{{ formatPeriod(row) }}</span>
                 </td>
                 <td class="text-end">{{ row.gross }}</td>

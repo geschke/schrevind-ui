@@ -55,7 +55,20 @@
         <div class="row mb-3">
           <label for="locale" class="col-sm-2 col-form-label">{{ t("adminUsers.common.locale") }}</label>
           <div class="col-sm-10 col-md-4 col-lg-3">
-            <input type="text" class="form-control" v-model="locale" v-bind="localeAttrs" id="locale" maxlength="5" />
+            <select class="form-select" id="locale" :value="localeSelectValue" @change="onLocaleSelect">
+              <option value="">{{ t("adminUsers.common.localeNone") }}</option>
+              <option value="__custom__">{{ t("adminUsers.common.localeCustom") }}</option>
+              <option v-for="loc in LOCALE_LIST" :key="loc.value" :value="loc.value">{{ loc.label }}</option>
+            </select>
+            <input
+              v-if="useCustomLocale"
+              type="text"
+              class="form-control mt-2"
+              v-model="locale"
+              v-bind="localeAttrs"
+              id="localeCustom"
+              :placeholder="t('adminUsers.common.localePlaceholder')"
+            />
             <small class="text-danger" v-if="errors.locale">{{ errors.locale }}</small>
           </div>
         </div>
@@ -170,6 +183,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import axios from "@/helper/axiosInstance";
+import { LOCALE_LIST } from "@/constants/locales";
 
 const { t } = useI18n();
 
@@ -195,7 +209,7 @@ const validationSchema = yup.object().shape({
     .string()
     .transform((value) => value?.trim() ?? "")
     .test("locale", () => t("adminUsers.validation.localeInvalid"), (value) => {
-      return value === "" || /^..-..$/.test(value ?? "");
+      return value === "" || /^[a-zA-Z]{2,3}(-[a-zA-Z]{2,4})?$/.test(value ?? "");
     }),
 });
 
@@ -271,6 +285,22 @@ const [firstname, firstnameAttrs] = defineField("firstname");
 const [lastname, lastnameAttrs] = defineField("lastname");
 const [locale, localeAttrs] = defineField("locale");
 
+const useCustomLocale = ref(false)
+
+const localeSelectValue = computed(() =>
+  useCustomLocale.value ? '__custom__' : (locale.value ?? '')
+)
+
+function onLocaleSelect(event: Event) {
+  const val = (event.target as HTMLSelectElement).value
+  if (val === '__custom__') {
+    useCustomLocale.value = true
+  } else {
+    useCustomLocale.value = false
+    locale.value = val
+  }
+}
+
 function errorContent(errorCode: string) {
   if (errorCode) {
     if (errorCode === "EMAIL_ALREADY_IN_USE" || errorCode === "EMAIL_EXISTS") {
@@ -331,6 +361,7 @@ function fillFormElements() {
   firstname.value = foundUser.FirstName;
   lastname.value = foundUser.LastName;
   locale.value = foundUser.Locale;
+  useCustomLocale.value = !!foundUser.Locale && !LOCALE_LIST.some(l => l.value === foundUser.Locale);
 }
 
 const onSubmit = handleSubmit((values) => {

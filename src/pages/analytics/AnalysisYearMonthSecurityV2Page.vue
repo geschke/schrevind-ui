@@ -148,7 +148,14 @@
             <tbody>
               <template v-for="period in sortedPeriods" :key="`${period.year}-${period.month}`">
                 <tr class="table-secondary">
-                  <td colspan="5" class="fw-semibold">{{ periodLabel(period.year, period.month) }}</td>
+                  <td colspan="5" class="fw-semibold">
+                    {{ periodLabel(period.year, period.month) }}
+                    <router-link
+                      :to="{ name: 'analysismonthshare', query: { year: period.year, month: period.month } }"
+                      class="ms-2 text-muted fw-normal"
+                      :title="t('analyses.charts.dividends_share_by_month.linkTitle')"
+                    ><i class="bi bi-pie-chart"></i></router-link>
+                  </td>
                 </tr>
                 <tr
                   v-for="(row, idx) in period.rows"

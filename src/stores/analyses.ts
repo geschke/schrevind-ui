@@ -15,6 +15,8 @@ import type {
   SecurityYearData,
   SecurityYearRow,
   SecurityYearSecurityEntry,
+  ShareByMonthChartData,
+  ShareByMonthChartRow,
   YearData,
   YearRow,
   YearMonthRow,
@@ -31,6 +33,7 @@ const DIVIDENDS_BY_YEAR_CHART_ENDPOINT = "/analyses/dividends-by-year-chart";
 const DIVIDENDS_BY_YEAR_MONTH_CHART_ENDPOINT = "/analyses/dividends-by-year-month-chart";
 const DIVIDENDS_BY_SECURITY_YEAR_DATA_ENDPOINT = "/analyses/dividends-by-security-year-data";
 const DIVIDENDS_BY_YEAR_MONTH_SECURITY_DATA_ENDPOINT = "/analyses/dividends-by-year-month-security-data";
+const DIVIDENDS_BY_SECURITY_MONTH_SHARE_CHART_ENDPOINT = "/analyses/dividends-by-security-month-share-chart";
 
 function getActiveGroupIDOrThrow(): number {
   const storeUserAuth = useUserAuthStore();
@@ -251,6 +254,41 @@ function normalizeYearMonthData(payload: unknown): YearMonthData {
   };
 }
 
+function normalizeShareByMonthChartRow(item: unknown): ShareByMonthChartRow {
+  const raw = isRecord(item) ? item : {};
+  return {
+    security_id: typeof raw.SecurityID === "number" ? raw.SecurityID : 0,
+    security_name: String(raw.SecurityName ?? ""),
+    security_isin: String(raw.SecurityISIN ?? ""),
+    gross: String(raw.Gross ?? ""),
+    after_withholding: String(raw.AfterWithholding ?? ""),
+    net: String(raw.Net ?? ""),
+    gross_pct: parseFloat(String(raw.GrossPercentage ?? "0")) || 0,
+    after_withholding_pct: parseFloat(String(raw.AfterWithholdingPercentage ?? "0")) || 0,
+    net_pct: parseFloat(String(raw.NetPercentage ?? "0")) || 0,
+  };
+}
+
+function normalizeShareByMonthChartData(payload: unknown): ShareByMonthChartData {
+  if (isRecord(payload) && payload.success === false) {
+    throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
+  }
+  const rawData = isRecord(payload) && "data" in payload ? payload.data : payload;
+  const raw = isRecord(rawData) ? rawData : {};
+  const totals = isRecord(raw.Totals) ? raw.Totals : {};
+  return {
+    currency: String(raw.Currency ?? ""),
+    year: String(raw.Year ?? ""),
+    month: String(raw.Month ?? ""),
+    totals: {
+      gross: String(totals.Gross ?? ""),
+      after_withholding: String(totals.AfterWithholding ?? ""),
+      net: String(totals.Net ?? ""),
+    },
+    rows: Array.isArray(raw.Rows) ? raw.Rows.map(normalizeShareByMonthChartRow) : [],
+  };
+}
+
 function normalizeDividendsByYearChart(payload: unknown): DividendsByYearChart {
   if (isRecord(payload) && payload.success === false) {
     throw new Error(String(payload.message ?? "UNKNOWN_ERROR"));
@@ -313,6 +351,20 @@ export const useAnalysesStore = defineStore("analyses", () => {
         currentMonthChartData.value = null;
         throw error;
       });
+  }
+
+  async function fetchShareByMonthChart(year: number, month: string, depotIds?: number[]): Promise<ShareByMonthChartData> {
+    const params = new URLSearchParams();
+    params.append("context_group_id", String(getActiveGroupIDOrThrow()));
+    params.append("year", String(year));
+    params.append("month", month);
+    if (depotIds && depotIds.length > 0) {
+      depotIds.forEach((id) => params.append("depot_id", String(id)));
+    }
+    return axios
+      .get(DIVIDENDS_BY_SECURITY_MONTH_SHARE_CHART_ENDPOINT, { params, withCredentials: true })
+      .then((response) => normalizeShareByMonthChartData(response.data))
+      .catch((error: unknown) => { throw error; });
   }
 
   async function fetchDividendsByYearMonthSecurityData(periods?: YearMonthPeriod[], depotIds?: number[]): Promise<YearMonthSecurityData> {
@@ -404,5 +456,6 @@ export const useAnalysesStore = defineStore("analyses", () => {
     fetchDividendsByYearChartData,
     fetchDividendsBySecurityYearData,
     fetchDividendsByYearMonthSecurityData,
+    fetchShareByMonthChart,
   };
 });
