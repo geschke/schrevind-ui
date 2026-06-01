@@ -666,17 +666,23 @@ body {
 .sb-sidenav .sb-sidenav-menu .nav-link .sb-nav-link-icon,
 .sb-sidenav .sb-sidenav-menu .nav-link .sb-sidenav-collapse-arrow {
   color: var(--bs-tertiary-color);
+  background-color: transparent;
+  pointer-events: none;
 }
-.sb-sidenav .sb-sidenav-menu .nav-link:hover,
-.sb-sidenav .sb-sidenav-menu .nav-link:hover .sb-nav-link-icon,
-.sb-sidenav .sb-sidenav-menu .nav-link:hover .sb-sidenav-collapse-arrow {
+.sb-sidenav .sb-sidenav-menu .nav-link:hover {
   color: var(--bs-body-color);
   background-color: rgba(var(--bs-emphasis-color-rgb), 0.07);
 }
-.sb-sidenav .sb-sidenav-menu .nav-link.active,
-.sb-sidenav .sb-sidenav-menu .nav-link.active .sb-nav-link-icon {
+.sb-sidenav .sb-sidenav-menu .nav-link:hover .sb-nav-link-icon,
+.sb-sidenav .sb-sidenav-menu .nav-link:hover .sb-sidenav-collapse-arrow {
+  color: var(--bs-body-color);
+}
+.sb-sidenav .sb-sidenav-menu .nav-link.active {
   color: var(--bs-primary);
   background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+.sb-sidenav .sb-sidenav-menu .nav-link.active .sb-nav-link-icon {
+  color: var(--bs-primary);
 }
 
 /* Content area links — dezent, kein Underline, passt sich Dark Mode an */
