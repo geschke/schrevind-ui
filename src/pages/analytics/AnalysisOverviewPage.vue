@@ -145,6 +145,26 @@
           </div>
         </div>
       </div>
+
+      <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column align-items-start">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="analysis-icon bg-danger-subtle text-danger">
+                <i class="bi bi-pie-chart"></i>
+              </div>
+              <div>
+                <h3 class="h5 mb-1">{{ t("analyses.charts.dividends_share_by_year.title") }}</h3>
+                <p class="text-muted mb-0">{{ t("analyses.charts.dividends_share_by_year.description") }}</p>
+              </div>
+            </div>
+
+            <router-link class="btn mt-auto btn-danger" :to="{ name: 'analysisyearshare' }">
+              {{ t("analyses.charts.action") }}
+            </router-link>
+          </div>
+        </div>
+      </div>
     </template>
   </TheMainLayout>
 </template>

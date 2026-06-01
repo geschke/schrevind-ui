@@ -1,6 +1,6 @@
 <template>
   <!-- navbar top -->
-  <nav class="sb-topnav navbar navbar-expand _fixed-top bg-body-secondary border-bottom shadow-sm">
+  <nav class="ui-topnav navbar navbar-expand _fixed-top bg-body-secondary border-bottom shadow-sm">
     <!-- Navbar Brand-->
     <router-link to="/overview" class="navbar-brand ps-3"><img :src="logoSrc" width="32" height="32" class="me-3"
         alt="Schrevind"> Schrevind</router-link>
@@ -271,7 +271,7 @@ async function signout() {
 
 function toggleSidebar() {
   //console.log("sidebar toggle clicked");
-  document.body.classList.toggle('sb-sidenav-toggled'); // see: https://www.w3schools.com/howto/howto_js_toggle_class.asp, switch CSS class with toggle function
+  document.body.classList.toggle('ui-sidenav-toggled'); // see: https://www.w3schools.com/howto/howto_js_toggle_class.asp, switch CSS class with toggle function
 
   // origin from: 
   /*!
@@ -291,13 +291,13 @@ function toggleSidebar() {
       if (sidebarToggle) {
           // Uncomment Below to persist sidebar toggle between refreshes
           // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-          //     document.body.classList.toggle('sb-sidenav-toggled');
+          //     document.body.classList.toggle('ui-sidenav-toggled');
           // }
           sidebarToggle.addEventListener('click', event => {
               console.log("sidebar something clicked");
               event.preventDefault();
-              document.body.classList.toggle('sb-sidenav-toggled');
-              localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+              document.body.classList.toggle('ui-sidenav-toggled');
+              localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('ui-sidenav-toggled'));
           });
       }
   

@@ -1,10 +1,10 @@
 <template>
   <div id="layoutSidenav_nav">
-    <nav class="sb-sidenav" id="sidenavAccordion">
-      <div class="sb-sidenav-menu">
+    <nav class="ui-sidenav" id="sidenavAccordion">
+      <div class="ui-sidenav-menu">
         <div class="nav">
           <div v-for="item in sidebarMenu">
-            <div class="sb-sidenav-menu-heading">
+            <div class="ui-sidenav-menu-heading">
             </div>
             <the-navbar-item v-if="item.sub" :items="item.sub" :menu-path="menuPath()"></the-navbar-item>
           </div>

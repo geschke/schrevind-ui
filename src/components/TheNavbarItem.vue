@@ -2,7 +2,7 @@
   <div v-for="item in items">
 
     <router-link v-if="item.type === 'item' && item.url" :class="getItemLinkClass(item)" :to="item.url">
-      <div class="sb-nav-link-icon"><i v-if="item.icon" :class="item.icon"></i></div>
+      <div class="ui-nav-link-icon"><i v-if="item.icon" :class="item.icon"></i></div>
       {{ t(item.title) }}
     </router-link>
 
@@ -11,16 +11,16 @@
       <a :class="getSubitemsLinkClass(item)" href="#" data-bs-toggle="collapse"
         :data-bs-target="getSubitemCollapseId(item.title, '#')" :aria-expanded="getSubitemsAriaExpanded(item)"
         :aria-controls="getSubitemCollapseId(item.title, '')">
-        <div class="sb-nav-link-icon"><i :class="item.icon"></i></div>
+        <div class="ui-nav-link-icon"><i :class="item.icon"></i></div>
         {{ t(item.title) }}
-        <div class="sb-sidenav-collapse-arrow">
+        <div class="ui-sidenav-collapse-arrow">
           <i class="bi bi-caret-down-fill"></i>
         </div>
       </a>
 
       <div :class="getSubitemsClass(item)" :id="getSubitemCollapseId(item.title, '')" aria-labelledby="headingOne"
         _data-bs-parent="#sidenavAccordion">
-        <nav class="sb-sidenav-menu-nested nav">
+        <nav class="ui-sidenav-menu-nested nav">
           <the-navbar-item v-if="item.sub" :items="item.sub" :menu-path="menuPath"></the-navbar-item>
 
         </nav>
