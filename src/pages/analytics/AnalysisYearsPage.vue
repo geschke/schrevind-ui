@@ -54,6 +54,11 @@
               <tr v-for="(row, idx) in data.rows" :key="idx">
                 <td>
                   <router-link :to="{ name: 'analysismonths', query: { year: row.year } }">{{ row.year }}</router-link>
+                  <router-link
+                    :to="{ name: 'analysisyearshare', query: { year: row.year } }"
+                    class="ms-2 text-muted"
+                    :title="t('analyses.charts.dividends_share_by_year.linkTitle')"
+                  ><i class="bi bi-pie-chart"></i></router-link>
                 </td>
                 <td class="text-end">{{ row.gross }}</td>
                 <td class="text-end">{{ row.after_withholding }}</td>

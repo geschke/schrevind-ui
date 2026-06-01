@@ -859,6 +859,21 @@
         "filterYear": "Year",
         "filterMonth": "Month"
       },
+      "dividends_share_by_year": {
+        "title": "Annual Shares",
+        "description": "Percentage share of each security in a year's dividends.",
+        "chartTitle": "Dividend Shares",
+        "tableTitle": "Overview",
+        "tableColSecurity": "Security",
+        "tableColAmount": "Amount",
+        "tableColShare": "Share",
+        "centerTotal": "Total",
+        "noData": "No data for the selected year.",
+        "linkTitle": "View annual shares",
+        "others": "Others",
+        "othersHint": "Details in table",
+        "filterYear": "Year"
+      },
       "common": {
         "baseCurrency": "Base currency",
         "export": "Export",

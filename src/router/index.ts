@@ -92,6 +92,15 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/analytics/year-security-share",
+    name: "analysisyearshare",
+    component: () => import("@/pages/analytics/DividendShareByYearChartPage.vue"),
+    meta: {
+      requiresAuth: true,
+      menuPath: "/analytics",
+    },
+  },
+  {
     path: "/analytics/security-years",
     name: "analysissecurityyears",
     component: () => import("@/pages/analytics/AnalysisSecurityYearsV2Page.vue"),

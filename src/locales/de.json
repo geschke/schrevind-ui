@@ -859,6 +859,21 @@
         "filterYear": "Jahr",
         "filterMonth": "Monat"
       },
+      "dividends_share_by_year": {
+        "title": "Anteile pro Jahr",
+        "description": "Prozentualer Anteil jedes Wertpapiers an den Dividenden eines Jahres.",
+        "chartTitle": "Dividendenanteile",
+        "tableTitle": "Übersicht",
+        "tableColSecurity": "Wertpapier",
+        "tableColAmount": "Betrag",
+        "tableColShare": "Anteil",
+        "centerTotal": "Gesamt",
+        "noData": "Keine Daten für das gewählte Jahr.",
+        "linkTitle": "Anteile pro Jahr ansehen",
+        "others": "Sonstige",
+        "othersHint": "Details in der Tabelle",
+        "filterYear": "Jahr"
+      },
       "common": {
         "baseCurrency": "Basiswährung",
         "export": "Export",

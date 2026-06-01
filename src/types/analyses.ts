@@ -149,3 +149,28 @@ export type ShareByMonthChartData = {
   totals: ShareByMonthChartTotals;
   rows: ShareByMonthChartRow[];
 };
+
+export type ShareByYearChartRow = {
+  security_id: number;
+  security_name: string;
+  security_isin: string;
+  gross: string;
+  after_withholding: string;
+  net: string;
+  gross_pct: number;
+  after_withholding_pct: number;
+  net_pct: number;
+};
+
+export type ShareByYearChartTotals = {
+  gross: string;
+  after_withholding: string;
+  net: string;
+};
+
+export type ShareByYearChartData = {
+  currency: string;
+  year: string;
+  totals: ShareByYearChartTotals;
+  rows: ShareByYearChartRow[];
+};
