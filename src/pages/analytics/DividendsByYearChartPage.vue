@@ -244,7 +244,14 @@
                   </thead>
                   <tbody>
                     <tr v-for="row in filteredRows" :key="row.year">
-                      <td><strong>{{ row.year }}</strong></td>
+                      <td>
+                        <strong>{{ row.year }}</strong>
+                        <router-link
+                          :to="{ name: 'analysisyearshare', query: { year: row.year } }"
+                          class="ms-2 text-muted"
+                          :title="t('analyses.charts.dividends_share_by_year.linkTitle')"
+                        ><i class="bi bi-pie-chart"></i></router-link>
+                      </td>
                       <td class="td-gross text-end font-monospace">{{ fmtMoney2(row.gross) }}</td>
                       <td class="td-after-wht text-end font-monospace">{{ fmtMoney2(row.afterWithholding) }}</td>
                       <td class="td-net text-end font-monospace">{{ fmtMoney2(row.net) }}</td>
