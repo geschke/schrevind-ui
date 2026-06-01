@@ -854,6 +854,8 @@
         "action": "Open chart",
         "loadButton": "Reload",
         "linkTitle": "View shares",
+        "others": "Others",
+        "othersHint": "Details in table",
         "filterYear": "Year",
         "filterMonth": "Month"
       },

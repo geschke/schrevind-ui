@@ -854,6 +854,8 @@
         "action": "Chart öffnen",
         "loadButton": "Neu laden",
         "linkTitle": "Anteile ansehen",
+        "others": "Sonstige",
+        "othersHint": "Details in der Tabelle",
         "filterYear": "Jahr",
         "filterMonth": "Monat"
       },

@@ -342,6 +342,29 @@ const sortedRows = computed<ShareByMonthChartRow[]>(() => {
   return rows.sort((a, b) => b.net_pct - a.net_pct)
 })
 
+type ChartItem =
+  | { type: 'row'; row: ShareByMonthChartRow }
+  | { type: 'others'; count: number; pct: number }
+
+const chartItems = computed<ChartItem[]>(() => {
+  const rows = sortedRows.value
+  if (!rows.length) return []
+
+  const sorted = [...rows].sort((a, b) => getPctValue(b) - getPctValue(a))
+  let main = sorted.filter(r => getPctValue(r) >= 1.0)
+  const others = sorted.filter(r => getPctValue(r) < 1.0)
+
+  while (main.length > 20) {
+    others.push(main.pop()!)
+  }
+
+  const result: ChartItem[] = main.map(r => ({ type: 'row' as const, row: r }))
+  if (others.length > 0) {
+    result.push({ type: 'others' as const, count: others.length, pct: others.reduce((s, r) => s + getPctValue(r), 0) })
+  }
+  return result
+})
+
 function getPctValue(row: ShareByMonthChartRow): number {
   if (activeValue.value === 'gross') return row.gross_pct
   if (activeValue.value === 'after_withholding') return row.after_withholding_pct
@@ -422,18 +445,24 @@ function monthName(m: string): string {
 }
 
 const chartOption = computed<ECOption>(() => {
-  const rows = sortedRows.value
-  if (!rows.length) return {}
+  const cRows = chartItems.value
+  if (!cRows.length) return {}
 
   const colors = storeSettings.currentPalette.yearColors as string[]
   const _showAmounts = showAmounts.value
   const _showLegend = showLegend.value
+  const othersLabel = t('analyses.charts.dividends_share_by_month.others')
 
-  const seriesData = rows.map((row, idx) => ({
-    name: row.security_name,
-    value: getPctValue(row),
-    itemStyle: { color: colors[idx % colors.length] },
-  }))
+  const seriesData = cRows.map((item, idx) => {
+    if (item.type === 'others') {
+      return { name: othersLabel, value: item.pct, itemStyle: { color: '#9e9e9e' } }
+    }
+    return {
+      name: item.row.security_name,
+      value: getPctValue(item.row),
+      itemStyle: { color: colors[idx % colors.length] },
+    }
+  })
 
   return {
     tooltip: {
@@ -444,14 +473,24 @@ const chartOption = computed<ECOption>(() => {
       padding: [10, 12],
       formatter: (params: unknown) => {
         const p = params as { name: string; color: string; value: number; dataIndex: number }
-        const row = rows[p.dataIndex]
-        if (!row) return ''
-        const amount = getAmountValue(row)
+        const item = cRows[p.dataIndex]
+        if (!item) return ''
+        if (item.type === 'others') {
+          return (
+            `<div style="font-weight:600;font-size:13px;margin-bottom:6px">${p.name} (${item.count})</div>` +
+            `<div style="display:flex;align-items:center;gap:8px">` +
+            `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${p.color}"></span>` +
+            `<strong style="margin-left:auto">${fmtPct(item.pct)}</strong>` +
+            `</div>` +
+            `<div style="color:#868e96;font-size:11px;margin-top:6px">${t('analyses.charts.dividends_share_by_month.othersHint')}</div>`
+          )
+        }
+        const row = item.row
         return (
           `<div style="font-weight:600;font-size:13px;margin-bottom:6px">${p.name}</div>` +
           `<div style="display:flex;align-items:center;gap:8px">` +
           `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${p.color}"></span>` +
-          `<span style="color:#ced4da">${amount} ${currency.value}</span>` +
+          `<span style="color:#ced4da">${getAmountValue(row)} ${currency.value}</span>` +
           `<strong style="margin-left:auto">${fmtPct(p.value)}</strong>` +
           `</div>`
         )
@@ -478,13 +517,17 @@ const chartOption = computed<ECOption>(() => {
           show: showLabels.value,
           formatter: (params: unknown) => {
             const p = params as { name: string; dataIndex: number }
-            const row = rows[p.dataIndex]
-            if (!row) return p.name
+            const item = cRows[p.dataIndex]
+            if (!item) return p.name
+            if (item.type === 'others') {
+              return `${othersLabel} (${item.count}): ${fmtPct(item.pct)}`
+            }
+            const row = item.row
             const pct = fmtPct(getPctValue(row))
             if (_showAmounts) {
-              return `${p.name}: ${getAmountValue(row)} ${currency.value} (${pct})`
+              return `${row.security_name}: ${getAmountValue(row)} ${currency.value} (${pct})`
             }
-            return `${p.name} (${pct})`
+            return `${row.security_name} (${pct})`
           },
           color: chartColors.value.label,
           fontSize: 11,
