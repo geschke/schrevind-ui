@@ -164,7 +164,7 @@
               </span>
             </div>
             <div class="card-body p-3">
-              <v-chart ref="chartRef" class="dividend-chart" :option="chartOption" :update-options="{ replaceMerge: ['series'] }" autoresize />
+              <v-chart ref="chartRef" class="dividend-chart" :option="chartOption" :update-options="{ notMerge: true }" autoresize />
             </div>
           </div>
 
@@ -484,10 +484,8 @@ const chartOption = computed<ECOption>(() => {
   const years = filteredYears.value
 
   const series: BarSeriesOption[] = years.map((year) => ({
-    id: year,
     name: year,
     type: 'bar',
-    universalTransition: true,
     data: months.map((m) => {
       const row = filteredRows.value.find((r) => r.year === year && r.month === m)
       return row ? row[activeValue.value] : 0
