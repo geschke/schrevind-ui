@@ -187,15 +187,15 @@
                         {{ row.security_name }}
                         <small v-if="row.security_isin" class="text-muted ms-1">{{ row.security_isin }}</small>
                       </td>
-                      <td class="text-end font-monospace">{{ getAmountValue(row) }}</td>
-                      <td class="text-end font-monospace">{{ fmtPct(getPctValue(row)) }}</td>
+                      <td class="text-end num-tabular">{{ getAmountValue(row) }}</td>
+                      <td class="text-end num-tabular">{{ fmtPct(getPctValue(row)) }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr class="fw-semibold table-secondary">
                       <td>{{ t('analyses.common.total') }}</td>
-                      <td class="text-end font-monospace">{{ totalAmountDisplay }} {{ currency }}</td>
-                      <td class="text-end font-monospace">{{ fmtPct(totalPct) }}</td>
+                      <td class="text-end num-tabular">{{ totalAmountDisplay }} {{ currency }}</td>
+                      <td class="text-end num-tabular">{{ fmtPct(totalPct) }}</td>
                     </tr>
                   </tfoot>
                 </table>

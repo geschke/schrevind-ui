@@ -695,3 +695,8 @@ main a:not(.btn):not(.nav-link):not(.dropdown-item):not(.badge):hover {
   text-decoration: none;
   color: var(--bs-body-color);
 }
+
+/* Zahlen mit gleicher Ziffernbreite, ohne Terminal-Schriftart */
+.num-tabular {
+  font-variant-numeric: tabular-nums;
+}

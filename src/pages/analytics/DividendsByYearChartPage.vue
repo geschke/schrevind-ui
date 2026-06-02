@@ -137,7 +137,7 @@
                     <span class="kpi-swatch" style="background: var(--c-gross)"></span>
                     {{ t('analyses.charts.common.totalGross') }}
                   </div>
-                  <div class="kpi-value font-monospace">{{ fmtMoney(kpis.totalGross) }}</div>
+                  <div class="kpi-value num-tabular">{{ fmtMoney(kpis.totalGross) }}</div>
                   <div class="text-muted small">{{ filteredRows.length }} {{ t('analyses.charts.common.years') }}</div>
                 </div>
               </div>
@@ -149,7 +149,7 @@
                     <span class="kpi-swatch" style="background: var(--c-net)"></span>
                     {{ t('analyses.charts.common.totalNet') }}
                   </div>
-                  <div class="kpi-value font-monospace">{{ fmtMoney(kpis.totalNet) }}</div>
+                  <div class="kpi-value num-tabular">{{ fmtMoney(kpis.totalNet) }}</div>
                   <div class="text-muted small">{{ t('analyses.charts.common.afterTaxes') }}</div>
                 </div>
               </div>
@@ -161,7 +161,7 @@
                     <span class="kpi-swatch" style="background: var(--c-after-wht)"></span>
                     {{ t('analyses.charts.common.bestYear') }}
                   </div>
-                  <div class="kpi-value font-monospace">{{ kpis.bestYear?.year ?? '—' }}</div>
+                  <div class="kpi-value num-tabular">{{ kpis.bestYear?.year ?? '—' }}</div>
                   <div class="text-success small">{{ kpis.bestYear ? fmtMoney(kpis.bestYear.gross) : '—' }}</div>
                 </div>
               </div>
@@ -252,9 +252,9 @@
                           :title="t('analyses.charts.dividends_share_by_year.linkTitle')"
                         ><i class="bi bi-pie-chart"></i></router-link>
                       </td>
-                      <td class="td-gross text-end font-monospace">{{ fmtMoney2(row.gross) }}</td>
-                      <td class="td-after-wht text-end font-monospace">{{ fmtMoney2(row.afterWithholding) }}</td>
-                      <td class="td-net text-end font-monospace">{{ fmtMoney2(row.net) }}</td>
+                      <td class="td-gross text-end num-tabular">{{ fmtMoney2(row.gross) }}</td>
+                      <td class="td-after-wht text-end num-tabular">{{ fmtMoney2(row.afterWithholding) }}</td>
+                      <td class="td-net text-end num-tabular">{{ fmtMoney2(row.net) }}</td>
                     </tr>
                   </tbody>
                 </table>
