@@ -833,7 +833,9 @@
         "tableTitle": "Table · Dividends per Month",
         "filterMonths": "Months",
         "resetFilter": "Reset filter",
-        "multiSelect": "Multi-select"
+        "multiSelect": "Multi-select",
+        "popoverDetailLink": "Monthly detail",
+        "popoverShareLink": "Shares"
       },
       "dividends_by_year": {
         "title": "Dividends per Year",

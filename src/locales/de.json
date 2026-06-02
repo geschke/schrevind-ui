@@ -833,7 +833,9 @@
         "tableTitle": "Tabelle · Dividenden pro Monat",
         "filterMonths": "Monate",
         "resetFilter": "Filter zurücksetzen",
-        "multiSelect": "Mehrfachauswahl"
+        "multiSelect": "Mehrfachauswahl",
+        "popoverDetailLink": "Monatsdetail",
+        "popoverShareLink": "Anteile"
       },
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",
@@ -1342,7 +1344,7 @@
       "errorTitle": "Fehler"
     }
   },
-    "auth": {
+  "auth": {
     "login": {
       "title": "Jetzt einloggen",
       "emailLabel": "E-Mail-Adresse",

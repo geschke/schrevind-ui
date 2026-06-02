@@ -403,6 +403,7 @@ a,
   --bs-table-striped-color: var(--bs-body-color);
   --bs-table-active-color:  var(--bs-body-color);
   --bs-table-hover-color:   var(--bs-body-color);
+  --bs-table-hover-bg:      var(--bs-tertiary-bg);
 }
 
 /* Pagination — Bootstrap hardcodiert #0d6efd, muss explizit überschrieben werden */

@@ -204,34 +204,39 @@
 
           <!-- Table: rows = years, columns = months + avg -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between">
               <span class="fw-medium">
                 <i class="bi bi-table me-2 text-primary"></i>
                 {{ t('analyses.charts.dividends_by_year_month.tableTitle') }}
               </span>
+              <span v-if="currency" class="text-muted small">{{ currency }}</span>
             </div>
             <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="table table-hover mb-0 month-table">
                   <thead>
                     <tr>
-                      <th>{{ t('analyses.common.year') }}</th>
+                      <th class="year-col">{{ t('analyses.common.year') }}</th>
                       <th v-for="m in selectedMonths" :key="m" class="text-end">{{ monthName(m) }}</th>
                       <th class="text-end th-avg">Ø</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="year in filteredYears" :key="year">
-                      <td>
+                      <td class="year-col">
                         <span class="year-dot" :style="{ background: yearColor(year) }"></span>
                         <strong>{{ year }}</strong>
                       </td>
-                      <td v-for="m in selectedMonths" :key="m" class="text-end font-monospace">
-                        <router-link :to="{ name: 'analysismonthsecurity', query: { year, month: Number(m) } }">
-                          {{ tableCell(year, m) }}
-                        </router-link>
+                      <td v-for="m in selectedMonths" :key="m" class="text-end cell-compact">
+                        <span
+                          v-if="tableRaw(year, m) !== null"
+                          class="cell-value"
+                          :class="{ 'cell-active': activePopover?.year === year && activePopover?.month === m }"
+                          @click="openCellPopover($event, year, m)"
+                        >{{ tableCompact(year, m) }}</span>
+                        <span v-else class="text-muted">–</span>
                       </td>
-                      <td class="text-end font-monospace th-avg">{{ tableAvg(year) }}</td>
+                      <td class="text-end cell-compact th-avg">{{ tableAvg(year) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -240,6 +245,32 @@
           </div>
         </template>
       </div>
+
+      <Teleport to="body">
+        <template v-if="activePopover">
+          <div class="cell-popover-backdrop" @click="closePopover"></div>
+          <div class="cell-popover-card" :style="popoverStyle">
+            <div class="cell-popover-header">
+              {{ activePopover.year }} · {{ monthName(activePopover.month) }}
+            </div>
+            <div class="cell-popover-body">
+              <div class="cell-popover-value">{{ tableExact(activePopover.year, activePopover.month) }}</div>
+              <div class="cell-popover-links mt-2">
+                <router-link
+                  class="cell-popover-link"
+                  :to="{ name: 'analysismonthsecurity', query: { year: activePopover.year, month: Number(activePopover.month) } }"
+                  @click="closePopover"
+                >{{ t('analyses.charts.dividends_by_year_month.popoverDetailLink') }}</router-link>
+                <router-link
+                  class="cell-popover-link"
+                  :to="{ name: 'analysismonthshare', query: { year: activePopover.year, month: activePopover.month } }"
+                  @click="closePopover"
+                >{{ t('analyses.charts.dividends_by_year_month.popoverShareLink') }}</router-link>
+              </div>
+            </div>
+          </div>
+        </template>
+      </Teleport>
 
       <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
     </template>
@@ -422,6 +453,27 @@ function resetMonthFilter() {
 // --- Value toggle ---
 const activeValue = ref<'gross' | 'after_withholding' | 'net'>('gross')
 
+// --- Cell popover ---
+const activePopover = ref<{ year: string; month: string; x: number; y: number } | null>(null)
+
+const popoverStyle = computed(() => {
+  if (!activePopover.value) return {}
+  return { top: activePopover.value.y + 6 + 'px', left: activePopover.value.x + 'px' }
+})
+
+function openCellPopover(event: MouseEvent, year: string, month: string) {
+  if (activePopover.value?.year === year && activePopover.value?.month === month) {
+    activePopover.value = null
+    return
+  }
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  activePopover.value = { year, month, x: rect.left + rect.width / 2, y: rect.bottom }
+}
+
+function closePopover() {
+  activePopover.value = null
+}
+
 // --- Filtered rows ---
 const filteredRows = computed(() => {
   const data = rawData.value
@@ -466,16 +518,25 @@ function monthName(m: string): string {
 }
 
 // --- Table helpers ---
-function tableCell(year: string, month: string): string {
+function tableRaw(year: string, month: string): number | null {
   const row = filteredRows.value.find((r) => r.year === year && r.month === month)
-  if (!row) return '–'
-  return fmtMoney2(row[activeValue.value])
+  return row ? row[activeValue.value] : null
+}
+
+function tableCompact(year: string, month: string): string {
+  const v = tableRaw(year, month)
+  return v !== null ? fmtShort(v) : '–'
+}
+
+function tableExact(year: string, month: string): string {
+  const v = tableRaw(year, month)
+  return v !== null ? fmtMoney2(v) : '–'
 }
 
 function tableAvg(year: string): string {
   const rows = filteredRows.value.filter((r) => r.year === year)
   if (rows.length === 0) return '–'
-  return fmtMoney2(rows.reduce((s, r) => s + r[activeValue.value], 0) / rows.length)
+  return fmtShort(rows.reduce((s, r) => s + r[activeValue.value], 0) / rows.length)
 }
 
 // --- Chart option ---
@@ -643,6 +704,61 @@ onMounted(() => {
 })
 </script>
 
+<style>
+.cell-popover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1049;
+}
+
+.cell-popover-card {
+  position: fixed;
+  z-index: 1050;
+  transform: translateX(-50%);
+  min-width: 190px;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.cell-popover-header {
+  padding: 0.4rem 0.75rem;
+  background: var(--bs-tertiary-bg);
+  border-bottom: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem 0.5rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+}
+
+.cell-popover-body {
+  padding: 0.5rem 0.75rem;
+}
+
+.cell-popover-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-popover-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cell-popover-link {
+  font-size: 0.8rem;
+  text-decoration: none;
+  color: var(--bs-secondary-color);
+}
+
+.cell-popover-link:hover {
+  color: var(--bs-body-color);
+}
+</style>
+
 <style scoped>
 .filter-label {
   font-size: 0.7rem;
@@ -677,5 +793,48 @@ onMounted(() => {
 
 .filter-btn {
   width: 2.25rem;
+}
+
+/* Compact table cells */
+.month-table th,
+.month-table td {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.cell-compact {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cell-value {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.cell-value:hover {
+  background-color: rgba(var(--bs-emphasis-color-rgb), 0.07);
+  color: var(--bs-primary);
+}
+
+.cell-value.cell-active {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+  color: var(--bs-primary);
+}
+
+/* Sticky year column */
+.month-table .year-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: var(--bs-body-bg);
+  white-space: nowrap;
+}
+
+.month-table tbody tr:hover .year-col {
+  background-color: var(--bs-table-hover-bg, rgba(0, 0, 0, 0.075));
 }
 </style>
