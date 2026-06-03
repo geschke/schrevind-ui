@@ -213,7 +213,18 @@
                     <tr>
                       <th class="year-col">{{ t('analyses.common.year') }}</th>
                       <th v-for="m in selectedMonths" :key="m" class="text-end">{{ monthName(m) }}</th>
-                      <th class="text-end th-avg">Ø</th>
+                      <th class="text-end th-avg">
+                        <span class="d-inline-flex align-items-center justify-content-end gap-1 w-100">
+                          Ø
+                          <button
+                            type="button"
+                            class="btn btn-link p-0 lh-1 avg-mode-btn"
+                            :class="avgMode === 'elapsed' ? 'text-primary' : 'text-body-tertiary'"
+                            @click="avgMode = avgMode === 'data' ? 'elapsed' : 'data'"
+                            :title="avgMode === 'elapsed' ? t('analyses.charts.dividends_by_year_month.avgToggleElapsed') : t('analyses.charts.dividends_by_year_month.avgToggleData')"
+                          ><i class="bi bi-calendar3"></i></button>
+                        </span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -538,10 +549,26 @@ function tableExact(year: string, month: string): string {
   return v !== null ? fmtMoney2(v) : '–'
 }
 
+const avgMode = ref<'data' | 'elapsed'>('data')
+
 function tableAvg(year: string): string {
   const rows = filteredRows.value.filter((r) => r.year === year)
   if (rows.length === 0) return '–'
-  return fmtShort(rows.reduce((s, r) => s + r[activeValue.value], 0) / rows.length)
+  const sum = rows.reduce((s, r) => s + r[activeValue.value], 0)
+  let divisor: number
+  if (avgMode.value === 'elapsed') {
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1
+    if (Number(year) === now.getFullYear()) {
+      divisor = selectedMonths.value.filter((m) => Number(m) <= currentMonth).length
+    } else {
+      divisor = selectedMonths.value.length
+    }
+    if (divisor === 0) divisor = rows.length
+  } else {
+    divisor = rows.length
+  }
+  return fmtShort(sum / divisor)
 }
 
 // --- Chart option ---
@@ -711,6 +738,11 @@ onMounted(() => {
 .th-avg {
   background: color-mix(in oklab, var(--bs-secondary-bg), transparent 40%);
   font-style: italic;
+}
+
+.avg-mode-btn {
+  font-size: 0.65rem;
+  line-height: 1;
 }
 
 .filter-btn {

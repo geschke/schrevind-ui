@@ -835,7 +835,9 @@
         "resetFilter": "Reset filter",
         "multiSelect": "Multi-select",
         "popoverDetailLink": "Monthly detail",
-        "popoverShareLink": "Shares"
+        "popoverShareLink": "Shares",
+        "avgToggleData": "Avg payment months — click for avg calendar months",
+        "avgToggleElapsed": "Avg calendar months to date — click for avg payment months"
       },
       "dividends_by_year": {
         "title": "Dividends per Year",

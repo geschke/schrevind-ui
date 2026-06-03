@@ -835,7 +835,9 @@
         "resetFilter": "Filter zurücksetzen",
         "multiSelect": "Mehrfachauswahl",
         "popoverDetailLink": "Monatsdetail",
-        "popoverShareLink": "Anteile"
+        "popoverShareLink": "Anteile",
+        "avgToggleData": "Ø Zahlungsmonate — klicken für Ø Kalendermonate",
+        "avgToggleElapsed": "Ø Kalendermonate bis heute — klicken für Ø Zahlungsmonate"
       },
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",
