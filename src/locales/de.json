@@ -837,7 +837,10 @@
         "popoverDetailLink": "Monatsdetail",
         "popoverShareLink": "Anteile",
         "avgToggleData": "Ø Zahlungsmonate — klicken für Ø Kalendermonate",
-        "avgToggleElapsed": "Ø Kalendermonate bis heute — klicken für Ø Zahlungsmonate"
+        "avgToggleElapsed": "Ø Kalendermonate bis heute — klicken für Ø Zahlungsmonate",
+        "avgLabelData": "Ø Zahlungsmonate",
+        "avgLabelElapsed": "Ø Kalendermonate",
+        "avgMonths": "Monate"
       },
       "dividends_by_year": {
         "title": "Dividenden pro Jahr",

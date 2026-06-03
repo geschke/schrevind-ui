@@ -242,7 +242,13 @@
                         >{{ tableCompact(year, m) }}</span>
                         <span v-else class="text-muted">–</span>
                       </td>
-                      <td class="text-end cell-compact th-avg">{{ tableAvg(year) }}</td>
+                      <td class="text-end cell-compact th-avg">
+                        <span
+                          class="cell-value"
+                          :class="{ 'cell-active': activeCellKey === `${year}-avg` }"
+                          @click="openAvgPopover($event, year)"
+                        >{{ tableAvg(year) }}</span>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -551,12 +557,13 @@ function tableExact(year: string, month: string): string {
 
 const avgMode = ref<'data' | 'elapsed'>('data')
 
-function tableAvg(year: string): string {
+function calcAvgData(year: string, mode?: 'data' | 'elapsed'): { value: number; divisor: number } | null {
   const rows = filteredRows.value.filter((r) => r.year === year)
-  if (rows.length === 0) return '–'
+  if (rows.length === 0) return null
   const sum = rows.reduce((s, r) => s + r[activeValue.value], 0)
+  const effectiveMode = mode ?? avgMode.value
   let divisor: number
-  if (avgMode.value === 'elapsed') {
+  if (effectiveMode === 'elapsed') {
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     if (Number(year) === now.getFullYear()) {
@@ -568,7 +575,69 @@ function tableAvg(year: string): string {
   } else {
     divisor = rows.length
   }
-  return fmtShort(sum / divisor)
+  return { value: sum / divisor, divisor }
+}
+
+function tableAvg(year: string): string {
+  const data = calcAvgData(year)
+  return data ? fmtShort(data.value) : '–'
+}
+
+function openAvgPopover(event: MouseEvent, year: string) {
+  event.stopPropagation()
+  const el = event.currentTarget as HTMLElement
+  if (activePopoverTriggerEl.value === el) {
+    closePopover()
+    return
+  }
+  closePopover()
+  const dataResult    = calcAvgData(year, 'data')
+  const elapsedResult = calcAvgData(year, 'elapsed')
+  if (!dataResult) return
+
+  const labelData    = t('analyses.charts.dividends_by_year_month.avgLabelData')
+  const labelElapsed = t('analyses.charts.dividends_by_year_month.avgLabelElapsed')
+  const months       = t('analyses.charts.dividends_by_year_month.avgMonths')
+  const isCurrentYear = Number(year) === new Date().getFullYear()
+  const showBoth = isCurrentYear && elapsedResult !== null && dataResult.divisor !== elapsedResult.divisor
+
+  let content: string
+  if (showBoth && elapsedResult) {
+    const activeData    = avgMode.value === 'data' ? dataResult    : elapsedResult
+    const inactiveData  = avgMode.value === 'data' ? elapsedResult : dataResult
+    const activeLabel   = avgMode.value === 'data' ? labelData     : labelElapsed
+    const inactiveLabel = avgMode.value === 'data' ? labelElapsed  : labelData
+    content = `
+      <div class="d-flex flex-column gap-2">
+        <div>
+          <div class="text-secondary small">${activeLabel} (÷ ${activeData.divisor} ${months})</div>
+          <div class="fw-semibold num-tabular">${fmtMoney2(activeData.value)}</div>
+        </div>
+        <div>
+          <div class="text-secondary small">${inactiveLabel} (÷ ${inactiveData.divisor} ${months})</div>
+          <div class="num-tabular">${fmtMoney2(inactiveData.value)}</div>
+        </div>
+      </div>`
+  } else {
+    const single = avgMode.value === 'elapsed' && elapsedResult ? elapsedResult : dataResult
+    content = `<div class="fw-semibold num-tabular mb-1">${fmtMoney2(single.value)}</div>
+      <div class="text-secondary small">÷ ${single.divisor} ${months}</div>`
+  }
+
+  const title = showBoth ? year : `${year} · ${avgMode.value === 'elapsed' ? labelElapsed : labelData}`
+  const popover = new BSPopoverClass(el, {
+    html: true,
+    title,
+    content,
+    trigger: 'manual',
+    placement: 'auto',
+    container: 'body',
+    customClass: 'popover-analytics',
+  })
+  popover.show()
+  activePopoverInstance.value = popover
+  activePopoverTriggerEl.value = el
+  activeCellKey.value = `${year}-avg`
 }
 
 // --- Chart option ---
