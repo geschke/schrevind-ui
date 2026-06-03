@@ -700,3 +700,12 @@ main a:not(.btn):not(.nav-link):not(.dropdown-item):not(.badge):hover {
 .num-tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* Bootstrap Custom Popover — Analyse-Zellen */
+.popover-analytics {
+  --bs-popover-max-width: 230px;
+  --bs-popover-border-color:  var(--bs-primary-border-subtle);
+  --bs-popover-header-bg:     var(--bs-primary-bg-subtle);
+  --bs-popover-header-color:  var(--bs-primary-text-emphasis);
+  --bs-popover-arrow-border:  var(--bs-primary-border-subtle);
+}

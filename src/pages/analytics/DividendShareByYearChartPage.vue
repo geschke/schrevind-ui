@@ -12,9 +12,18 @@
             <span v-if="currency" class="badge rounded-pill text-bg-light border">
               <i class="bi bi-cash-coin me-1"></i>{{ t('analyses.charts.common.baseCurrency') }}: <strong>{{ currency }}</strong>
             </span>
-            <button class="btn btn-sm btn-outline-secondary" @click="exportPng" :disabled="sortedRows.length === 0">
-              <i class="bi bi-image me-1"></i>PNG
-            </button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" type="button" :disabled="sortedRows.length === 0">
+                <i class="bi bi-download me-1"></i>{{ t('analyses.charts.common.export') }}
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="#" @click.prevent="exportPng">
+                    <i class="bi bi-image me-2"></i>PNG
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 

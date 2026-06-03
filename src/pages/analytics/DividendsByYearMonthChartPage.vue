@@ -22,11 +22,6 @@
                     <i class="bi bi-image me-2"></i>PNG
                   </a>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="#" @click.prevent="exportCsv">
-                    <i class="bi bi-filetype-csv me-2"></i>CSV
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -231,7 +226,7 @@
                         <span
                           v-if="tableRaw(year, m) !== null"
                           class="cell-value"
-                          :class="{ 'cell-active': activePopover?.year === year && activePopover?.month === m }"
+                          :class="{ 'cell-active': activeCellKey === `${year}-${m}` }"
                           @click="openCellPopover($event, year, m)"
                         >{{ tableCompact(year, m) }}</span>
                         <span v-else class="text-muted">–</span>
@@ -246,33 +241,7 @@
         </template>
       </div>
 
-      <Teleport to="body">
-        <template v-if="activePopover">
-          <div class="cell-popover-backdrop" @click="closePopover"></div>
-          <div class="cell-popover-card" :style="popoverStyle">
-            <div class="cell-popover-header">
-              {{ activePopover.year }} · {{ monthName(activePopover.month) }}
-            </div>
-            <div class="cell-popover-body">
-              <div class="cell-popover-value">{{ tableExact(activePopover.year, activePopover.month) }}</div>
-              <div class="cell-popover-links mt-2">
-                <router-link
-                  class="cell-popover-link"
-                  :to="{ name: 'analysismonthsecurity', query: { year: activePopover.year, month: Number(activePopover.month) } }"
-                  @click="closePopover"
-                >{{ t('analyses.charts.dividends_by_year_month.popoverDetailLink') }}</router-link>
-                <router-link
-                  class="cell-popover-link"
-                  :to="{ name: 'analysismonthshare', query: { year: activePopover.year, month: activePopover.month } }"
-                  @click="closePopover"
-                >{{ t('analyses.charts.dividends_by_year_month.popoverShareLink') }}</router-link>
-              </div>
-            </div>
-          </div>
-        </template>
-      </Teleport>
-
-      <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
+<GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
     </template>
   </TheMainLayout>
 </template>
@@ -298,12 +267,15 @@ import { useDepotsStore } from '@/stores/depots'
 import { GToast, GToastDanger, GToastWarning } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import * as bootstrap from 'bootstrap'
 import { useSettingsStore } from '@/stores/settings'
 
 const ALL_MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 const { t, locale } = useI18n()
+const router = useRouter()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
 const storeSettings = useSettingsStore()
@@ -337,10 +309,17 @@ function handleDocumentClick(e: MouseEvent) {
   if (depotDropdownEl.value && !depotDropdownEl.value.contains(e.target as Node)) {
     depotDropdownOpen.value = false
   }
+  if (activePopoverInstance.value) {
+    const popoverEl = document.querySelector('.popover.show')
+    if (!popoverEl?.contains(e.target as Node)) {
+      closePopover()
+    }
+  }
 }
 
 onUnmounted(() => {
   document.removeEventListener('click', handleDocumentClick)
+  closePopover()
 })
 
 const depotFilterLabel = computed(() => {
@@ -454,25 +433,51 @@ function resetMonthFilter() {
 const activeValue = ref<'gross' | 'after_withholding' | 'net'>('gross')
 
 // --- Cell popover ---
-const activePopover = ref<{ year: string; month: string; x: number; y: number } | null>(null)
+// Bootstrap 5.3.8 ships no .d.ts files; cast once here, use typed interface everywhere else
+type BSPopover = { show(): void; hide(): void; dispose(): void }
+const BSPopoverClass = (bootstrap as unknown as { Popover: new (el: Element, opts?: object) => BSPopover }).Popover
 
-const popoverStyle = computed(() => {
-  if (!activePopover.value) return {}
-  return { top: activePopover.value.y + 6 + 'px', left: activePopover.value.x + 'px' }
-})
-
-function openCellPopover(event: MouseEvent, year: string, month: string) {
-  if (activePopover.value?.year === year && activePopover.value?.month === month) {
-    activePopover.value = null
-    return
-  }
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  activePopover.value = { year, month, x: rect.left + rect.width / 2, y: rect.bottom }
-}
+const activePopoverInstance = ref<BSPopover | null>(null)
+const activePopoverTriggerEl = ref<HTMLElement | null>(null)
 
 function closePopover() {
-  activePopover.value = null
+  activePopoverInstance.value?.hide()
+  activePopoverInstance.value?.dispose()
+  activePopoverInstance.value = null
+  activePopoverTriggerEl.value = null
+  activeCellKey.value = null
 }
+
+function openCellPopover(event: MouseEvent, year: string, month: string) {
+  event.stopPropagation()
+  const el = event.currentTarget as HTMLElement
+  if (activePopoverTriggerEl.value === el) {
+    closePopover()
+    return
+  }
+  closePopover()
+  const detailHref = router.resolve({ name: 'analysismonthsecurity', query: { year, month: Number(month) } }).href
+  const shareHref = router.resolve({ name: 'analysismonthshare', query: { year, month } }).href
+  const popover = new BSPopoverClass(el, {
+    html: true,
+    title: `${year} · ${monthName(month)}`,
+    content: `<div class="fw-semibold num-tabular mb-1">${tableExact(year, month)}</div>
+      <div class="d-flex flex-column gap-1 mt-1">
+        <a href="${detailHref}" class="text-secondary text-decoration-none small">${t('analyses.charts.dividends_by_year_month.popoverDetailLink')}</a>
+        <a href="${shareHref}" class="text-secondary text-decoration-none small">${t('analyses.charts.dividends_by_year_month.popoverShareLink')}</a>
+      </div>`,
+    trigger: 'manual',
+    placement: 'auto',
+    container: 'body',
+    customClass: 'popover-analytics',
+  })
+  popover.show()
+  activePopoverInstance.value = popover
+  activePopoverTriggerEl.value = el
+  activeCellKey.value = `${year}-${month}`
+}
+
+const activeCellKey = ref<string | null>(null)
 
 // --- Filtered rows ---
 const filteredRows = computed(() => {
@@ -634,35 +639,6 @@ function exportPng() {
   a.click()
 }
 
-function exportCsv() {
-  const years = filteredYears.value
-  const months = selectedMonths.value
-  const sep = ';'
-  const header = [t('analyses.common.year'), ...months.map((m) => monthName(m)), 'Ø'].join(sep)
-  const lines = [
-    header,
-    ...years.map((year) => {
-      const cells = months.map((m) => {
-        const row = filteredRows.value.find((r) => r.year === year && r.month === m)
-        return row ? row[activeValue.value].toFixed(2).replace('.', ',') : ''
-      })
-      const yearRows = filteredRows.value.filter((r) => r.year === year)
-      const avg =
-        yearRows.length > 0
-          ? (yearRows.reduce((s, r) => s + r[activeValue.value], 0) / yearRows.length).toFixed(2).replace('.', ',')
-          : ''
-      return [year, ...cells, avg].join(sep)
-    }),
-  ]
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `dividenden_monate_${yearFrom.value}-${yearTo.value}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
 // --- Fetch ---
 function reloadChartData() {
   loading.value = true
@@ -704,60 +680,6 @@ onMounted(() => {
 })
 </script>
 
-<style>
-.cell-popover-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1049;
-}
-
-.cell-popover-card {
-  position: fixed;
-  z-index: 1050;
-  transform: translateX(-50%);
-  min-width: 190px;
-  background: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.cell-popover-header {
-  padding: 0.4rem 0.75rem;
-  background: var(--bs-tertiary-bg);
-  border-bottom: 1px solid var(--bs-border-color);
-  border-radius: 0.5rem 0.5rem 0 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--bs-secondary-color);
-}
-
-.cell-popover-body {
-  padding: 0.5rem 0.75rem;
-}
-
-.cell-popover-value {
-  font-size: 1rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.cell-popover-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.cell-popover-link {
-  font-size: 0.8rem;
-  text-decoration: none;
-  color: var(--bs-secondary-color);
-}
-
-.cell-popover-link:hover {
-  color: var(--bs-body-color);
-}
-</style>
 
 <style scoped>
 .filter-label {

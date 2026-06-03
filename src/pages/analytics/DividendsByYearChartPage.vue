@@ -22,11 +22,6 @@
                     <i class="bi bi-image me-2"></i>PNG
                   </a>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="#" @click.prevent="exportCsv">
-                    <i class="bi bi-filetype-csv me-2"></i>CSV
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -628,35 +623,6 @@ function exportPng() {
   a.href = url
   a.download = `dividenden_pro_jahr_${yearFrom.value}-${yearTo.value}.png`
   a.click()
-}
-
-function exportCsv() {
-  const rows = filteredRows.value
-  const sep = ';'
-  const header = [
-    t('analyses.common.year'),
-    t('analyses.dividends_by_year.columns.gross'),
-    t('analyses.dividends_by_year.columns.after_withholding'),
-    t('analyses.dividends_by_year.columns.net'),
-  ].join(sep)
-  const lines = [
-    header,
-    ...rows.map((r) =>
-      [
-        r.year,
-        r.gross.toFixed(2).replace('.', ','),
-        r.afterWithholding.toFixed(2).replace('.', ','),
-        r.net.toFixed(2).replace('.', ','),
-      ].join(sep),
-    ),
-  ]
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `dividenden_pro_jahr_${yearFrom.value}-${yearTo.value}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
 }
 
 // --- Fetch ---
