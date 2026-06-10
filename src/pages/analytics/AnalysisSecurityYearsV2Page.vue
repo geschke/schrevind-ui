@@ -42,7 +42,7 @@
 
                 <div
                   v-if="securityDropdownOpen"
-                  class="position-absolute bg-white border rounded shadow-sm p-2 mt-1"
+                  class="position-absolute bg-body border rounded shadow-sm p-2 mt-1"
                   style="z-index: 1050; min-width: 420px; max-height: 280px; overflow-y: auto;"
                   @click.stop
                 >

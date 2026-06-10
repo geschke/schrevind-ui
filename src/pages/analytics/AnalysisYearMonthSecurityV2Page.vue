@@ -26,7 +26,7 @@
                   </div>
                   <div
                     v-if="yearDropdownOpen"
-                    class="position-absolute bg-white border rounded shadow-sm p-2 mt-1"
+                    class="position-absolute bg-body border rounded shadow-sm p-2 mt-1"
                     style="z-index: 1050; min-width: 100px;"
                     @click.stop
                   >
@@ -261,7 +261,10 @@ function periodLabel(year: string, month: string): string {
 }
 
 function setDefaultPeriods(range: TimeRange) {
-  selectedYears.value = [range.current_year];
+  const defaultYear = range.last_year > 0 && range.current_year > range.last_year
+    ? range.last_year
+    : range.current_year;
+  selectedYears.value = [defaultYear];
   selectedMonths.value = [range.current_month];
   multiSelectMode.value = false;
 }

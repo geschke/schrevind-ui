@@ -190,18 +190,20 @@ function handleFocus(event: FocusEvent) {
 }
 
 function handleInput(event: Event) {
-  callAttrHandler("onInput", event);
+  // Only update the display value while typing — no emit, no vee-validate trigger.
+  // Value is committed (emitted) on blur via confirmCurrentValue or on dropdown selection.
   const target = event.target as HTMLInputElement | null;
-  const normalized = normalizeCurrencyCode(target?.value ?? "");
-  updateValue(normalized);
+  inputValue.value = normalizeCurrencyCode(target?.value ?? "");
   openSuggestions(true);
 }
 
 function handleBlur(event: FocusEvent) {
-  callAttrHandler("onBlur", event);
+  // Commit the typed value first, then trigger vee-validate's blur handler so it
+  // validates the final committed value — not the stale pre-fill.
   window.setTimeout(() => {
     closeSuggestions();
     confirmCurrentValue();
+    callAttrHandler("onBlur", event);
   }, 120);
 }
 
