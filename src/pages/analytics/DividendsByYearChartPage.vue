@@ -93,17 +93,17 @@
               <div class="ms-auto">
                 <div class="filter-label">{{ t('analyses.charts.common.values') }}</div>
                 <div class="btn-group" role="group">
-                  <input type="checkbox" class="btn-check" id="v-gross" v-model="activeValues" value="gross" />
+                  <input type="checkbox" class="btn-check" id="v-gross" v-model="activeValues" value="gross" :disabled="activeValues.length === 1 && activeValues.includes('gross')" />
                   <label class="btn btn-sm btn-value btn-value-gross" for="v-gross">
                     <span class="legend-dot" style="background: var(--c-gross)"></span>
                     {{ t('analyses.dividends_by_year.columns.gross') }}
                   </label>
-                  <input type="checkbox" class="btn-check" id="v-after-wht" v-model="activeValues" value="after_withholding" />
+                  <input type="checkbox" class="btn-check" id="v-after-wht" v-model="activeValues" value="after_withholding" :disabled="activeValues.length === 1 && activeValues.includes('after_withholding')" />
                   <label class="btn btn-sm btn-value btn-value-after-wht" for="v-after-wht">
                     <span class="legend-dot" style="background: var(--c-after-wht)"></span>
                     {{ t('analyses.dividends_by_year.columns.after_withholding') }}
                   </label>
-                  <input type="checkbox" class="btn-check" id="v-net" v-model="activeValues" value="net" />
+                  <input type="checkbox" class="btn-check" id="v-net" v-model="activeValues" value="net" :disabled="activeValues.length === 1 && activeValues.includes('net')" />
                   <label class="btn btn-sm btn-value btn-value-net" for="v-net">
                     <span class="legend-dot" style="background: var(--c-net)"></span>
                     {{ t('analyses.dividends_by_year.columns.net') }}
@@ -510,7 +510,7 @@ const chartOption = computed<ECOption>(() => {
       label: {
         show: showLabels.value,
         position: 'top',
-        formatter: (p: { value: number }) => fmtShort(p.value),
+        formatter: (p: { value: unknown }) => fmtShort(p.value as number),
         fontSize: 11,
         color: chartColors.value.label,
       },
