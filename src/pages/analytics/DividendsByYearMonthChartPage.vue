@@ -213,6 +213,7 @@
                     <tr>
                       <th class="year-col">{{ t('analyses.common.year') }}</th>
                       <th v-for="m in selectedMonths" :key="m" class="text-end">{{ monthName(m) }}</th>
+                      <th class="text-end th-sum">Σ</th>
                       <th class="text-end th-avg">
                         <span class="d-inline-flex align-items-center justify-content-end gap-1 w-100">
                           Ø
@@ -241,6 +242,13 @@
                           @click="openCellPopover($event, year, m)"
                         >{{ tableCompact(year, m) }}</span>
                         <span v-else class="text-muted">–</span>
+                      </td>
+                      <td class="text-end cell-compact th-sum">
+                        <span
+                          class="cell-value"
+                          :class="{ 'cell-active': activeCellKey === `${year}-sum` }"
+                          @click="openSumPopover($event, year)"
+                        >{{ tableSum(year) }}</span>
                       </td>
                       <td class="text-end cell-compact th-avg">
                         <span
@@ -583,6 +591,41 @@ function tableAvg(year: string): string {
   return data ? fmtShort(data.value) : '–'
 }
 
+function tableSum(year: string): string {
+  const rows = filteredRows.value.filter((r) => r.year === year)
+  if (rows.length === 0) return '–'
+  const sum = rows.reduce((s, r) => s + r[activeValue.value], 0)
+  return fmtShort(sum)
+}
+
+function openSumPopover(event: MouseEvent, year: string) {
+  event.stopPropagation()
+  const el = event.currentTarget as HTMLElement
+  if (activePopoverTriggerEl.value === el) {
+    closePopover()
+    return
+  }
+  closePopover()
+  const rows = filteredRows.value.filter((r) => r.year === year)
+  if (rows.length === 0) return
+  const sum = rows.reduce((s, r) => s + r[activeValue.value], 0)
+  const months = t('analyses.charts.dividends_by_year_month.avgMonths')
+  const popover = new BSPopoverClass(el, {
+    html: true,
+    title: year,
+    content: `<div class="fw-semibold num-tabular mb-1">${fmtMoney2(sum)}</div>
+      <div class="text-secondary small">${rows.length} ${months}</div>`,
+    trigger: 'manual',
+    placement: 'auto',
+    container: 'body',
+    customClass: 'popover-analytics',
+  })
+  popover.show()
+  activePopoverInstance.value = popover
+  activePopoverTriggerEl.value = el
+  activeCellKey.value = `${year}-sum`
+}
+
 function openAvgPopover(event: MouseEvent, year: string) {
   event.stopPropagation()
   const el = event.currentTarget as HTMLElement
@@ -802,6 +845,11 @@ onMounted(() => {
   border-radius: 50%;
   margin-right: 6px;
   flex-shrink: 0;
+}
+
+.th-sum {
+  background: color-mix(in oklab, var(--bs-secondary-bg), transparent 60%);
+  font-weight: 600;
 }
 
 .th-avg {
