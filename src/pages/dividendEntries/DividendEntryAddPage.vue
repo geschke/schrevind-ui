@@ -653,9 +653,14 @@
                 <input v-model="newWithholdingTaxCountryName" type="text" class="form-control" />
               </div>
 
-              <div class="mb-0">
+              <div class="mb-3">
                 <label class="form-label">{{ t("withholdingTaxDefaults.common.percentDefault") }}</label>
                 <input v-model="newWithholdingTaxPercentDefault" type="text" class="form-control" />
+              </div>
+
+              <div class="mb-0">
+                <label class="form-label">{{ t("withholdingTaxDefaults.common.percentCreditDefault") }}</label>
+                <input v-model="newWithholdingTaxPercentCreditDefault" type="text" class="form-control" />
               </div>
 
               <div v-if="withholdingTaxCreateError !== ''" class="text-danger small mt-2">
@@ -790,6 +795,7 @@ const withholdingTaxCreateError = ref("");
 const newWithholdingTaxCountryCode = ref("");
 const newWithholdingTaxCountryName = ref("");
 const newWithholdingTaxPercentDefault = ref("");
+const newWithholdingTaxPercentCreditDefault = ref("");
 const withholdingTaxCreateCountryCodeRef = ref<HTMLInputElement | null>(null);
 const showDateWarningModal = ref(false);
 const dateWarnings = ref<string[]>([]);
@@ -1329,6 +1335,7 @@ async function confirmWithholdingCountryValue() {
   newWithholdingTaxCountryCode.value = countryCode;
   newWithholdingTaxCountryName.value = "";
   newWithholdingTaxPercentDefault.value = "";
+  newWithholdingTaxPercentCreditDefault.value = "";
   withholdingTaxCreateError.value = "";
   withholdingTaxCreateState.value = "idle";
     showWithholdingTaxCreateDialog.value = true;
@@ -1437,6 +1444,7 @@ function closeWithholdingTaxCreateDialog() {
   showWithholdingTaxCreateDialog.value = false;
   withholdingTaxCreateError.value = "";
   withholdingTaxCreateState.value = "idle";
+  newWithholdingTaxPercentCreditDefault.value = "";
 }
 
 async function confirmWithholdingTaxCreateDialog() {
@@ -1449,7 +1457,7 @@ async function confirmWithholdingTaxCreateDialog() {
       CountryCode: normalizeCountryCode(newWithholdingTaxCountryCode.value),
       CountryName: normalizeOptionalString(newWithholdingTaxCountryName.value).trim(),
       WithholdingTaxPercentDefault: normalizeOptionalString(newWithholdingTaxPercentDefault.value).trim(),
-      WithholdingTaxPercentCreditDefault: "",
+      WithholdingTaxPercentCreditDefault: normalizeOptionalString(newWithholdingTaxPercentCreditDefault.value).trim(),
     });
 
     setFieldValue("withholdingTaxCountryCode", normalizeCountryCode(newWithholdingTaxCountryCode.value));
