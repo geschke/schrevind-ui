@@ -50,7 +50,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function fetchDepots() {
     return axios
-      .get("/depots/list", { withCredentials: true })
+      .get("/depots/list", { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         depots.value = normalizeDepotItems(response.data);
         depotsLoaded.value = true;
@@ -64,7 +64,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function fetchDepotById(id: number | string): Promise<Depot> {
     return axios
-      .get(`/depots/${id}`, { withCredentials: true })
+      .get(`/depots/${id}`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const rawItem = response.data?.item ?? response.data?.depot ?? response.data;
         const depot = normalizeDepot(rawItem);
@@ -104,6 +104,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function updateDepot(payload: UpdateDepotPayload) {
     const body = {
+      ContextGroupID: getActiveGroupIDOrThrow(),
       Name: payload.Name,
       BrokerName: payload.BrokerName,
       AccountNumber: payload.AccountNumber,
@@ -122,7 +123,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function deleteDepot(payload: Pick<Depot, "ID">) {
     return axios
-      .post(`/depots/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .post(`/depots/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => fetchDepots())
       .catch((error: unknown) => {
         throw error;
@@ -131,7 +132,7 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function fetchAccess(depotId: number | string): Promise<DepotAccess[]> {
     return axios
-      .get(`/depots/${depotId}/access`, { withCredentials: true })
+      .get(`/depots/${depotId}/access`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const items = response.data?.items ?? [];
         return (Array.isArray(items) ? items : Object.values(items)) as DepotAccess[];
@@ -140,19 +141,19 @@ export const useDepotsStore = defineStore("depots", () => {
 
   async function addAccess(depotId: number | string, payload: AddDepotAccessPayload): Promise<void> {
     return axios
-      .post(`/depots/${depotId}/access/add`, payload, { withCredentials: true })
+      .post(`/depots/${depotId}/access/add`, { ContextGroupID: getActiveGroupIDOrThrow(), ...payload }, { withCredentials: true })
       .then(() => undefined);
   }
 
   async function changeAccess(depotId: number | string, payload: ChangeDepotAccessPayload): Promise<void> {
     return axios
-      .post(`/depots/${depotId}/access/change`, payload, { withCredentials: true })
+      .post(`/depots/${depotId}/access/change`, { ContextGroupID: getActiveGroupIDOrThrow(), ...payload }, { withCredentials: true })
       .then(() => undefined);
   }
 
   async function removeAccess(depotId: number | string, payload: RemoveDepotAccessPayload): Promise<void> {
     return axios
-      .post(`/depots/${depotId}/access/remove`, payload, { withCredentials: true })
+      .post(`/depots/${depotId}/access/remove`, { ContextGroupID: getActiveGroupIDOrThrow(), ...payload }, { withCredentials: true })
       .then(() => undefined);
   }
 

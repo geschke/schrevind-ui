@@ -29,7 +29,7 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function fetchGroups() {
     return await axios
-      .get("/groups/list", { withCredentials: true })
+      .get("/groups/list", { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const items = response.data?.items ?? {};
         const groupsDO: Group[] = Object.values(items).map((item) => ({
@@ -46,7 +46,7 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function addGroup(payload: CreateGroupPayload) {
     return await axios
-      .post("/groups/add", { Name: payload.Name }, { withCredentials: true })
+      .post("/groups/add", { ContextGroupID: getActiveGroupIDOrThrow(), Name: payload.Name }, { withCredentials: true })
       .then(() => {
         return fetchGroups();
       })
@@ -57,7 +57,7 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function updateGroup(payload: UpdateGroupPayload) {
     return await axios
-      .post(`/groups/update/${payload.ID}`, { Name: payload.Name }, { withCredentials: true })
+      .post(`/groups/update/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow(), Name: payload.Name }, { withCredentials: true })
       .then(() => {
         return;
       })
@@ -68,7 +68,7 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function deleteGroup(payload: Pick<Group, "ID">) {
     return await axios
-      .post(`/groups/delete/${payload.ID}`, undefined, { withCredentials: true })
+      .post(`/groups/delete/${payload.ID}`, { ContextGroupID: getActiveGroupIDOrThrow() }, { withCredentials: true })
       .then(() => {
         return fetchGroups();
       })
@@ -79,7 +79,7 @@ export const useGroupsStore = defineStore("groups", () => {
 
   async function fetchMembers(groupId: number | string): Promise<User[]> {
     return await axios
-      .get(`/groups/${groupId}/members`, { withCredentials: true })
+      .get(`/groups/${groupId}/members`, { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const items = response.data?.items ?? {};
         return Object.values(items).map((item) => ({ ...(item as User) }));

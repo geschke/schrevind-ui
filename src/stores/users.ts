@@ -42,7 +42,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function fetchUsers() {
     return await axios
-      .get("/users/list", { withCredentials: true })
+      .get("/users/list", { params: { context_group_id: getActiveGroupIDOrThrow() }, withCredentials: true })
       .then((response) => {
         const items = response.data?.items ?? {};
         const usersDO: User[] = Object.values(items).map((item) => normalizeUser(item));
@@ -120,7 +120,7 @@ export const useUsersStore = defineStore("users", () => {
   // Assigns a user to a group via the groups members/add endpoint.
   async function assignUserToGroup(userId: number, groupId: number) {
     return await axios
-      .post(`/groups/${groupId}/members/add`, { UserIDs: [userId] }, { withCredentials: true })
+      .post(`/groups/${groupId}/members/add`, { ContextGroupID: getActiveGroupIDOrThrow(), UserIDs: [userId] }, { withCredentials: true })
       .catch((error: any) => {
         throw error;
       });
