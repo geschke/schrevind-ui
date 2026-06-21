@@ -37,7 +37,13 @@ const route = useRoute();
 
 const activeGroupID = computed(() => storeUserAuth.activeGroupID);
 
-const activeMenuPath = computed(() => (props.menuPath != '' ? props.menuPath : route.path));
+const activeMenuPath = computed(() => {
+  // Own group's members page → highlight "Mitglieder" nav item
+  if (route.name === 'admingroupmembers' && String(route.params.id) === String(activeGroupID.value)) {
+    return `/admin/group/${activeGroupID.value}/members`;
+  }
+  return props.menuPath !== '' ? props.menuPath : route.path;
+});
 const menuPath = () => activeMenuPath.value;
 
 const sidebarMenu = computed<SidebarItem[]>(() => {
