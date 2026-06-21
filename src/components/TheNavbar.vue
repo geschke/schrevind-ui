@@ -19,6 +19,7 @@
 import TheNavbarItem from "@/components/TheNavbarItem.vue";
 import type { SidebarItem } from "@/types/navigation";
 import { usePermissions } from "@/composables/usePermissions";
+import { useUserAuthStore } from "@/stores/userauth";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
@@ -31,17 +32,22 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { canManageUsers } = usePermissions();
+const storeUserAuth = useUserAuthStore();
 const route = useRoute();
+
+const activeGroupID = computed(() => storeUserAuth.activeGroupID);
 
 const activeMenuPath = computed(() => (props.menuPath != '' ? props.menuPath : route.path));
 const menuPath = () => activeMenuPath.value;
 
 const sidebarMenu = computed<SidebarItem[]>(() => {
-  const adminItems: SidebarItem[] = canManageUsers.value
-    ? [
-        { title: "nav.items.users", type: "item", icon: "bi bi-people", url: "/admin/user" },
-        { title: "nav.items.groups", type: "item", icon: "bi bi-people-fill", url: "/admin/group" },
-      ]
+  const adminItems: SidebarItem[] = [
+    ...(storeUserAuth.isSystemContext ? [{ title: "nav.items.users", type: "item" as const, icon: "bi bi-people", url: "/admin/user" }] : []),
+    ...(canManageUsers.value ? [{ title: "nav.items.groups", type: "item" as const, icon: "bi bi-people-fill", url: "/admin/group" }] : []),
+  ];
+
+  const membersItems: SidebarItem[] = activeGroupID.value != null
+    ? [{ title: "nav.items.groupMembers", type: "item", icon: "bi bi-person-lines-fill", url: `/admin/group/${activeGroupID.value}/members` }]
     : [];
 
   const menu: SidebarItem[] = [
@@ -70,6 +76,7 @@ const sidebarMenu = computed<SidebarItem[]>(() => {
         { title: "nav.items.securities", type: "item", icon: "bi bi-graph-up-arrow", url: "/securities" },
         { title: "nav.items.withholdingTaxDefaults", type: "item", icon: "bi bi-percent", url: "/withholding-tax-defaults" },
         { title: "nav.items.currencies", type: "item", icon: "bi bi-currency-exchange", url: "/currencies" },
+        ...membersItems,
         ...adminItems,
       ],
     },

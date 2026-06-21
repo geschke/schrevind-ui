@@ -922,7 +922,8 @@
     "title": "Admin",
     "links": {
       "users": "Users",
-      "groups": "Groups"
+      "groups": "Groups",
+      "groupMembers": "Members"
     }
   },
   "totp": {
@@ -1178,6 +1179,7 @@
     "members": {
       "title": "Group members",
       "addButton": "Add members",
+      "addButtonCreate": "Create new user",
       "table": {
         "empty": "No members in this group.",
         "columns": {
@@ -1325,7 +1327,8 @@
       "withholdingTaxDefaults": "Withholding taxes",
       "currencies": "Currencies",
       "users": "Users",
-      "groups": "Groups"
+      "groups": "Groups",
+      "groupMembers": "Members"
     }
   },
   "landing": {

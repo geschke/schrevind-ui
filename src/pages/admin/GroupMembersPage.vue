@@ -56,8 +56,8 @@
         </template>
       </GTable>
 
-      <!-- Add members button (hidden while add section is open) -->
-      <div class="row mt-2" v-if="!addSectionVisible">
+      <!-- Add members button: system admins get user picker, group admins get create-user link -->
+      <div class="row mt-2" v-if="isSystemAdmin && !addSectionVisible">
         <div class="col-12">
           <button type="button" class="btn btn-primary" @click="openAddSection">
             {{ t("adminGroups.members.addButton") }}
@@ -65,7 +65,15 @@
         </div>
       </div>
 
-      <!-- Add members section (inline, shown on button click) -->
+      <div class="row mt-2" v-if="!isSystemAdmin && isGroupAdmin">
+        <div class="col-12">
+          <router-link type="button" class="btn btn-primary" :to="{ name: 'adminusernew' }">
+            {{ t("adminGroups.members.addButtonCreate") }}
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Add members section (inline, shown on button click — system admin only) -->
       <div v-if="addSectionVisible" class="mt-4">
         <h5>{{ t("adminGroups.members.addSection.title") }}</h5>
 
@@ -201,6 +209,7 @@ import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useGroupsStore } from "@/stores/groups";
 import { useUsersStore } from "@/stores/users";
 import { useUserAuthStore } from "@/stores/userauth";
+import { usePermissions } from "@/composables/usePermissions";
 import { getErrorCode } from "@/helper/errorCode";
 import type { User } from "@/types/users";
 import { GTable } from "goar-components";
@@ -216,16 +225,21 @@ const props = defineProps<{ id: string }>();
 
 // ── Current members table ──────────────────────────────────────────────────
 
-const memberHeaders = computed<GTableHeader[]>(() => [
-  { title: t("adminGroups.members.table.columns.id"), field: "ID" },
-  { title: t("adminGroups.members.table.columns.email"), field: "Email" },
-  {
-    title: t("adminGroups.members.table.columns.name"),
-    render: (item: User) => [item.FirstName, item.LastName].filter(Boolean).join(" ") || "-",
-  },
-  { title: t("adminGroups.members.table.columns.role"), field: "tmplMemberRole" },
-  { title: t("adminGroups.members.table.columns.actions"), field: "tmplMemberActions" },
-]);
+const memberHeaders = computed<GTableHeader[]>(() => {
+  const headers: GTableHeader[] = [
+    { title: t("adminGroups.members.table.columns.id"), field: "ID" },
+    { title: t("adminGroups.members.table.columns.email"), field: "Email" },
+    {
+      title: t("adminGroups.members.table.columns.name"),
+      render: (item: User) => [item.FirstName, item.LastName].filter(Boolean).join(" ") || "-",
+    },
+    { title: t("adminGroups.members.table.columns.role"), field: "tmplMemberRole" },
+  ];
+  if (isGroupAdmin.value) {
+    headers.push({ title: t("adminGroups.members.table.columns.actions"), field: "tmplMemberActions" });
+  }
+  return headers;
+});
 
 // ── Add-users table ────────────────────────────────────────────────────────
 
@@ -247,6 +261,8 @@ const addUsersHeaders = computed<GTableHeader[]>(() => [
 ]);
 
 // ── Store & state ──────────────────────────────────────────────────────────
+
+const { isSystemAdmin, isGroupAdmin } = usePermissions();
 
 const storeGroups = useGroupsStore();
 const storeUsers = useUsersStore();

@@ -212,7 +212,7 @@
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useDepotsStore } from "@/stores/depots";
-import { useUsersStore } from "@/stores/users";
+import { useGroupsStore } from "@/stores/groups";
 import { useUserAuthStore } from "@/stores/userauth";
 import { usePermissions } from "@/composables/usePermissions";
 import { getErrorCode } from "@/helper/errorCode";
@@ -231,7 +231,7 @@ const router = useRouter();
 const props = defineProps<{ id: string }>();
 
 const storeDepots = useDepotsStore();
-const storeUsers = useUsersStore();
+const storeGroups = useGroupsStore();
 const storeUserAuth = useUserAuthStore();
 const { canDeleteDepot } = usePermissions();
 const toast: any = ref(null);
@@ -334,14 +334,12 @@ function loadAccess() {
 }
 
 function loadUsers() {
-  if (storeUsers.usersLoaded) {
-    allUsers.value = storeUsers.getUsers;
-    return;
-  }
+  const groupId = storeUserAuth.activeGroupID;
+  if (groupId == null) return;
   loadingUsers.value = true;
-  storeUsers
-    .fetchUsers()
-    .then(() => { allUsers.value = storeUsers.getUsers; })
+  storeGroups
+    .fetchMembers(groupId)
+    .then((members) => { allUsers.value = members; })
     .catch(() => { /* users are optional for display */ })
     .finally(() => { loadingUsers.value = false; });
 }
