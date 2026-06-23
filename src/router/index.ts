@@ -276,6 +276,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/pages/admin/UserListPage.vue"),
     meta: {
       requiresAuth: true,
+      requiresSystemContext: true,
     },
   },
   {
@@ -295,6 +296,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/admin/user",
       requiresAuth: true,
+      requiresSystemContext: true,
     },
   },
   {
@@ -305,6 +307,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       menuPath: "/admin/user",
       requiresAuth: true,
+      requiresSystemContext: true,
     },
   },
   {

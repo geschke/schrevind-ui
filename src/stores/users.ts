@@ -67,7 +67,12 @@ export const useUsersStore = defineStore("users", () => {
     };
     return await axios
       .post("/users/add", body, { withCredentials: true })
-      .then(() => fetchUsers())
+      .then(() => {
+        const storeUserAuth = useUserAuthStore();
+        if (storeUserAuth.isSystemContext) {
+          return fetchUsers();
+        }
+      })
       .catch((error: any) => {
         throw error;
       });

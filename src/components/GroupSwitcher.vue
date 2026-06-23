@@ -69,6 +69,8 @@ function switchGroup(id: number) {
     .then(() => {
       if (route.meta.contextSensitive) {
         void router.push(String(route.meta.menuPath));
+      } else if (route.meta.requiresSystemContext && !storeUserAuth.isSystemContext) {
+        void router.push('/overview');
       }
     })
     .catch((error: unknown) => {

@@ -57,7 +57,7 @@
       </GTable>
 
       <!-- Add members button: system admins get user picker, group admins get create-user link -->
-      <div class="row mt-2" v-if="isSystemAdmin && !addSectionVisible">
+      <div class="row mt-2" v-if="isSystemContext && !addSectionVisible">
         <div class="col-12">
           <button type="button" class="btn btn-primary" @click="openAddSection">
             {{ t("adminGroups.members.addButton") }}
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="row mt-2" v-if="!isSystemAdmin && isGroupAdmin">
+      <div class="row mt-2" v-if="isGroupAdmin">
         <div class="col-12">
           <router-link type="button" class="btn btn-primary" :to="{ name: 'adminusernew' }">
             {{ t("adminGroups.members.addButtonCreate") }}
@@ -262,7 +262,8 @@ const addUsersHeaders = computed<GTableHeader[]>(() => [
 
 // ── Store & state ──────────────────────────────────────────────────────────
 
-const { isSystemAdmin, isGroupAdmin } = usePermissions();
+const { isGroupAdmin } = usePermissions();
+const isSystemContext = computed(() => storeUserAuth.isSystemContext);
 
 const storeGroups = useGroupsStore();
 const storeUsers = useUsersStore();
