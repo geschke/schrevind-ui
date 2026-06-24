@@ -2,7 +2,8 @@
   "common": {
     "loading": "Loading...",
     "today": "Today",
-    "rowsPerPage": "Rows per page"
+    "rowsPerPage": "Rows per page",
+    "backToOverview": "Back to overview"
   },
   "dividendEntries": {
     "common": {

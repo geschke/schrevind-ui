@@ -12,6 +12,7 @@ type AuthMeItem = {
   FirstName: string;
   LastName: string;
   Email: string;
+  Locale?: string;
   Settings?: { LastActiveGroupID?: number; Theme?: string; InlandTaxTemplate?: string; TOTPEnabled?: boolean };
 };
 
@@ -52,6 +53,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
   const email = ref<string | null>(null);
   const firstname = ref<string | null>(null);
   const lastname = ref<string | null>(null);
+  const locale = ref<string | null>(null);
   const token = ref<string | null>(null);
   const authInitialized = ref(false);
   const groups = ref<UserGroup[]>([]);
@@ -84,6 +86,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     email: string | null;
     firstname: string | null;
     lastname: string | null;
+    locale?: string | null;
     token: string | null;
     groups?: UserGroup[];
     lastActiveGroupID?: number | null;
@@ -92,6 +95,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     email.value = payload.email;
     firstname.value = payload.firstname;
     lastname.value = payload.lastname;
+    locale.value = payload.locale ?? null;
     token.value = payload.token;
 
     if (payload.groups) {
@@ -111,6 +115,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     email.value = null;
     firstname.value = null;
     lastname.value = null;
+    locale.value = null;
     token.value = null;
     groups.value = [];
     activeGroupID.value = null;
@@ -156,6 +161,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
             email: item.Email,
             firstname: item.FirstName,
             lastname: item.LastName,
+            locale: item.Locale ?? null,
             token: null,
             groups: parsedGroups,
             lastActiveGroupID: item.Settings?.LastActiveGroupID ?? null,
@@ -198,6 +204,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
           email: response.data.email,
           firstname: response.data.firstname,
           lastname: response.data.lastname,
+          locale: response.data.locale ?? null,
           token: response.data.session,
           groups: parsedGroups,
           lastActiveGroupID: response.data.Settings?.LastActiveGroupID ?? null,
@@ -224,6 +231,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
           email: response.data.email,
           firstname: response.data.firstname,
           lastname: response.data.lastname,
+          locale: response.data.locale ?? null,
           token: response.data.session,
           groups: parsedGroups,
           lastActiveGroupID: response.data.Settings?.LastActiveGroupID ?? null,
@@ -267,6 +275,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     email,
     firstname,
     lastname,
+    locale,
     authInitialized,
     groups,
     activeGroupID,

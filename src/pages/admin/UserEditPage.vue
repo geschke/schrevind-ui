@@ -6,8 +6,8 @@
           <h2 class="mb-0">{{ t("adminUsers.edit.title") }}</h2>
         </div>
         <div class="col-auto">
-          <router-link class="btn btn-outline-secondary" :to="{ name: 'adminusers' }">
-            {{ t("adminUsers.common.backToList") }}
+          <router-link class="btn btn-outline-secondary" :to="backRoute">
+            {{ backLabel }}
           </router-link>
         </div>
       </div>
@@ -15,8 +15,8 @@
       <div v-if="saveState === 'success'" class="alert alert-success alert-dismissible fade show" role="alert">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
           <span>{{ messageSuccess }}</span>
-          <router-link class="btn btn-sm btn-success" :to="{ name: 'adminusers' }">
-            {{ t("adminUsers.common.backToList") }}
+          <router-link class="btn btn-sm btn-success" :to="backRoute">
+            {{ backLabel }}
           </router-link>
         </div>
         <button type="button" class="btn-close" aria-label="Close" @click="dismissSaveMessage"></button>
@@ -228,6 +228,9 @@ const toast: any = ref(null);
 
 const isSelf = computed(() => user.value != null && user.value.ID === storeUserAuth.userId);
 
+const backRoute = computed(() => storeUserAuth.isSystemContext ? { name: 'adminusers' } : { name: 'overview' });
+const backLabel = computed(() => storeUserAuth.isSystemContext ? t("adminUsers.common.backToList") : t("common.backToOverview"));
+
 const showTotpSetup = ref(false);
 const showTotpDisableConfirm = ref(false);
 const totpDisableLoading = ref(false);
@@ -328,6 +331,23 @@ onMounted(() => {
 });
 
 async function loadUserData() {
+  // Self-edit: build user object from auth store — works in any context
+  if (storeUserAuth.userId != null && props.id === String(storeUserAuth.userId)) {
+    user.value = {
+      ID: storeUserAuth.userId,
+      Email: storeUserAuth.email ?? "",
+      FirstName: storeUserAuth.firstname ?? "",
+      LastName: storeUserAuth.lastname ?? "",
+      Locale: storeUserAuth.locale ?? "",
+    };
+    email.value = user.value.Email;
+    firstname.value = user.value.FirstName;
+    lastname.value = user.value.LastName;
+    locale.value = user.value.Locale;
+    useCustomLocale.value = !!user.value.Locale && !LOCALE_LIST.some((l) => l.value === user.value!.Locale);
+    return;
+  }
+
   if (storeUsers.usersLoaded) {
     fillFormElements();
     return;
