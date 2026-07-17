@@ -156,14 +156,17 @@
                 <th>{{ t("analyses.dividends_by_year_month_security_data.columns.security_name") }}</th>
                 <th>{{ t("analyses.dividends_by_year_month_security_data.columns.security_isin") }}</th>
                 <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.gross") }} ({{ data.currency }})</th>
+                <th v-if="compareMode" class="text-center trend-col">Δ</th>
                 <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.after_withholding") }} ({{ data.currency }})</th>
+                <th v-if="compareMode" class="text-center trend-col">Δ</th>
                 <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.net") }} ({{ data.currency }})</th>
+                <th v-if="compareMode" class="text-center trend-col">Δ</th>
               </tr>
             </thead>
             <tbody>
               <template v-for="period in sortedPeriods" :key="`${period.year}-${period.month}`">
                 <tr class="table-secondary">
-                  <td colspan="5" class="fw-semibold">
+                  <td :colspan="compareMode ? 8 : 5" class="fw-semibold">
                     {{ periodLabel(period.year, period.month) }}
                     <router-link
                       :to="{ name: 'analysismonthshare', query: { year: period.year, month: period.month } }"
@@ -180,8 +183,32 @@
                   <td>{{ row.type === "summary" ? t("analyses.dividends_by_year_month_security_data.summary") : row.security_name }}</td>
                   <td>{{ row.security_isin }}</td>
                   <td class="text-end">{{ row.gross }}</td>
+                  <td v-if="compareMode" class="text-nowrap trend-col">
+                    <template v-for="trend in [getTrend(period.year, period.month, row, 'gross')]" :key="0">
+                      <template v-if="trend">
+                        <i :class="trendIconClass(trend)"></i>
+                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                      </template>
+                    </template>
+                  </td>
                   <td class="text-end">{{ row.after_withholding }}</td>
+                  <td v-if="compareMode" class="text-nowrap trend-col">
+                    <template v-for="trend in [getTrend(period.year, period.month, row, 'after_withholding')]" :key="0">
+                      <template v-if="trend">
+                        <i :class="trendIconClass(trend)"></i>
+                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                      </template>
+                    </template>
+                  </td>
                   <td class="text-end">{{ row.net }}</td>
+                  <td v-if="compareMode" class="text-nowrap trend-col">
+                    <template v-for="trend in [getTrend(period.year, period.month, row, 'net')]" :key="0">
+                      <template v-if="trend">
+                        <i :class="trendIconClass(trend)"></i>
+                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                      </template>
+                    </template>
+                  </td>
                 </tr>
               </template>
             </tbody>
@@ -198,7 +225,7 @@ import { useAnalysesStore } from "@/stores/analyses";
 import { useDepotsStore } from "@/stores/depots";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import type { TimeRange } from "@/stores/dividendEntries";
-import type { YearMonthPeriod, YearMonthSecurityData } from "@/types/analyses";
+import type { YearMonthPeriod, YearMonthSecurityData, YearMonthPeriodData, YearMonthSecurityRow } from "@/types/analyses";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
@@ -263,6 +290,12 @@ const activeYearCount = computed(() => {
   return new Set(data.value.periods.map((p) => p.year)).size;
 });
 
+const sortedActiveYears = computed<string[]>(() => {
+  if (!data.value) return [];
+  const years = [...new Set(data.value.periods.map((p) => p.year))];
+  return years.sort((a, b) => Number(a) - Number(b));
+});
+
 // Map key: `${year}-${month}-${isin}` → 'all' | 'some'
 const comparisonMap = computed((): Map<string, "all" | "some"> => {
   const result = new Map<string, "all" | "some">();
@@ -291,12 +324,104 @@ const comparisonMap = computed((): Map<string, "all" | "some"> => {
   return result;
 });
 
+type TrendInfo = { direction: "up" | "down" | "eq"; pct: string };
+type TrendEntry = { gross: TrendInfo; after_withholding: TrendInfo; net: TrendInfo };
+
+function parseCurrencyString(s: string): number {
+  if (!s) return 0;
+  const cleaned = s.replace(/[^\d,.-]/g, "");
+  const lastComma = cleaned.lastIndexOf(",");
+  const lastPeriod = cleaned.lastIndexOf(".");
+  if (lastComma > lastPeriod) {
+    return parseFloat(cleaned.replace(/\./g, "").replace(",", "."));
+  }
+  return parseFloat(cleaned.replace(/,/g, ""));
+}
+
+function makeTrend(curr: string, prev: string): TrendInfo {
+  const currVal = parseCurrencyString(curr);
+  const prevVal = parseCurrencyString(prev);
+  if (prevVal === 0) {
+    const direction: "up" | "down" | "eq" = currVal > 0.005 ? "up" : currVal < -0.005 ? "down" : "eq";
+    return { direction, pct: "" };
+  }
+  const diff = ((currVal - prevVal) / Math.abs(prevVal)) * 100;
+  const direction: "up" | "down" | "eq" = diff > 0.005 ? "up" : diff < -0.005 ? "down" : "eq";
+  const pct =
+    direction === "eq" ? "" : `${diff > 0 ? "+" : "−"}${Math.abs(diff).toFixed(1).replace(".", ",")} %`;
+  return { direction, pct };
+}
+
+const trendMap = computed((): Map<string, TrendEntry> => {
+  const result = new Map<string, TrendEntry>();
+  if (!compareMode.value || !data.value) return result;
+
+  const years = sortedActiveYears.value;
+  if (years.length < 2) return result;
+
+  const byMonth = new Map<string, YearMonthPeriodData[]>();
+  for (const period of data.value.periods) {
+    const existing = byMonth.get(period.month) ?? [];
+    existing.push(period);
+    byMonth.set(period.month, existing);
+  }
+
+  for (const [month, periods] of byMonth) {
+    const byYear = new Map(periods.map((p) => [p.year, p]));
+
+    for (let i = 1; i < years.length; i++) {
+      const year = years[i];
+      const prevYear = years[i - 1];
+      const currPeriod = byYear.get(year);
+      const prevPeriod = byYear.get(prevYear);
+      if (!currPeriod || !prevPeriod) continue;
+
+      const prevRowMap = new Map<string, YearMonthSecurityRow>();
+      for (const r of prevPeriod.rows) {
+        prevRowMap.set(r.type === "summary" ? "__summary__" : r.security_isin, r);
+      }
+
+      for (const row of currPeriod.rows) {
+        const key = row.type === "summary" ? "__summary__" : row.security_isin;
+        if (!key) continue;
+        const prev = prevRowMap.get(key);
+        if (!prev) continue;
+        result.set(`${year}-${month}-${key}`, {
+          gross: makeTrend(row.gross, prev.gross),
+          after_withholding: makeTrend(row.after_withholding, prev.after_withholding),
+          net: makeTrend(row.net, prev.net),
+        });
+      }
+    }
+  }
+  return result;
+});
+
 function rowCompareClass(year: string, month: string, isin: string): string {
   if (!compareMode.value || !isin) return "";
   const status = comparisonMap.value.get(`${year}-${month}-${isin}`);
   if (status === "all") return "row-compare-all";
   if (status === "some") return "row-compare-some";
   return "";
+}
+
+function getTrend(year: string, month: string, row: YearMonthSecurityRow, field: "gross" | "after_withholding" | "net"): TrendInfo | null {
+  if (!compareMode.value) return null;
+  const key = row.type === "summary" ? "__summary__" : row.security_isin;
+  if (!key) return null;
+  return trendMap.value.get(`${year}-${month}-${key}`)?.[field] ?? null;
+}
+
+function trendIconClass(trend: TrendInfo): string {
+  if (trend.direction === "up") return "bi bi-arrow-up text-success";
+  if (trend.direction === "down") return "bi bi-arrow-down text-danger";
+  return "bi bi-dash text-secondary";
+}
+
+function trendTextClass(trend: TrendInfo): string {
+  if (trend.direction === "up") return "text-success";
+  if (trend.direction === "down") return "text-danger";
+  return "text-secondary";
 }
 
 const filterActive = computed(() => {
@@ -428,6 +553,13 @@ onUnmounted(() => {
 <style scoped>
 .filter-btn {
   width: 2.25rem;
+}
+
+.trend-col {
+  width: 1px;
+  white-space: nowrap;
+  padding-left: 0.25rem;
+  padding-right: 0.5rem;
 }
 
 .row-compare-all {
