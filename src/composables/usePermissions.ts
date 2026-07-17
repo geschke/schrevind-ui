@@ -46,11 +46,6 @@ export function usePermissions() {
   // Can manage users and groups in the current context.
   const canManageUsers = computed(() => isSystemAdmin.value || isGroupAdmin.value);
 
-  // Can create a depot (requires active group context + admin or owner role).
-  const canCreateDepot = computed(
-    () => storeUserAuth.activeGroupID != null && (isGroupAdmin.value || isOwner.value)
-  );
-
   // Can edit depot metadata (rename, update fields).
   const canEditDepot = computed(() => isSystemAdmin.value || isGroupAdmin.value || isOwner.value);
 
@@ -73,7 +68,6 @@ export function usePermissions() {
     isEditor,
     isViewer,
     canManageUsers,
-    canCreateDepot,
     canEditDepot,
     canDeleteDepot,
     canEditEntries,

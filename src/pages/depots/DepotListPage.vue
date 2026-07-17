@@ -63,7 +63,7 @@
         </template>
       </GTable>
 
-      <div class="row" v-if="canCreateDepot">
+      <div class="row">
         <div class="col-12">
           <router-link type="button" class="btn btn-primary" :to="{ name: 'depotnew' }">
             {{ t("depots.list.addButton") }}
@@ -140,7 +140,7 @@ const { t, locale } = useI18n();
 const CREATED_DEPOT_FLASH_KEY = "schrevind.depots.createdName";
 
 const storeDepots = useDepotsStore();
-const { canCreateDepot, canDeleteDepot } = usePermissions();
+const { canDeleteDepot } = usePermissions();
 const toast: any = ref(null);
 const loading = ref(false);
 const toBeDeleted = ref<Depot | null>(null);

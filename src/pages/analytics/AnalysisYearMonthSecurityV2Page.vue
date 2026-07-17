@@ -72,6 +72,21 @@
                 </div>
               </div>
 
+              <!-- Compare mode toggle -->
+              <div v-if="activeYearCount >= 2">
+                <div class="form-label text-secondary small mb-1 text-uppercase fw-semibold">&nbsp;</div>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  :class="compareMode ? 'btn-warning' : 'btn-outline-secondary'"
+                  @click="compareMode = !compareMode"
+                  :title="t('analyses.dividends_by_year_month_security_data.compareButton')"
+                >
+                  <i class="bi bi-arrows-angle-contract me-1"></i>
+                  {{ t("analyses.dividends_by_year_month_security_data.compareButton") }}
+                </button>
+              </div>
+
               <!-- Reload button -->
               <div>
                 <div class="form-label text-secondary small mb-1 text-uppercase fw-semibold">&nbsp;</div>
@@ -160,7 +175,7 @@
                 <tr
                   v-for="(row, idx) in period.rows"
                   :key="idx"
-                  :class="{ 'fw-bold': row.type === 'summary' }"
+                  :class="[{ 'fw-bold': row.type === 'summary' }, row.type !== 'summary' ? rowCompareClass(period.year, period.month, row.security_isin) : '']"
                 >
                   <td>{{ row.type === "summary" ? t("analyses.dividends_by_year_month_security_data.summary") : row.security_name }}</td>
                   <td>{{ row.security_isin }}</td>
@@ -207,6 +222,7 @@ const multiSelectMode = ref(false);
 const selectedDepotId = ref<number | null>(null);
 const yearSortDesc = ref(true);
 const monthSortAsc = ref(true);
+const compareMode = ref(false);
 
 const availableYears = computed<number[]>(() => {
   if (!timeRange.value || timeRange.value.first_year === 0) return [];
@@ -241,6 +257,47 @@ const sortedPeriods = computed(() => {
       : Number(b.month) - Number(a.month);
   });
 });
+
+const activeYearCount = computed(() => {
+  if (!data.value) return 0;
+  return new Set(data.value.periods.map((p) => p.year)).size;
+});
+
+// Map key: `${year}-${month}-${isin}` → 'all' | 'some'
+const comparisonMap = computed((): Map<string, "all" | "some"> => {
+  const result = new Map<string, "all" | "some">();
+  if (!compareMode.value || !data.value) return result;
+
+  const byMonth = new Map<string, typeof data.value.periods>();
+  for (const period of data.value.periods) {
+    const existing = byMonth.get(period.month) ?? [];
+    existing.push(period);
+    byMonth.set(period.month, existing);
+  }
+
+  for (const [, periods] of byMonth) {
+    if (periods.length < 2) continue;
+    const isinSets = periods.map(
+      (p) => new Set(p.rows.filter((r) => r.type !== "summary" && r.security_isin).map((r) => r.security_isin))
+    );
+    const allIsins = new Set(isinSets.flatMap((s) => [...s]));
+    for (const isin of allIsins) {
+      const inAll = isinSets.every((s) => s.has(isin));
+      for (const period of periods) {
+        result.set(`${period.year}-${period.month}-${isin}`, inAll ? "all" : "some");
+      }
+    }
+  }
+  return result;
+});
+
+function rowCompareClass(year: string, month: string, isin: string): string {
+  if (!compareMode.value || !isin) return "";
+  const status = comparisonMap.value.get(`${year}-${month}-${isin}`);
+  if (status === "all") return "row-compare-all";
+  if (status === "some") return "row-compare-some";
+  return "";
+}
 
 const filterActive = computed(() => {
   if (multiSelectMode.value) return true;
@@ -371,5 +428,15 @@ onUnmounted(() => {
 <style scoped>
 .filter-btn {
   width: 2.25rem;
+}
+
+.row-compare-all {
+  --bs-table-bg: color-mix(in oklab, var(--bs-success), transparent 80%);
+  --bs-table-striped-bg: color-mix(in oklab, var(--bs-success), transparent 80%);
+}
+
+.row-compare-some {
+  --bs-table-bg: color-mix(in oklab, var(--bs-warning), transparent 70%);
+  --bs-table-striped-bg: color-mix(in oklab, var(--bs-warning), transparent 70%);
 }
 </style>

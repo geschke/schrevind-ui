@@ -6,8 +6,8 @@
           <h2 class="mb-0">{{ t("adminUsers.password.title") }}</h2>
         </div>
         <div class="col-auto">
-          <router-link class="btn btn-outline-secondary" :to="{ name: 'adminusers' }">
-            {{ t("adminUsers.common.backToList") }}
+          <router-link class="btn btn-outline-secondary" :to="backRoute">
+            {{ backLabel }}
           </router-link>
         </div>
       </div>
@@ -70,7 +70,7 @@ import { useUserAuthStore } from "@/stores/userauth";
 import { getErrorCode } from "@/helper/errorCode";
 import { GToast, GToastSuccess, GToastDanger } from "goar-components";
 import type { GToastContent } from "goar-components";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps<{ id: string }>();
@@ -88,6 +88,9 @@ const validationSchema = yup.object().shape({
     .required(() => t("adminUsers.validation.passwordRequired"))
     .oneOf([yup.ref("password")], () => t("adminUsers.validation.passwordConfirmMismatch")),
 });
+
+const backRoute = computed(() => storeUserAuth.isSystemContext ? { name: 'adminusers' } : { name: 'overview' });
+const backLabel = computed(() => storeUserAuth.isSystemContext ? t("adminUsers.common.backToList") : t("common.backToOverview"));
 
 const saveState = ref<SaveState>("idle");
 const messageSuccess = ref("");
