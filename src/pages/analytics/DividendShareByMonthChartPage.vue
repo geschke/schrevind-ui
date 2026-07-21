@@ -130,7 +130,8 @@
         </div>
 
         <!-- Error -->
-        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">{{ errorMsg }}</div>
+        <!-- Error: cause shown as toast, area shows the resulting empty state -->
+        <div v-else-if="errorMsg" class="alert alert-info" role="alert">{{ t('analyses.common.empty') }}</div>
 
         <!-- No data -->
         <div v-else-if="data !== null && sortedRows.length === 0" class="alert alert-info" role="alert">
@@ -597,6 +598,7 @@ function loadData() {
 
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick)
+  loading.value = true // show spinner during the initial fetches, loadData() takes over afterwards
   Promise.all([storeDepots.fetchDepots(), storeDividendEntries.fetchTimeRange()])
     .then(([, range]) => {
       timeRange.value = range
@@ -608,7 +610,13 @@ onMounted(() => {
       loadData()
     })
     .catch(() => {
+      loading.value = false
       errorMsg.value = t('analyses.errors.loadFailed')
+      toast.value?.addToast({
+        ...GToastDanger,
+        title: t('analyses.common.errorTitle'),
+        content: errorMsg.value,
+      } as GToastContent)
     })
 })
 

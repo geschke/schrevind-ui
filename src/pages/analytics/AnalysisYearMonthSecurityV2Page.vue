@@ -138,9 +138,9 @@
           </div>
         </div>
 
-        <!-- Error -->
-        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">
-          {{ errorMsg }}
+        <!-- Error: cause shown as toast, area shows the resulting empty state -->
+        <div v-else-if="errorMsg" class="alert alert-info" role="alert">
+          {{ t("analyses.common.empty") }}
         </div>
 
         <!-- Empty -->
@@ -244,6 +244,8 @@
           </div>
         </div>
       </div>
+
+      <GToast ref="toast" />
     </template>
   </TheMainLayout>
 </template>
@@ -256,8 +258,8 @@ import { useDepotsStore } from "@/stores/depots";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import type { TimeRange } from "@/stores/dividendEntries";
 import type { YearMonthPeriod, YearMonthSecurityData, YearMonthPeriodData, YearMonthSecurityRow } from "@/types/analyses";
-import { GTable } from "goar-components";
-import type { GTableHeader, GTableItem } from "goar-components";
+import { GTable, GToast, GToastDanger } from "goar-components";
+import type { GTableHeader, GTableItem, GToastContent } from "goar-components";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
@@ -286,6 +288,15 @@ const compareMode = ref(false);
 // incremented on every data load; part of the per-period GTable :key so tables
 // remount on reload and stale expand state can't attach to changed rows
 const reloadCounter = ref(0);
+const toast = ref<InstanceType<typeof GToast> | null>(null);
+
+function showErrorToast() {
+  toast.value?.addToast(<GToastContent>{
+    ...GToastDanger,
+    title: t("analyses.common.errorTitle"),
+    content: t("analyses.errors.loadFailed"),
+  });
+}
 
 const availableYears = computed<number[]>(() => {
   if (!timeRange.value || timeRange.value.first_year === 0) return [];
@@ -599,6 +610,7 @@ function loadData() {
     })
     .catch(() => {
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     })
     .finally(() => {
       loading.value = false;
@@ -607,6 +619,7 @@ function loadData() {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  loading.value = true; // show spinner during the initial fetches, loadData() takes over afterwards
   Promise.all([storeDepots.fetchDepots(), storeDividendEntries.fetchTimeRange()])
     .then(([, range]) => {
       timeRange.value = range;
@@ -622,7 +635,9 @@ onMounted(() => {
       loadData();
     })
     .catch(() => {
+      loading.value = false;
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     });
 });
 

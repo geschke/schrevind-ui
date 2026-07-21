@@ -109,9 +109,9 @@
           </div>
         </div>
 
-        <!-- Error -->
-        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">
-          {{ errorMsg }}
+        <!-- Error: cause shown as toast, area shows the resulting empty state -->
+        <div v-else-if="errorMsg" class="alert alert-info" role="alert">
+          {{ t("analyses.common.empty") }}
         </div>
 
         <!-- Empty -->
@@ -163,6 +163,8 @@
           </table>
         </div>
       </div>
+
+      <GToast ref="toast" />
     </template>
   </TheMainLayout>
 </template>
@@ -173,6 +175,8 @@ import { useAnalysesStore } from "@/stores/analyses";
 import { useDepotsStore } from "@/stores/depots";
 import { useSecuritiesStore } from "@/stores/securities";
 import type { SecurityYearData } from "@/types/analyses";
+import { GToast, GToastDanger } from "goar-components";
+import type { GToastContent } from "goar-components";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -184,6 +188,15 @@ const storeSecurities = useSecuritiesStore();
 const loading = ref(false);
 const errorMsg = ref<string | null>(null);
 const data = ref<SecurityYearData | null>(null);
+const toast = ref<InstanceType<typeof GToast> | null>(null);
+
+function showErrorToast() {
+  toast.value?.addToast(<GToastContent>{
+    ...GToastDanger,
+    title: t("analyses.common.errorTitle"),
+    content: t("analyses.errors.loadFailed"),
+  });
+}
 
 const securityDropdownOpen = ref(false);
 const securitySearch = ref("");
@@ -243,6 +256,7 @@ async function loadData() {
     })
     .catch(() => {
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     })
     .finally(() => {
       loading.value = false;
@@ -251,13 +265,16 @@ async function loadData() {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  loading.value = true; // show spinner during the initial fetches, loadData() takes over afterwards
   Promise.all([
     storeDepots.fetchDepots(),
     storeSecurities.fetchAllSecurities({ sort: "Name", direction: "asc" }),
   ])
     .then(() => loadData())
     .catch(() => {
+      loading.value = false;
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     });
 });
 

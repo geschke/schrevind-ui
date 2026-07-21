@@ -264,6 +264,9 @@
             </div>
           </div>
         </template>
+
+        <!-- Empty / error state -->
+        <div v-else class="alert alert-info" role="alert">{{ t('analyses.common.empty') }}</div>
       </div>
 
 <GToast ref="toast" :_maxNumber="0" _placement="top-50 start-50 translate-middle" />
@@ -289,7 +292,7 @@ import { getErrorCode } from '@/helper/errorCode'
 import TheMainLayout from '@/layouts/TheMainLayout.vue'
 import { useAnalysesStore } from '@/stores/analyses'
 import { useDepotsStore } from '@/stores/depots'
-import { GToast, GToastDanger, GToastWarning } from 'goar-components'
+import { GToast, GToastDanger } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -788,15 +791,6 @@ function reloadChartData() {
   const ids = selectedDepotIds.value.length > 0 ? selectedDepotIds.value : undefined
   storeAnalyses
     .fetchDividendsByYearMonthChartData(ids)
-    .then(() => {
-      if (!rawData.value || rawData.value.rows.length === 0) {
-        toast.value?.addToast({
-          ...GToastWarning,
-          title: t('analyses.common.errorTitle'),
-          content: t('analyses.common.empty'),
-        } as GToastContent)
-      }
-    })
     .catch((requestError: unknown) => {
       const code = getErrorCode(requestError)
       const content =

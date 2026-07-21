@@ -29,9 +29,9 @@
           </div>
         </div>
 
-        <!-- Error -->
-        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">
-          {{ errorMsg }}
+        <!-- Error: cause shown as toast, area shows the resulting empty state -->
+        <div v-else-if="errorMsg" class="alert alert-info" role="alert">
+          {{ t("analyses.common.empty") }}
         </div>
 
         <!-- Empty -->
@@ -68,6 +68,8 @@
           </table>
         </div>
       </div>
+
+      <GToast ref="toast" />
     </template>
   </TheMainLayout>
 </template>
@@ -77,6 +79,8 @@ import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useAnalysesStore } from "@/stores/analyses";
 import { useDepotsStore } from "@/stores/depots";
 import type { YearData } from "@/types/analyses";
+import { GToast, GToastDanger } from "goar-components";
+import type { GToastContent } from "goar-components";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -88,6 +92,15 @@ const loading = ref(false);
 const errorMsg = ref<string | null>(null);
 const data = ref<YearData | null>(null);
 const selectedDepotId = ref<number | null>(null);
+const toast = ref<InstanceType<typeof GToast> | null>(null);
+
+function showErrorToast() {
+  toast.value?.addToast(<GToastContent>{
+    ...GToastDanger,
+    title: t("analyses.common.errorTitle"),
+    content: t("analyses.errors.loadFailed"),
+  });
+}
 
 function loadData() {
   loading.value = true;
@@ -100,6 +113,7 @@ function loadData() {
     })
     .catch(() => {
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     })
     .finally(() => {
       loading.value = false;
@@ -107,11 +121,14 @@ function loadData() {
 }
 
 onMounted(() => {
+  loading.value = true; // show spinner during the initial depot fetch, loadData() takes over afterwards
   storeDepots
     .fetchDepots()
     .then(() => loadData())
     .catch(() => {
+      loading.value = false;
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     });
 });
 </script>

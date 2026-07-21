@@ -58,9 +58,9 @@
           </div>
         </div>
 
-        <!-- Error -->
-        <div v-else-if="errorMsg" class="alert alert-danger" role="alert">
-          {{ errorMsg }}
+        <!-- Error: cause shown as toast, area shows the resulting empty state -->
+        <div v-else-if="errorMsg" class="alert alert-info" role="alert">
+          {{ t("analyses.common.empty") }}
         </div>
 
         <!-- Empty -->
@@ -104,6 +104,8 @@
           </table>
         </div>
       </div>
+
+      <GToast ref="toast" />
     </template>
   </TheMainLayout>
 </template>
@@ -115,6 +117,8 @@ import { useDepotsStore } from "@/stores/depots";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import type { TimeRange } from "@/stores/dividendEntries";
 import type { YearMonthData, YearMonthRow } from "@/types/analyses";
+import { GToast, GToastDanger } from "goar-components";
+import type { GToastContent } from "goar-components";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
@@ -129,6 +133,15 @@ const loading = ref(false);
 const errorMsg = ref<string | null>(null);
 const data = ref<YearMonthData | null>(null);
 const timeRange = ref<TimeRange | null>(null);
+const toast = ref<InstanceType<typeof GToast> | null>(null);
+
+function showErrorToast() {
+  toast.value?.addToast(<GToastContent>{
+    ...GToastDanger,
+    title: t("analyses.common.errorTitle"),
+    content: t("analyses.errors.loadFailed"),
+  });
+}
 
 const yearDropdownOpen = ref(false);
 const yearDropdownRef = ref<HTMLElement | null>(null);
@@ -218,6 +231,7 @@ function loadData() {
     })
     .catch(() => {
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     })
     .finally(() => {
       loading.value = false;
@@ -235,6 +249,7 @@ function formatPeriod(row: YearMonthRow): string {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  loading.value = true; // show spinner during the initial fetches, loadData() takes over afterwards
   Promise.all([storeDepots.fetchDepots(), storeDividendEntries.fetchTimeRange()])
     .then(([, range]) => {
       timeRange.value = range;
@@ -243,7 +258,9 @@ onMounted(() => {
       loadData();
     })
     .catch(() => {
+      loading.value = false;
       errorMsg.value = t("analyses.errors.loadFailed");
+      showErrorToast();
     });
 });
 
