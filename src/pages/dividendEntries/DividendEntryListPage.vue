@@ -269,6 +269,7 @@ import { Modal } from "bootstrap";
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePageSize } from "@/composables/usePageSize";
+import { useUserLocale } from "@/composables/useUserLocale";
 
 type DetailField = {
   label: string;
@@ -283,7 +284,8 @@ type DetailSection = {
   rows: DetailField[][];
 };
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const { userLocale } = useUserLocale();
 const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("dividendEntries");
 const LIST_STATE_SESSION_KEY = "schrevind.dividendEntries.listState";
 type SortField = "PayDate" | "ExDate" | "SecurityName";
@@ -715,25 +717,22 @@ function formatDateValue(value: string): string {
   const normalized = String(value ?? "").trim();
   if (normalized === "") return "-";
 
+  // Plain ISO dates get a stable time component so timezone shifts can't change the day
   const dateMatch = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (dateMatch) {
-    const [, year, month, day] = dateMatch;
-    return `${day}.${month}.${year}`;
-  }
-
-  const parsed = new Date(normalized);
+  const parsed = dateMatch ? new Date(`${normalized}T00:00:00`) : new Date(normalized);
   if (Number.isNaN(parsed.getTime())) return normalized;
 
-  const day = String(parsed.getDate()).padStart(2, "0");
-  const month = String(parsed.getMonth() + 1).padStart(2, "0");
-  const year = String(parsed.getFullYear());
-  return `${day}.${month}.${year}`;
+  return parsed.toLocaleDateString(userLocale.value, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }
 
 function formatTimestamp(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(milliseconds).toLocaleString(locale.value || "de-DE", {
+  return new Date(milliseconds).toLocaleString(userLocale.value, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

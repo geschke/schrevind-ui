@@ -789,6 +789,7 @@
       "allYears": "All years",
       "filterYears": "Years",
       "loadButton": "Refresh list",
+      "compareButton": "Compare mode",
       "sortLabel": "Sort",
       "sortYears": "Years",
       "sortMonths": "Months",
@@ -799,6 +800,13 @@
         "gross": "Gross",
         "after_withholding": "After WHT",
         "net": "Net"
+      },
+      "details": {
+        "payDate": "Pay date",
+        "originalAmount": "Original amount",
+        "fxRate": "FX rate",
+        "dividendPerUnit": "Dividend per unit",
+        "inlandTaxTotal": "Domestic taxes total"
       }
     },
     "dividends_by_security_year": {

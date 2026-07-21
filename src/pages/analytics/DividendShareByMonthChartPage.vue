@@ -262,11 +262,13 @@ import { GToast, GToastDanger } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useUserLocale } from '@/composables/useUserLocale'
 import { useRoute } from 'vue-router'
 
 const ALL_MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 const { t, locale } = useI18n()
+const { userLocale } = useUserLocale()
 const route = useRoute()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
@@ -390,7 +392,7 @@ const currency = computed(() => data.value?.currency ?? '')
 const fmtLocale = computed(() => (locale.value.startsWith('de') ? 'de-DE' : 'en-US'))
 
 function fmtMoney2(n: number): string {
-  return new Intl.NumberFormat(fmtLocale.value, {
+  return new Intl.NumberFormat(userLocale.value, {
     style: 'currency',
     currency: currency.value || 'EUR',
     minimumFractionDigits: 2,

@@ -223,9 +223,11 @@ import type { GToastContent } from "goar-components";
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { useUserLocale } from "@/composables/useUserLocale";
 import { useRouter } from "vue-router";
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const { userLocale } = useUserLocale();
 const router = useRouter();
 
 const props = defineProps<{ id: string }>();
@@ -271,7 +273,7 @@ const candidateUsers = computed<User[]>(() => {
 function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const ms = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(ms).toLocaleString(locale.value || "de-DE", {
+  return new Date(ms).toLocaleString(userLocale.value, {
     day: "2-digit", month: "2-digit", year: "numeric",
     hour: "2-digit", minute: "2-digit", second: "2-digit",
   });

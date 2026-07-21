@@ -148,71 +148,100 @@
           {{ t("analyses.common.empty") }}
         </div>
 
-        <!-- Table -->
-        <div v-else-if="data" class="table-responsive">
-          <table class="table table-sm table-bordered table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>{{ t("analyses.dividends_by_year_month_security_data.columns.security_name") }}</th>
-                <th>{{ t("analyses.dividends_by_year_month_security_data.columns.security_isin") }}</th>
-                <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.gross") }} ({{ data.currency }})</th>
-                <th v-if="compareMode" class="text-center trend-col">Δ</th>
-                <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.after_withholding") }} ({{ data.currency }})</th>
-                <th v-if="compareMode" class="text-center trend-col">Δ</th>
-                <th class="text-end">{{ t("analyses.dividends_by_year_month_security_data.columns.net") }} ({{ data.currency }})</th>
-                <th v-if="compareMode" class="text-center trend-col">Δ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="period in sortedPeriods" :key="`${period.year}-${period.month}`">
-                <tr class="table-secondary">
-                  <td :colspan="compareMode ? 8 : 5" class="fw-semibold">
-                    {{ periodLabel(period.year, period.month) }}
-                    <router-link
-                      :to="{ name: 'analysismonthshare', query: { year: period.year, month: period.month } }"
-                      class="ms-2 text-muted fw-normal"
-                      :title="t('analyses.charts.dividends_share_by_month.linkTitle')"
-                    ><i class="bi bi-pie-chart"></i></router-link>
-                  </td>
-                </tr>
-                <tr
-                  v-for="(row, idx) in period.rows"
-                  :key="idx"
-                  :class="[{ 'fw-bold': row.type === 'summary' }, row.type !== 'summary' ? rowCompareClass(period.year, period.month, row.security_isin) : '']"
-                >
-                  <td>{{ row.type === "summary" ? t("analyses.dividends_by_year_month_security_data.summary") : row.security_name }}</td>
-                  <td>{{ row.security_isin }}</td>
-                  <td class="text-end">{{ row.gross }}</td>
-                  <td v-if="compareMode" class="text-nowrap trend-col">
-                    <template v-for="trend in [getTrend(period.year, period.month, row, 'gross')]" :key="0">
-                      <template v-if="trend">
-                        <i :class="trendIconClass(trend)"></i>
-                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
-                      </template>
-                    </template>
-                  </td>
-                  <td class="text-end">{{ row.after_withholding }}</td>
-                  <td v-if="compareMode" class="text-nowrap trend-col">
-                    <template v-for="trend in [getTrend(period.year, period.month, row, 'after_withholding')]" :key="0">
-                      <template v-if="trend">
-                        <i :class="trendIconClass(trend)"></i>
-                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
-                      </template>
-                    </template>
-                  </td>
-                  <td class="text-end">{{ row.net }}</td>
-                  <td v-if="compareMode" class="text-nowrap trend-col">
-                    <template v-for="trend in [getTrend(period.year, period.month, row, 'net')]" :key="0">
-                      <template v-if="trend">
-                        <i :class="trendIconClass(trend)"></i>
-                        <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
-                      </template>
-                    </template>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
+        <!-- Tables (one GTable per period) -->
+        <div v-else-if="data">
+          <div v-for="period in sortedPeriods" :key="`${reloadCounter}-${period.year}-${period.month}`" class="mb-4">
+            <h5 class="mb-2">
+              {{ periodLabel(period.year, period.month) }}
+              <router-link
+                :to="{ name: 'analysismonthshare', query: { year: period.year, month: period.month } }"
+                class="ms-2 text-muted fw-normal fs-6"
+                :title="t('analyses.charts.dividends_share_by_month.linkTitle')"
+              ><i class="bi bi-pie-chart"></i></router-link>
+            </h5>
+            <div class="table-responsive period-table">
+              <GTable
+                :headers="tableHeaders"
+                :items="tableItems(period)"
+                keyField="row_key"
+                :pagination="false"
+                :show-empty="false"
+                classes="table-sm table-bordered table-hover align-middle mb-1"
+                headClasses="table-light"
+                :row-class="(item: GTableItem) => tableRowClass(period, item)"
+              >
+                <template #tmplName="slotData">
+                  {{ slotData.value.type === "summary" ? t("analyses.dividends_by_year_month_security_data.summary") : slotData.value.security_name }}
+                </template>
+
+                <template #tmplGross="slotData">
+                  <div class="text-end">{{ slotData.value.gross }}</div>
+                </template>
+
+                <template #tmplAfterWithholding="slotData">
+                  <div class="text-end">{{ slotData.value.after_withholding }}</div>
+                </template>
+
+                <template #tmplNet="slotData">
+                  <div class="text-end">{{ slotData.value.net }}</div>
+                </template>
+
+                <template #tmplTrendGross="slotData">
+                  <template v-for="trend in [getTrend(period.year, period.month, slotData.value, 'gross')]" :key="0">
+                    <div v-if="trend" class="text-nowrap">
+                      <i :class="trendIconClass(trend)"></i>
+                      <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                    </div>
+                  </template>
+                </template>
+
+                <template #tmplTrendAfterWithholding="slotData">
+                  <template v-for="trend in [getTrend(period.year, period.month, slotData.value, 'after_withholding')]" :key="0">
+                    <div v-if="trend" class="text-nowrap">
+                      <i :class="trendIconClass(trend)"></i>
+                      <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                    </div>
+                  </template>
+                </template>
+
+                <template #tmplTrendNet="slotData">
+                  <template v-for="trend in [getTrend(period.year, period.month, slotData.value, 'net')]" :key="0">
+                    <div v-if="trend" class="text-nowrap">
+                      <i :class="trendIconClass(trend)"></i>
+                      <small v-if="trend.pct" :class="trendTextClass(trend)"> {{ trend.pct }}</small>
+                    </div>
+                  </template>
+                </template>
+
+                <template #tmplExpandDetails="slotData">
+                  <div class="bg-body-tertiary p-2">
+                    <table class="table table-sm table-borderless w-auto mb-2">
+                      <thead>
+                        <tr class="small text-body-secondary">
+                          <th class="fw-semibold">{{ t("analyses.dividends_by_year_month_security_data.details.payDate") }}</th>
+                          <th class="fw-semibold text-end">{{ t("analyses.dividends_by_year_month_security_data.details.originalAmount") }}</th>
+                          <th class="fw-semibold text-end">{{ t("analyses.dividends_by_year_month_security_data.details.fxRate") }}</th>
+                          <th class="fw-semibold text-end">{{ t("analyses.dividends_by_year_month_security_data.details.dividendPerUnit") }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(payment, paymentIdx) in (slotData.item?.payments ?? [])" :key="paymentIdx" class="small">
+                          <td>{{ formatPayDate(payment.pay_date) }}</td>
+                          <td class="text-end">{{ payment.original_amount }} {{ payment.original_currency }}</td>
+                          <td class="text-end">{{ payment.fx_rate }}</td>
+                          <td class="text-end">{{ payment.dividend_per_unit }} {{ payment.dividend_per_unit_currency }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="small">
+                      <span class="text-body-secondary">{{ t("analyses.dividends_by_year_month_security_data.details.inlandTaxTotal") }}:</span>
+                      <span class="fw-semibold ms-1">{{ slotData.item?.inland_tax_amount }} {{ slotData.item?.inland_tax_currency }}</span>
+                    </div>
+                  </div>
+                </template>
+              </GTable>
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -221,16 +250,20 @@
 
 <script setup lang="ts">
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
+import { useUserLocale } from "@/composables/useUserLocale";
 import { useAnalysesStore } from "@/stores/analyses";
 import { useDepotsStore } from "@/stores/depots";
 import { useDividendEntriesStore } from "@/stores/dividendEntries";
 import type { TimeRange } from "@/stores/dividendEntries";
 import type { YearMonthPeriod, YearMonthSecurityData, YearMonthPeriodData, YearMonthSecurityRow } from "@/types/analyses";
+import { GTable } from "goar-components";
+import type { GTableHeader, GTableItem } from "goar-components";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 
 const { t, locale } = useI18n();
+const { userLocale } = useUserLocale();
 const route = useRoute();
 const storeAnalyses = useAnalysesStore();
 const storeDepots = useDepotsStore();
@@ -250,6 +283,9 @@ const selectedDepotId = ref<number | null>(null);
 const yearSortDesc = ref(true);
 const monthSortAsc = ref(true);
 const compareMode = ref(false);
+// incremented on every data load; part of the per-period GTable :key so tables
+// remount on reload and stale expand state can't attach to changed rows
+const reloadCounter = ref(0);
 
 const availableYears = computed<number[]>(() => {
   if (!timeRange.value || timeRange.value.first_year === 0) return [];
@@ -424,6 +460,50 @@ function trendTextClass(trend: TrendInfo): string {
   return "text-secondary";
 }
 
+const tableHeaders = computed<GTableHeader[]>(() => {
+  const currency = data.value?.currency ?? "";
+  const headers: GTableHeader[] = [
+    { title: t("analyses.dividends_by_year_month_security_data.columns.security_name"), field: "tmplName" },
+    { title: t("analyses.dividends_by_year_month_security_data.columns.security_isin"), field: "security_isin" },
+    {
+      title: "",
+      field: "tmplExpandDetails",
+      type: "expandable",
+      isExpandable: (item: GTableItem) => item.type === "detail" && Array.isArray(item.payments) && item.payments.length > 0,
+    },
+    { title: `${t("analyses.dividends_by_year_month_security_data.columns.gross")} (${currency})`, field: "tmplGross" },
+  ];
+  if (compareMode.value) headers.push({ title: "Δ", field: "tmplTrendGross" });
+  headers.push({ title: `${t("analyses.dividends_by_year_month_security_data.columns.after_withholding")} (${currency})`, field: "tmplAfterWithholding" });
+  if (compareMode.value) headers.push({ title: "Δ", field: "tmplTrendAfterWithholding" });
+  headers.push({ title: `${t("analyses.dividends_by_year_month_security_data.columns.net")} (${currency})`, field: "tmplNet" });
+  if (compareMode.value) headers.push({ title: "Δ", field: "tmplTrendNet" });
+  return headers;
+});
+
+function tableItems(period: YearMonthPeriodData): GTableItem[] {
+  return period.rows.map((row) => ({
+    ...row,
+    row_key: row.type === "summary" ? "__summary__" : row.security_isin,
+  }));
+}
+
+function tableRowClass(period: YearMonthPeriodData, item: GTableItem): string {
+  if (item.type === "summary") return "fw-bold";
+  return rowCompareClass(period.year, period.month, String(item.security_isin ?? ""));
+}
+
+function formatPayDate(iso: string): string {
+  if (!iso) return "-";
+  const parsed = new Date(`${iso}T00:00:00`);
+  if (isNaN(parsed.getTime())) return iso;
+  return parsed.toLocaleDateString(userLocale.value, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 const filterActive = computed(() => {
   if (multiSelectMode.value) return true;
   if (selectedMonths.value.length !== 1) return true;
@@ -515,6 +595,7 @@ function loadData() {
     .fetchDividendsByYearMonthSecurityData(periods, depotIds)
     .then((result) => {
       data.value = result;
+      reloadCounter.value++;
     })
     .catch(() => {
       errorMsg.value = t("analyses.errors.loadFailed");
@@ -555,19 +636,13 @@ onUnmounted(() => {
   width: 2.25rem;
 }
 
-.trend-col {
-  width: 1px;
-  white-space: nowrap;
-  padding-left: 0.25rem;
-  padding-right: 0.5rem;
-}
-
-.row-compare-all {
+/* rows are rendered inside the GTable child component, so :deep() is required */
+.period-table :deep(.row-compare-all) {
   --bs-table-bg: color-mix(in oklab, var(--bs-success), transparent 80%);
   --bs-table-striped-bg: color-mix(in oklab, var(--bs-success), transparent 80%);
 }
 
-.row-compare-some {
+.period-table :deep(.row-compare-some) {
   --bs-table-bg: color-mix(in oklab, var(--bs-warning), transparent 70%);
   --bs-table-striped-bg: color-mix(in oklab, var(--bs-warning), transparent 70%);
 }

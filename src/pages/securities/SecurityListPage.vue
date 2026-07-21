@@ -197,9 +197,11 @@ import { GToast, GToastSuccess, GToastWarning, GToastDanger } from "goar-compone
 import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { useUserLocale } from "@/composables/useUserLocale";
 import { usePageSize } from "@/composables/usePageSize";
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const { userLocale } = useUserLocale();
 const { pageSize, PAGE_SIZE_OPTIONS } = usePageSize("securities");
 const CREATED_SECURITY_FLASH_KEY = "schrevind.securities.createdName";
 type SortField = "ID" | "Name" | "ISIN" | "WKN" | "Symbol" | "Status" | "CreatedAt" | "UpdatedAt";
@@ -263,7 +265,7 @@ function showCreateSuccessBannerFromFlash() {
 function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(milliseconds).toLocaleString(locale.value || "de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date(milliseconds).toLocaleString(userLocale.value, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 async function loadPage(offset: number, limit: number) {

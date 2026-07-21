@@ -294,12 +294,14 @@ import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useUserLocale } from '@/composables/useUserLocale'
 import * as bootstrap from 'bootstrap'
 import { useSettingsStore } from '@/stores/settings'
 
 const ALL_MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 const { t, locale } = useI18n()
+const { userLocale } = useUserLocale()
 const router = useRouter()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
@@ -529,7 +531,7 @@ const showLegend = ref(true)
 const fmtLocale = computed(() => (locale.value.startsWith('de') ? 'de-DE' : 'en-US'))
 
 function fmtMoney2(n: number) {
-  return new Intl.NumberFormat(fmtLocale.value, {
+  return new Intl.NumberFormat(userLocale.value, {
     style: 'currency',
     currency: currency.value || 'EUR',
     minimumFractionDigits: 2,
@@ -539,8 +541,8 @@ function fmtMoney2(n: number) {
 
 function fmtShort(n: number) {
   if (n >= 1000)
-    return new Intl.NumberFormat(fmtLocale.value, { maximumFractionDigits: 1 }).format(n / 1000) + ' k'
-  return new Intl.NumberFormat(fmtLocale.value, { maximumFractionDigits: 0 }).format(n)
+    return new Intl.NumberFormat(userLocale.value, { maximumFractionDigits: 1 }).format(n / 1000) + ' k'
+  return new Intl.NumberFormat(userLocale.value, { maximumFractionDigits: 0 }).format(n)
 }
 
 function monthName(m: string): string {

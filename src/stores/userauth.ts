@@ -245,6 +245,15 @@ export const useUserAuthStore = defineStore("userauth", () => {
       });
   }
 
+  // Sync the auth store after the current user edited their own profile,
+  // so locale-dependent formatting and displayed name/email update without re-login.
+  function updateCurrentUserProfile(payload: { email: string; firstname: string; lastname: string; locale: string | null }) {
+    email.value = payload.email;
+    firstname.value = payload.firstname;
+    lastname.value = payload.lastname;
+    locale.value = payload.locale;
+  }
+
   async function refreshAuth() {
     authInitialized.value = false;
     return initAuth();
@@ -287,6 +296,7 @@ export const useUserAuthStore = defineStore("userauth", () => {
     getTOTPEnabled,
     setActiveGroup,
     initAuth,
+    updateCurrentUserProfile,
     refreshAuth,
     signin,
     verify2FA,

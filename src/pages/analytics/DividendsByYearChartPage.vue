@@ -289,6 +289,7 @@ import { GToast, GToastDanger, GToastWarning } from 'goar-components'
 import type { GToastContent } from 'goar-components'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useUserLocale } from '@/composables/useUserLocale'
 
 interface ChartRow {
   year: string
@@ -317,7 +318,8 @@ const cssVars = computed(() => ({
   '--c-net': storeSettings.currentPalette.net,
 }))
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { userLocale } = useUserLocale()
 const storeAnalyses = useAnalysesStore()
 const storeDepots = useDepotsStore()
 const toast = ref<InstanceType<typeof GToast> | null>(null)
@@ -458,7 +460,7 @@ const kpis = computed(() => {
 })
 
 // --- Formatting ---
-const fmtLocale = computed(() => (locale.value.startsWith('de') ? 'de-DE' : 'en-US'))
+const fmtLocale = userLocale
 
 function fmtMoney(n: number) {
   return new Intl.NumberFormat(fmtLocale.value, {

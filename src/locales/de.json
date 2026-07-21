@@ -800,6 +800,13 @@
         "gross": "Brutto",
         "after_withholding": "nach QuSt.",
         "net": "Netto"
+      },
+      "details": {
+        "payDate": "Zahltag",
+        "originalAmount": "Originalbetrag",
+        "fxRate": "Wechselkurs",
+        "dividendPerUnit": "Dividende pro Einheit",
+        "inlandTaxTotal": "Inländische Steuern gesamt"
       }
     },
     "dividends_by_security_year": {

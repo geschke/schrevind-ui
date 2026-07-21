@@ -103,6 +103,15 @@ export type YearMonthPeriod = {
   month: string;
 };
 
+export type YearMonthPayment = {
+  pay_date: string;
+  original_currency: string;
+  original_amount: string;
+  fx_rate: string;
+  dividend_per_unit: string;
+  dividend_per_unit_currency: string;
+};
+
 export type YearMonthSecurityRow = {
   security_id: number;
   security_name: string;
@@ -110,6 +119,9 @@ export type YearMonthSecurityRow = {
   gross: string;
   after_withholding: string;
   net: string;
+  inland_tax_amount: string;
+  inland_tax_currency: string;
+  payments: YearMonthPayment[];
   type: "detail" | "summary";
 };
 

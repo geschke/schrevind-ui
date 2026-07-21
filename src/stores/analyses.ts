@@ -23,6 +23,7 @@ import type {
   YearRow,
   YearMonthRow,
   YearMonthData,
+  YearMonthPayment,
   YearMonthPeriod,
   YearMonthPeriodData,
   YearMonthSecurityData,
@@ -164,6 +165,18 @@ function normalizeSecurityYearEntry(item: unknown): SecurityYearSecurityEntry {
   };
 }
 
+function normalizeYearMonthPayment(item: unknown): YearMonthPayment {
+  const raw = isRecord(item) ? item : {};
+  return {
+    pay_date: String(raw.PayDate ?? ""),
+    original_currency: String(raw.OriginalCurrency ?? ""),
+    original_amount: String(raw.OriginalAmount ?? ""),
+    fx_rate: String(raw.FXRate ?? ""),
+    dividend_per_unit: String(raw.DividendPerUnit ?? ""),
+    dividend_per_unit_currency: String(raw.DividendPerUnitCurrency ?? ""),
+  };
+}
+
 function normalizeYearMonthSecurityRow(item: unknown): YearMonthSecurityRow {
   const raw = isRecord(item) ? item : {};
   return {
@@ -173,6 +186,9 @@ function normalizeYearMonthSecurityRow(item: unknown): YearMonthSecurityRow {
     gross: String(raw.Gross ?? ""),
     after_withholding: String(raw.AfterWithholding ?? ""),
     net: String(raw.Net ?? ""),
+    inland_tax_amount: String(raw.InlandTaxAmount ?? ""),
+    inland_tax_currency: String(raw.InlandTaxCurrency ?? ""),
+    payments: Array.isArray(raw.Payments) ? raw.Payments.map(normalizeYearMonthPayment) : [],
     type: raw.Type === "summary" ? "summary" : "detail",
   };
 }

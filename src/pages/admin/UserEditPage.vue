@@ -405,6 +405,15 @@ const onSubmit = handleSubmit((values) => {
       Locale: values.locale ?? "",
     })
     .then(() => {
+      // Self-edit: sync auth store so the new locale/name/email take effect without re-login
+      if (user.value && storeUserAuth.userId != null && user.value.ID === storeUserAuth.userId) {
+        storeUserAuth.updateCurrentUserProfile({
+          email: values.email,
+          firstname: values.firstname,
+          lastname: values.lastname,
+          locale: values.locale ?? null,
+        });
+      }
       saveState.value = "success";
       messageSuccess.value = t("adminUsers.edit.alerts.saved");
       toast.value?.addToast(<GToastContent>{

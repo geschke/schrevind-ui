@@ -127,6 +127,7 @@
 import TheMainLayout from "@/layouts/TheMainLayout.vue";
 import { useDepotsStore } from "@/stores/depots";
 import { usePermissions } from "@/composables/usePermissions";
+import { useUserLocale } from "@/composables/useUserLocale";
 import { getErrorCode } from "@/helper/errorCode";
 import type { Depot } from "@/types/depots";
 import { GTable } from "goar-components";
@@ -136,7 +137,8 @@ import { Modal } from "bootstrap";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const { userLocale } = useUserLocale();
 const CREATED_DEPOT_FLASH_KEY = "schrevind.depots.createdName";
 
 const storeDepots = useDepotsStore();
@@ -206,7 +208,7 @@ function showCreateSuccessBannerFromFlash() {
 function formatDate(unixTs: number): string {
   if (!unixTs) return "-";
   const milliseconds = unixTs > 1_000_000_000_000 ? unixTs : unixTs * 1000;
-  return new Date(milliseconds).toLocaleString(locale.value || "de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date(milliseconds).toLocaleString(userLocale.value, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 function errorContent(errorCode: string) {
