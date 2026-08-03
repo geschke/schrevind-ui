@@ -31,7 +31,7 @@
 
           <div class="col-md-10 offset-md-1">
 
-      <form @submit="onSubmit" class="g-3">
+      <form @submit="onSubmit" class="g-3" novalidate>
 
             <div class="row py-2 bg-body-secondary">
             <label for="depotId" class="col-sm-3 col-form-label">{{ t("dividendEntries.common.depotId") }}</label>
@@ -887,6 +887,27 @@ function optionalCurrencyPairSchema() {
     });
 }
 
+const MIN_DATE_YEAR = 1900;
+const MAX_DATE_YEAR = 9999;
+
+// Accepts only real calendar dates (rejects e.g. 2026-02-31) within the supported year
+// range. The date inputs carry matching min/max attributes, but the form is novalidate,
+// so this rule is what surfaces the error at the field.
+function isDateInRange(value: string): boolean {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return true; // malformed input is reported by the matches() rule
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  if (year < MIN_DATE_YEAR || year > MAX_DATE_YEAR) return false;
+  if (month < 1 || month > 12) return false;
+
+  const parsed = new Date(year, month - 1, day);
+  return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day;
+}
+
 const validationSchema = yup.object().shape({
   depotId: yup.string().required(() => t("dividendEntries.validation.depotIdRequired")),
   securityId: yup.string().required(() => t("dividendEntries.validation.securityIdRequired")),
@@ -894,12 +915,18 @@ const validationSchema = yup.object().shape({
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.payDateRequired"))
-    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid")),
+    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid"))
+    .test("date-range", () => t("dividendEntries.validation.dateOutOfRange"), (value) => {
+      return value === "" || isDateInRange(value ?? "");
+    }),
   exDate: yup
     .string()
     .transform((value) => value?.trim() ?? "")
     .required(() => t("dividendEntries.validation.exDateRequired"))
-    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid")),
+    .matches(/^\d{4}-\d{2}-\d{2}$/, () => t("dividendEntries.validation.dateInvalid"))
+    .test("date-range", () => t("dividendEntries.validation.dateOutOfRange"), (value) => {
+      return value === "" || isDateInRange(value ?? "");
+    }),
   quantity: yup
     .string()
     .transform((value) => value?.trim() ?? "")
@@ -943,63 +970,58 @@ const { defineField, errors, handleSubmit, resetForm, setErrors, setFieldValue, 
   initialValues,
 });
 
+// Free-text fields validate on blur and submit only — validating on every keystroke
+// would flag half-typed input as invalid.
+const validateOnBlurOnly = {
+  validateOnModelUpdate: false,
+  validateOnInput: false,
+};
+
+// A date input additionally fires "change" as soon as its segments form a complete date,
+// which happens mid-typing, so that trigger has to be off as well.
+const validateDateOnBlurOnly = {
+  ...validateOnBlurOnly,
+  validateOnChange: false,
+};
+
 const [depotId, depotIdAttrs] = defineField("depotId");
 const [securityId, securityIdAttrs] = defineField("securityId");
-const [payDate, payDateAttrs] = defineField("payDate");
-const [exDate, exDateAttrs] = defineField("exDate");
-const [quantity, quantityAttrs] = defineField("quantity");
-const [dividendPerUnitAmount, dividendPerUnitAmountAttrs] = defineField("dividendPerUnitAmount");
-const [dividendPerUnitCurrency, dividendPerUnitCurrencyAttrs] = defineField("dividendPerUnitCurrency", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
-const [grossAmount, grossAmountAttrs] = defineField("grossAmount");
-const [grossCurrency, grossCurrencyAttrs] = defineField("grossCurrency", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
-const [payoutAmount, payoutAmountAttrs] = defineField("payoutAmount");
-const [payoutCurrency, payoutCurrencyAttrs] = defineField("payoutCurrency", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
-const [fxRateLabel, fxRateLabelAttrs] = defineField("fxRateLabel", {
-  validateOnModelUpdate: false,
-});
-const [fxRate, fxRateAttrs] = defineField("fxRate");
-const [withholdingTaxCountryCode, withholdingTaxCountryCodeAttrs] = defineField("withholdingTaxCountryCode", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
-const [withholdingTaxPercent, withholdingTaxPercentAttrs] = defineField("withholdingTaxPercent");
-const [withholdingTaxAmount, withholdingTaxAmountAttrs] = defineField("withholdingTaxAmount");
-const [withholdingTaxCurrency, withholdingTaxCurrencyAttrs] = defineField("withholdingTaxCurrency", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
-const [withholdingTaxAmountCredit, withholdingTaxAmountCreditAttrs] = defineField("withholdingTaxAmountCredit");
+const [payDate, payDateAttrs] = defineField("payDate", validateDateOnBlurOnly);
+const [exDate, exDateAttrs] = defineField("exDate", validateDateOnBlurOnly);
+const [quantity, quantityAttrs] = defineField("quantity", validateOnBlurOnly);
+const [dividendPerUnitAmount, dividendPerUnitAmountAttrs] = defineField("dividendPerUnitAmount", validateOnBlurOnly);
+const [dividendPerUnitCurrency, dividendPerUnitCurrencyAttrs] = defineField("dividendPerUnitCurrency", validateOnBlurOnly);
+const [grossAmount, grossAmountAttrs] = defineField("grossAmount", validateOnBlurOnly);
+const [grossCurrency, grossCurrencyAttrs] = defineField("grossCurrency", validateOnBlurOnly);
+const [payoutAmount, payoutAmountAttrs] = defineField("payoutAmount", validateOnBlurOnly);
+const [payoutCurrency, payoutCurrencyAttrs] = defineField("payoutCurrency", validateOnBlurOnly);
+const [fxRateLabel, fxRateLabelAttrs] = defineField("fxRateLabel", validateOnBlurOnly);
+const [fxRate, fxRateAttrs] = defineField("fxRate", validateOnBlurOnly);
+const [withholdingTaxCountryCode, withholdingTaxCountryCodeAttrs] = defineField(
+  "withholdingTaxCountryCode",
+  validateOnBlurOnly
+);
+const [withholdingTaxPercent, withholdingTaxPercentAttrs] = defineField("withholdingTaxPercent", validateOnBlurOnly);
+const [withholdingTaxAmount, withholdingTaxAmountAttrs] = defineField("withholdingTaxAmount", validateOnBlurOnly);
+const [withholdingTaxCurrency, withholdingTaxCurrencyAttrs] = defineField("withholdingTaxCurrency", validateOnBlurOnly);
+const [withholdingTaxAmountCredit, withholdingTaxAmountCreditAttrs] = defineField(
+  "withholdingTaxAmountCredit",
+  validateOnBlurOnly
+);
 const [withholdingTaxAmountCreditCurrency, withholdingTaxAmountCreditCurrencyAttrs] = defineField(
   "withholdingTaxAmountCreditCurrency",
-  {
-    validateOnModelUpdate: false,
-    validateOnInput: false,
-  }
+  validateOnBlurOnly
 );
 const [withholdingTaxAmountRefundable, withholdingTaxAmountRefundableAttrs] = defineField(
-  "withholdingTaxAmountRefundable"
+  "withholdingTaxAmountRefundable",
+  validateOnBlurOnly
 );
 const [withholdingTaxAmountRefundableCurrency, withholdingTaxAmountRefundableCurrencyAttrs] = defineField(
   "withholdingTaxAmountRefundableCurrency",
-  {
-    validateOnModelUpdate: false,
-    validateOnInput: false,
-  }
+  validateOnBlurOnly
 );
-const [foreignFeesAmount, foreignFeesAmountAttrs] = defineField("foreignFeesAmount");
-const [foreignFeesCurrency, foreignFeesCurrencyAttrs] = defineField("foreignFeesCurrency", {
-  validateOnModelUpdate: false,
-  validateOnInput: false,
-});
+const [foreignFeesAmount, foreignFeesAmountAttrs] = defineField("foreignFeesAmount", validateOnBlurOnly);
+const [foreignFeesCurrency, foreignFeesCurrencyAttrs] = defineField("foreignFeesCurrency", validateOnBlurOnly);
 const [note, noteAttrs] = defineField("note");
 
 const depotOptions = computed(() => storeDepots.getDepots);
@@ -1244,7 +1266,8 @@ function onDividendPerUnitCurrencyChange(value: string) {
 function onFxRateLabelInput() {
   const normalized = normalizeCurrencyPair(fxRateLabel.value);
   if (normalized !== fxRateLabel.value) {
-    setFieldValue("fxRateLabel", normalized);
+    // Runs on every keystroke, so suppress validation — the field validates on blur.
+    setFieldValue("fxRateLabel", normalized, false);
   }
 
   const currentValue = normalized;
@@ -1293,7 +1316,9 @@ function applyWithholdingTaxPercentDefault(countryCode: string) {
 function onWithholdingCountryInput() {
   const normalized = normalizeCountryCode(withholdingTaxCountryCode.value);
   if (normalized !== withholdingTaxCountryCode.value) {
-    setFieldValue("withholdingTaxCountryCode", normalized);
+    // Runs on every keystroke, so suppress validation — confirmWithholdingCountryValue
+    // validates when the field loses focus.
+    setFieldValue("withholdingTaxCountryCode", normalized, false);
   }
 
   withholdingCountrySearchQuery.value = normalized;
@@ -1479,7 +1504,7 @@ function normalizeIdentifier(value: unknown) {
   return Number.isInteger(normalized) ? normalized : 0;
 }
 
-function applySecuritySnapshot(securityKey: unknown) {
+function applySecuritySnapshot(securityKey: string | number | null | undefined) {
   const security = storeSecurities.getItem(securityKey ?? "");
   setFieldValue("securityName", security?.Name ?? "");
   setFieldValue("securityISIN", security?.ISIN ?? "");
@@ -1635,7 +1660,7 @@ function onSecurityKeydown(event: KeyboardEvent) {
   }
 }
 
-function applyDepotCurrencyDefaults(depotKey: unknown) {
+function applyDepotCurrencyDefaults(depotKey: string | number | null | undefined) {
   const depot = storeDepots.getItem(depotKey ?? "");
   const baseCurrency = normalizeCurrencyCode(depot?.BaseCurrency ?? "");
 

@@ -96,6 +96,7 @@
       "payDateRequired": "Please enter the pay date.",
       "exDateRequired": "Please enter the ex date.",
       "dateInvalid": "Please enter a valid date (year must be 4 digits).",
+      "dateOutOfRange": "Please enter a valid date between 1900-01-01 and 9999-12-31.",
       "quantityRequired": "Please enter the quantity.",
       "dividendPerUnitAmountRequired": "Please enter the dividend per unit.",
       "dividendPerUnitCurrencyRequired": "Please enter the per-unit currency.",

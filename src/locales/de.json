@@ -96,6 +96,7 @@
       "payDateRequired": "Bitte geben Sie den Zahltag ein.",
       "exDateRequired": "Bitte geben Sie den Ex-Tag ein.",
       "dateInvalid": "Bitte geben Sie ein gültiges Datum ein (Jahr muss 4 Ziffern haben).",
+      "dateOutOfRange": "Bitte geben Sie ein gültiges Datum zwischen dem 01.01.1900 und dem 31.12.9999 ein.",
       "quantityRequired": "Bitte geben Sie die Stückzahl ein.",
       "dividendPerUnitAmountRequired": "Bitte geben Sie die Dividende je Einheit ein.",
       "dividendPerUnitCurrencyRequired": "Bitte geben Sie die Währung je Einheit ein.",
